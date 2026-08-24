@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_meta_lead_field_mapping_list" model="ir.ui.view">
+        <field name="name">meta.lead.field.mapping.list</field>
+        <field name="model">meta.lead.field.mapping</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="active"/>
+                <field name="connection_id"/>
+                <field name="meta_field_name"/>
+                <field name="meta_field_name_normalized" readonly="1" optional="hide"/>
+                <field name="target_field"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_meta_lead_field_mapping" model="ir.actions.act_window">
+        <field name="name">Field Mappings</field>
+        <field name="res_model">meta.lead.field.mapping</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
+

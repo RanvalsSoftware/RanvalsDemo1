@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_meta_lead_ads_root" name="Meta Lead Ads" parent="crm.crm_menu_config" sequence="90" groups="base.group_system"/>
+    <menuitem id="menu_meta_lead_connection" name="Connections" parent="menu_meta_lead_ads_root" action="action_meta_lead_connection" sequence="10"/>
+    <menuitem id="menu_meta_lead_event" name="Webhook Events" parent="menu_meta_lead_ads_root" action="action_meta_lead_event" sequence="20"/>
+    <menuitem id="menu_meta_lead_routing_rule" name="Routing Rules" parent="menu_meta_lead_ads_root" action="action_meta_lead_routing_rule" sequence="30"/>
+    <menuitem id="menu_meta_lead_field_mapping" name="Field Mappings" parent="menu_meta_lead_ads_root" action="action_meta_lead_field_mapping" sequence="40"/>
+</odoo>
+
