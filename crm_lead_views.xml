@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_meta_lead_ads" model="ir.ui.view">
+        <field name="name">crm.lead.form.meta.lead.ads</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_meta_events" type="object" class="oe_stat_button" icon="fa-facebook" groups="base.group_system" invisible="meta_event_count == 0">
+                    <field name="meta_event_count" widget="statinfo" string="Meta Events"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Meta Lead Ads" name="meta_lead_ads" invisible="not meta_leadgen_id">
+                    <group>
+                        <group string="Submission">
+                            <field name="meta_connection_id" readonly="1"/>
+                            <field name="meta_leadgen_id" readonly="1"/>
+                            <field name="meta_created_time" readonly="1"/>
+                            <field name="meta_platform" readonly="1"/>
+                            <field name="meta_is_organic" readonly="1"/>
+                        </group>
+                        <group string="Page &amp; Form">
+                            <field name="meta_page_id" readonly="1"/>
+                            <field name="meta_page_name" readonly="1"/>
+                            <field name="meta_form_id" readonly="1"/>
+                            <field name="meta_form_name" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Campaign">
+                            <field name="meta_campaign_id" readonly="1"/>
+                            <field name="meta_campaign_name" readonly="1"/>
+                            <field name="meta_adset_id" readonly="1"/>
+                            <field name="meta_adset_name" readonly="1"/>
+                        </group>
+                        <group string="Ad">
+                            <field name="meta_ad_id" readonly="1"/>
+                            <field name="meta_ad_name" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

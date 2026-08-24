@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_meta_lead_connection_list" model="ir.ui.view">
+        <field name="name">meta.lead.connection.list</field>
+        <field name="model">meta.lead.connection</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'connected'" decoration-danger="state == 'error'">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="page_name"/>
+                <field name="page_id"/>
+                <field name="graph_api_version"/>
+                <field name="webhook_enabled"/>
+                <field name="state" widget="badge"/>
+                <field name="last_test_at" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_meta_lead_connection_search" model="ir.ui.view">
+        <field name="name">meta.lead.connection.search</field>
+        <field name="model">meta.lead.connection</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="page_id"/>
+                <field name="page_name"/>
+                <filter name="enabled" string="Webhook Enabled" domain="[('webhook_enabled', '=', True)]"/>
+                <filter name="errors" string="Errors" domain="[('state', '=', 'error')]"/>
+                <group>
+                    <filter name="company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_meta_lead_connection_form" model="ir.ui.view">
+        <field name="name">meta.lead.connection.form</field>
+        <field name="model">meta.lead.connection</field>
+        <field name="arch" type="xml">
+            <form string="Meta Lead Ads Connection">
+                <header>
+                    <button name="action_test_connection" type="object" string="Test Connection" class="oe_highlight"/>
+                    <button name="action_subscribe_page" type="object" string="Subscribe Page"/>
+                    <button name="action_open_test_wizard" type="object" string="Create Test Lead"/>
+                    <button name="action_process_pending" type="object" string="Process Queue"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,connected,error"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_events" type="object" class="oe_stat_button" icon="fa-inbox">
+                            <field name="event_count" widget="statinfo" string="Events"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Disabled" bg_color="text-bg-secondary" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Main Facebook Page"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="page_id"/>
+                            <field name="page_name" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="webhook_enabled"/>
+                            <field name="allow_non_production"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Meta Connection" name="meta_connection">
+                            <group>
+                                <group string="App Credentials">
+                                    <field name="app_id"/>
+                                    <field name="app_secret" password="True"/>
+                                    <field name="access_token" password="True"/>
+                                    <field name="graph_api_version" placeholder="v26.0"/>
+                                </group>
+                                <group string="Webhook">
+                                    <field name="webhook_url" readonly="1"/>
+                                    <field name="verify_token" password="True"/>
+                                    <button name="action_regenerate_verify_token" type="object" string="Regenerate Verify Token" class="btn-link" icon="fa-refresh"/>
+                                </group>
+                            </group>
+                            <group string="Last Connection Test">
+                                <field name="last_test_at" readonly="1"/>
+                                <field name="last_error" readonly="1" invisible="not last_error"/>
+                            </group>
+                        </page>
+                        <page string="CRM Defaults" name="crm_defaults">
+                            <group>
+                                <group>
+                                    <field name="lead_type"/>
+                                    <field name="team_id"/>
+                                    <field name="user_id"/>
+                                    <field name="tag_id"/>
+                                </group>
+                                <group string="Duplicate Contact Handling">
+                                    <field name="duplicate_policy"/>
+                                    <field name="update_missing_on_duplicate" invisible="duplicate_policy == 'meta_only'"/>
+                                    <div class="text-muted" colspan="2">
+                                        Repeated Meta Lead IDs are always blocked atomically. Contact matching is optional and never overwrites existing values.
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Routing Rules" name="routing_rules">
+                            <field name="routing_rule_ids" context="{'default_connection_id': id}">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="active"/>
+                                    <field name="name"/>
+                                    <field name="match_field"/>
+                                    <field name="match_value" invisible="match_field == 'any'"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                    <field name="team_id"/>
+                                    <field name="user_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Field Mappings" name="field_mappings">
+                            <p class="text-muted">Standard name, email, phone, company, job title, street, city, and ZIP fields are mapped automatically. Add aliases for custom Meta field names here; all other answers remain in the CRM description.</p>
+                            <field name="field_mapping_ids" context="{'default_connection_id': id}">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="active"/>
+                                    <field name="meta_field_name"/>
+                                    <field name="meta_field_name_normalized" readonly="1" optional="hide"/>
+                                    <field name="target_field"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Reliability &amp; Privacy" name="privacy">
+                            <group>
+                                <group string="Queue">
+                                    <field name="processing_batch_size"/>
+                                    <field name="max_retries"/>
+                                </group>
+                                <group string="Payload Retention">
+                                    <field name="store_payloads"/>
+                                    <field name="payload_retention_days"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                Raw payload storage is disabled by default. Event IDs and processing results remain available for audit and retry purposes.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_meta_lead_connection" model="ir.actions.act_window">
+        <field name="name">Connections</field>
+        <field name="res_model">meta.lead.connection</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_meta_lead_connection_search"/>
+        <field name="context">{'search_default_enabled': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Connect a Meta page to Odoo CRM</p>
+            <p>Create a connection, test it, then configure the callback URL and verify token in Meta for Developers.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="crm_tag_meta_lead_ads" model="crm.tag">
+        <field name="name">Meta Lead Ads</field>
+        <field name="color">4</field>
+    </record>
+
+    <record id="utm_source_meta_lead_ads" model="utm.source">
+        <field name="name">Meta Lead Ads</field>
+    </record>
+    <record id="utm_medium_meta_lead_ads" model="utm.medium">
+        <field name="name">Meta Instant Form</field>
+    </record>
+    <record id="utm_medium_facebook_lead_ads" model="utm.medium">
+        <field name="name">Facebook Instant Form</field>
+    </record>
+    <record id="utm_medium_instagram_lead_ads" model="utm.medium">
+        <field name="name">Instagram Instant Form</field>
+    </record>
+</odoo>
+

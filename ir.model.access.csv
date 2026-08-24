@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_meta_lead_connection_system,meta.lead.connection system,model_meta_lead_connection,base.group_system,1,1,1,1
+access_meta_lead_event_system,meta.lead.event system,model_meta_lead_event,base.group_system,1,1,1,1
+access_meta_lead_routing_rule_system,meta.lead.routing.rule system,model_meta_lead_routing_rule,base.group_system,1,1,1,1
+access_meta_lead_field_mapping_system,meta.lead.field.mapping system,model_meta_lead_field_mapping,base.group_system,1,1,1,1
+access_meta_lead_test_wizard_system,meta.lead.test.wizard system,model_meta_lead_test_wizard,base.group_system,1,1,1,1
+
