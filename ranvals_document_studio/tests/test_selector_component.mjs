@@ -7,7 +7,12 @@ import { readFile } from 'node:fs/promises';
 
 const componentSource = await readFile(new URL('../static/src/studio/js/report_design_selector.js', import.meta.url), 'utf8');
 const flowSource = await readFile(new URL('../static/src/studio/js/selector_flow.js', import.meta.url), 'utf8');
-const templates = ['beauty', 'construction', 'technology', 'industrial', 'eco', 'furniture']
+const selectorTemplateSource = await readFile(new URL('../static/src/studio/xml/report_design_selector.xml', import.meta.url), 'utf8');
+const templates = [
+    'beauty', 'construction', 'technology', 'industrial', 'eco', 'furniture',
+    'noir_executive', 'royal_ledger', 'swiss_grid', 'arctic_minimal',
+    'indigo_flow', 'emerald_ledger', 'sandstone_classic', 'graphite_copper',
+]
     .map((style, i) => ({id: i + 1, name: `Template ${i + 1}`, style}));
 
 async function fixture({ recordId = 36, reportModel = 'sale.order', canManage = true } = {}) {
@@ -22,7 +27,7 @@ async function fixture({ recordId = 36, reportModel = 'sale.order', canManage = 
         orm: {call: async (name, method, args, kwargs) => {
             calls.push({name, method, args, kwargs});
             if (method === 'rds_apply_design') chosen = args[2];
-            return method === 'rds_export_design' ? {type: 'ir.actions.client', tag: 'download'} : options();
+            return options();
         }},
         action: {doAction: async action => calls.push({method: 'action', action})},
         notification: {add: (message, config) => notifications.push({message, config})},
@@ -62,9 +67,13 @@ test('native Studio component registrations are preserved', async () => {
     assert.equal(f.nativeEditor.components.Many2OneField, f.nativeField);
     assert.equal(f.nativeEditor.components.RdsReportDesignSelector, f.instance.constructor);
 });
+test('Studio remains a design selector and exposes no download workflow', () => {
+    assert.doesNotMatch(componentSource, /rds_export_design|exportFile|canDownload|OUTPUT_FORMATS/);
+    assert.doesNotMatch(selectorTemplateSource, /rds-design-download|exportFile|output_format/);
+});
 test('sale sidebar is visible during loading, buttons disabled', async () => {
     const {instance} = await fixture();
-    assert.equal(instance.visible, true); assert.equal(instance.canApply, false); assert.equal(instance.canDownload, false);
+    assert.equal(instance.visible, true); assert.equal(instance.canApply, false);
 });
 test('unrelated model remains hidden when unsupported', async () => {
     const {instance} = await fixture({reportModel: 'res.partner'});
@@ -77,9 +86,9 @@ test('invoice and purchase sidebars stay visible while loading', async () => {
     assert.equal(invoice.instance.visible, true);
     assert.equal(purchase.instance.visible, true);
 });
-test('all six themes load and become selectable', async () => {
+test('all fourteen themes load and become selectable', async () => {
     const {instance, calls} = await fixture(); await instance.load();
-    assert.equal(instance.state.templates.length, 6); assert.equal(instance.canApply, true);
+    assert.equal(instance.state.templates.length, 14); assert.equal(instance.canApply, true);
     assert.equal(calls[0].args[0][0], 101); assert.equal(calls[0].args[1], 36);
 });
 test('application saves Studio first, writes choice then reloads exact record', async () => {
@@ -120,9 +129,9 @@ test('loading errors stay visible and retry recovers', async () => {
     assert.equal(instance.visible, true); assert.equal(instance.state.error, 'Connection problem');
     services.orm.call = call; await instance.load(); assert.equal(instance.state.error, ''); assert.equal(instance.canApply, true);
 });
-test('no record disables preview and export without making RPC writes', async () => {
+test('no record disables preview and apply without making RPC writes', async () => {
     const {instance, calls} = await fixture({recordId: false}); await instance.load(); calls.length = 0;
-    await instance.apply(); await instance.exportFile(); assert.equal(calls.length, 0);
+    await instance.apply(); assert.equal(calls.length, 0);
 });
 test('invalid transient ids never reach the ORM service', async () => {
     const {instance, model, calls} = await fixture();
@@ -148,47 +157,30 @@ test('manager can clear a stale binding when no active template remains', async 
     instance.acceptOptions({supported: true, can_manage: true, templates: [], company_name: 'Test Company',
         has_saved_configuration: true});
     instance.state.ready = true;
-    assert.equal(instance.canApply, true); assert.equal(instance.canDownload, false);
+    assert.equal(instance.canApply, true);
 });
 test('empty configuration with no templates keeps apply disabled', async () => {
     const {instance} = await fixture();
     instance.acceptOptions({supported: true, can_manage: true, templates: [], company_name: 'Test Company',
         has_saved_configuration: false});
     instance.state.ready = true;
-    assert.equal(instance.canApply, false); assert.equal(instance.canDownload, false);
+    assert.equal(instance.canApply, false);
 });
-test('read-only user can download but cannot change configuration', async () => {
+test('read-only user cannot change configuration', async () => {
     const {instance, calls} = await fixture({canManage: false}); await instance.load();
-    assert.equal(instance.canApply, false); assert.equal(instance.canDownload, true);
-    instance.state.templateId = '1'; assert.equal(instance.canDownload, false);
+    assert.equal(instance.canApply, false);
+    instance.state.templateId = '1';
     calls.length = 0; await instance.apply(); assert.equal(calls.length, 0);
 });
-test('Word export uses selected report and record, preserving download action', async () => {
-    const {instance, calls} = await fixture(); await instance.load(); calls.length = 0;
-    instance.state.format = 'docx'; await instance.exportFile();
-    assert.deepEqual(calls.map(c => c.method), ['save', 'reload', 'rds_export_design', 'action']);
-    assert.equal(calls[2].args[0][0], 101); assert.equal(calls[2].args[1], 36); assert.equal(calls[2].args[2], 'docx');
-});
-test('ZIP export is forwarded as an explicit all-format request', async () => {
-    const {instance, calls} = await fixture(); await instance.load(); calls.length = 0;
-    instance.state.format = 'zip'; await instance.exportFile();
-    assert.deepEqual(calls.map(c => c.method), ['save', 'reload', 'rds_export_design', 'action']);
-    assert.equal(calls[2].args[2], 'zip');
-});
-test('failed preview blocks download and produces warning', async () => {
+test('failed preview reports a warning after saving the design', async () => {
     const {instance, model, calls, notifications} = await fixture(); await instance.load(); calls.length = 0;
     model.loadReportHtml = async () => {model._errorMessage = new Error('QWeb');};
-    await instance.exportFile(); assert.equal(calls.some(c => c.method === 'rds_export_design'), false);
+    await instance.apply(); assert.equal(calls.some(c => c.method === 'rds_apply_design'), true);
     assert.equal(notifications.at(-1).config.type, 'warning');
 });
 test('busy click cannot run the operation twice', async () => {
     const {instance, calls} = await fixture(); await instance.load(); calls.length = 0; instance.state.busy = true;
-    await instance.apply(); await instance.exportFile(); assert.equal(calls.length, 0);
-});
-test('unknown output format is rejected before export RPC', async () => {
-    const {instance, calls} = await fixture(); await instance.load(); calls.length = 0;
-    instance.state.format = 'exe'; await instance.exportFile();
-    assert.equal(calls.length, 0);
+    await instance.apply(); await instance.apply(); assert.equal(calls.length, 0);
 });
 test('unmount makes pending load inert', async () => {
     const {instance, services, unmount, options} = await fixture(); let resolve;

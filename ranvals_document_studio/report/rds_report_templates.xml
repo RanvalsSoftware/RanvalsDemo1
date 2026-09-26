@@ -470,13 +470,255 @@
         </div>
     </template>
 
+    <!-- 7. NOIR EXECUTIVE: dark title band and restrained gold details. -->
+    <template id="rds_layout_noir_executive">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table t-att-style="'table-layout:fixed;border-bottom:3px solid %s;' % ctx['theme']['accent']">
+                <tr>
+                    <td t-att-style="'width:36%;padding:13px;background:' + ctx['theme']['secondary'] + ';'"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td t-att-style="'width:64%;padding:16px 18px;text-align:right;background:' + ctx['theme']['primary'] + ';color:#fff;'">
+                        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
+                        <div style="font-size:27px;font-weight:800;margin-top:7px;" t-out="ctx['title']"/>
+                        <div t-att-style="'font-size:11px;color:%s;margin-top:5px;' % ctx['theme']['accent']">No: <strong t-out="ctx['number']"/></div>
+                    </td>
+                </tr>
+            </table>
+            <table class="rds-two-columns" style="margin-top:7mm;">
+                <tr>
+                    <td><div t-att-style="'border-top:3px solid %s;padding:12px;background:%s;' % (ctx['theme']['accent'], ctx['theme']['secondary'])">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                        <t t-set="block_info" t-value="ctx['company_info']"/>
+                        <t t-set="block_icon" t-value="'fa-building-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </div></td>
+                    <td><div t-att-style="'border-top:3px solid %s;padding:12px;' % ctx['theme']['primary']">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                        <t t-set="block_info" t-value="ctx['partner_info']"/>
+                        <t t-set="block_icon" t-value="'fa-user-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </div></td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 8. ROYAL LEDGER: formal left ledger panel with a document card. -->
+    <template id="rds_layout_royal_ledger">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;background:#fff;border:1px solid #ded8ca;">
+                <tr>
+                    <td t-att-style="'width:31%;padding:20px 16px;background:' + ctx['theme']['primary'] + ';color:#fff;border-bottom:5px solid ' + ctx['theme']['accent'] + ';'">
+                        <div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
+                        <div style="font-size:25px;line-height:1.08;font-weight:800;margin-top:10px;" t-out="ctx['title']"/>
+                        <div t-att-style="'font-size:12px;color:%s;margin-top:13px;' % ctx['theme']['accent']" t-out="ctx['number']"/>
+                    </td>
+                    <td style="width:69%;padding:17px 20px;">
+                        <div style="text-align:right;margin-bottom:13px;"><t t-call="ranvals_document_studio.rds_logo"/></div>
+                        <table style="table-layout:fixed;border-top:1px solid #ded8ca;">
+                            <tr>
+                                <td style="width:50%;padding:13px 12px 4px 0;border-right:1px solid #ded8ca;">
+                                    <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                                    <t t-set="block_info" t-value="ctx['company_info']"/>
+                                    <t t-set="block_icon" t-value="'fa-university'"/>
+                                    <t t-call="ranvals_document_studio.rds_info_block"/>
+                                </td>
+                                <td style="width:50%;padding:13px 0 4px 12px;">
+                                    <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                    <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                    <t t-set="block_icon" t-value="'fa-address-card-o'"/>
+                                    <t t-call="ranvals_document_studio.rds_info_block"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 9. SWISS GRID: typographic grid, oversized number and red micro-accent. -->
+    <template id="rds_layout_swiss_grid">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;border-top:7px solid %s;' % (ctx['theme']['body_font'], ctx['theme']['text'], ctx['theme']['accent'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;border-bottom:1px solid #111;">
+                <tr>
+                    <td style="width:42%;padding:12px 5px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td style="width:58%;padding:12px 5px;text-align:right;font-size:8px;letter-spacing:1px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
+                </tr>
+            </table>
+            <table style="table-layout:fixed;margin:7mm 0 5mm 0;">
+                <tr>
+                    <td style="width:68%;padding:0 8px 0 0;">
+                        <div style="font-size:34px;font-weight:900;line-height:.95;letter-spacing:-1px;" t-out="ctx['title']"/>
+                    </td>
+                    <td t-att-style="'width:32%;padding:0 0 0 12px;border-left:6px solid ' + ctx['theme']['accent'] + ';'">
+                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:1px;">Document No.</div>
+                        <div style="font-size:20px;font-weight:900;margin-top:4px;" t-out="ctx['number']"/>
+                    </td>
+                </tr>
+            </table>
+            <table class="rds-three-columns" style="border-top:1px solid #111;border-bottom:1px solid #111;">
+                <tr>
+                    <td style="width:34%;border-right:1px solid #111;">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/><t t-set="block_info" t-value="ctx['company_info']"/><t t-set="block_icon" t-value="False"/><t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td style="width:34%;border-right:1px solid #111;">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/><t t-set="block_info" t-value="ctx['partner_info']"/><t t-set="block_icon" t-value="False"/><t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td style="width:32%;">
+                        <div class="rds-section-title" t-out="ctx['labels']['document_info']"/>
+                        <t t-if="ctx.get('show_metadata')" t-foreach="ctx['metadata'][:4]" t-as="item"><div style="font-size:8px;margin:3px 0;"><strong t-out="item['label']"/> · <span t-out="item['value']"/></div></t>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 10. ARCTIC MINIMAL: airy right-aligned title and light information fields. -->
+    <template id="rds_layout_arctic_minimal">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td style="width:46%;padding:8px 4px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td t-att-style="'width:54%;padding:16px 18px;text-align:right;background:' + ctx['theme']['secondary'] + ';border-right:4px solid ' + ctx['theme']['accent'] + ';'">
+                        <div style="font-size:25px;font-weight:300;letter-spacing:.8px;" t-out="ctx['title']"/>
+                        <div t-att-style="'font-size:10px;color:%s;margin-top:7px;' % ctx['theme']['primary']"><span t-out="ctx.get('tagline')"/> · <strong t-out="ctx['number']"/></div>
+                    </td>
+                </tr>
+            </table>
+            <table class="rds-two-columns" style="margin-top:9mm;">
+                <tr>
+                    <td t-att-style="'padding-bottom:15px;border-bottom:2px solid %s;' % ctx['theme']['accent']">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/><t t-set="block_info" t-value="ctx['company_info']"/><t t-set="block_icon" t-value="'fa-circle-o'"/><t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td t-att-style="'padding-bottom:15px;border-bottom:2px solid %s;' % ctx['theme']['primary']">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/><t t-set="block_info" t-value="ctx['partner_info']"/><t t-set="block_icon" t-value="'fa-circle-o'"/><t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 11. INDIGO FLOW: asymmetric colour blocks and a floating partner panel. -->
+    <template id="rds_layout_indigo_flow">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td t-att-style="'width:62%;padding:18px 20px;background:' + ctx['theme']['primary'] + ';color:#fff;border-bottom:6px solid ' + ctx['theme']['accent'] + ';'">
+                        <div style="font-size:9px;letter-spacing:1.3px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
+                        <div style="font-size:29px;font-weight:800;margin-top:9px;" t-out="ctx['title']"/>
+                        <div style="font-size:11px;margin-top:8px;"># <strong t-out="ctx['number']"/></div>
+                    </td>
+                    <td t-att-style="'width:38%;padding:17px;background:' + ctx['theme']['secondary'] + ';border-bottom:6px solid ' + ctx['theme']['primary'] + ';'">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/><t t-set="block_info" t-value="ctx['partner_info']"/><t t-set="block_icon" t-value="'fa-user-circle-o'"/><t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                </tr>
+            </table>
+            <table style="table-layout:fixed;margin-top:6mm;border-bottom:1px solid #deddf0;">
+                <tr>
+                    <td style="width:42%;padding:8px 12px 12px 4px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td style="width:58%;padding:8px 4px 12px 12px;">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/><t t-set="block_info" t-value="ctx['company_info']"/><t t-set="block_icon" t-value="'fa-building-o'"/><t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 12. EMERALD LEDGER: centered value banner and three balanced columns. -->
+    <template id="rds_layout_emerald_ledger">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;background:#fff;">
+                <tr><td style="width:50%;padding:10px;"><t t-call="ranvals_document_studio.rds_logo"/></td><td style="width:50%;padding:12px;text-align:right;font-style:italic;" t-out="ctx.get('tagline')"/></tr>
+            </table>
+            <div t-att-style="'background:%s;color:#fff;text-align:center;padding:17px;border-bottom:4px solid %s;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
+                <div style="font-size:27px;font-weight:700;" t-out="ctx['title']"/>
+                <div style="font-size:11px;margin-top:5px;">No: <strong t-out="ctx['number']"/></div>
+            </div>
+            <table class="rds-three-columns" style="background:#fff;border:1px solid #d8e2dc;margin-top:0;">
+                <tr>
+                    <td style="width:34%;border-right:1px solid #d8e2dc;"><t t-set="block_title" t-value="ctx['labels']['company_info']"/><t t-set="block_info" t-value="ctx['company_info']"/><t t-set="block_icon" t-value="'fa-building-o'"/><t t-call="ranvals_document_studio.rds_info_block"/></td>
+                    <td style="width:34%;border-right:1px solid #d8e2dc;"><t t-set="block_title" t-value="ctx['labels']['partner_info']"/><t t-set="block_info" t-value="ctx['partner_info']"/><t t-set="block_icon" t-value="'fa-user-o'"/><t t-call="ranvals_document_studio.rds_info_block"/></td>
+                    <td style="width:32%;"><div class="rds-section-title" t-out="ctx['labels']['document_info']"/><t t-if="ctx.get('show_metadata')" t-foreach="ctx['metadata'][:4]" t-as="item"><div style="font-size:8.5px;padding:3px 0;border-bottom:1px solid #edf2ef;"><span t-out="item['label']"/>: <strong style="float:right;" t-out="item['value']"/></div></t></td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 13. SANDSTONE CLASSIC: centered editorial masthead and double rule. -->
+    <template id="rds_layout_sandstone_classic">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;padding-left:5mm;padding-right:5mm;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <div style="text-align:center;padding:9px 0;"><t t-call="ranvals_document_studio.rds_logo"/></div>
+            <div t-att-style="'border-top:1px solid %s;border-bottom:3px double %s;text-align:center;padding:13px 8px;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
+                <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
+                <div style="font-size:29px;font-weight:700;margin-top:6px;" t-out="ctx['title']"/>
+                <div t-att-style="'font-size:11px;color:%s;margin-top:6px;' % ctx['theme']['accent']">No. <strong t-out="ctx['number']"/></div>
+            </div>
+            <table class="rds-two-columns" style="margin-top:7mm;">
+                <tr>
+                    <td><div style="background:#fff;border:1px solid #d9cec0;padding:14px;min-height:115px;"><t t-set="block_title" t-value="ctx['labels']['company_info']"/><t t-set="block_info" t-value="ctx['company_info']"/><t t-set="block_icon" t-value="False"/><t t-call="ranvals_document_studio.rds_info_block"/></div></td>
+                    <td><div style="background:#fff;border:1px solid #d9cec0;padding:14px;min-height:115px;"><t t-set="block_title" t-value="ctx['labels']['partner_info']"/><t t-set="block_info" t-value="ctx['partner_info']"/><t t-set="block_icon" t-value="False"/><t t-call="ranvals_document_studio.rds_info_block"/></div></td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 14. GRAPHITE COPPER: compact technical header with a vertical copper rail. -->
+    <template id="rds_layout_graphite_copper">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td t-att-style="'width:4%;background:' + ctx['theme']['accent'] + ';'"></td>
+                    <td t-att-style="'width:58%;padding:17px 18px;background:' + ctx['theme']['primary'] + ';color:#fff;'">
+                        <div style="font-size:28px;font-weight:900;letter-spacing:.5px;" t-out="ctx['title']"/>
+                        <div style="font-size:9px;margin-top:7px;letter-spacing:1px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
+                    </td>
+                    <td t-att-style="'width:38%;padding:15px;background:' + ctx['theme']['secondary'] + ';text-align:right;'">
+                        <t t-call="ranvals_document_studio.rds_logo"/>
+                        <div t-att-style="'font-size:13px;font-weight:800;color:%s;margin-top:10px;' % ctx['theme']['accent']" t-out="ctx['number']"/>
+                    </td>
+                </tr>
+            </table>
+            <table class="rds-two-columns" t-att-style="'margin-top:6mm;border-left:4px solid %s;padding-left:4px;' % ctx['theme']['accent']">
+                <tr>
+                    <td><div class="rds-card" style="border-radius:0;"><t t-set="block_title" t-value="ctx['labels']['company_info']"/><t t-set="block_info" t-value="ctx['company_info']"/><t t-set="block_icon" t-value="'fa-cube'"/><t t-call="ranvals_document_studio.rds_info_block"/></div></td>
+                    <td><div class="rds-card" style="border-radius:0;"><t t-set="block_title" t-value="ctx['labels']['partner_info']"/><t t-set="block_info" t-value="ctx['partner_info']"/><t t-set="block_icon" t-value="'fa-address-card-o'"/><t t-call="ranvals_document_studio.rds_info_block"/></div></td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
     <template id="rds_layout_router">
         <t t-if="rds_template.layout_style == 'beauty'" t-call="ranvals_document_studio.rds_layout_beauty"/>
         <t t-elif="rds_template.layout_style == 'construction'" t-call="ranvals_document_studio.rds_layout_construction"/>
         <t t-elif="rds_template.layout_style == 'technology'" t-call="ranvals_document_studio.rds_layout_technology"/>
         <t t-elif="rds_template.layout_style == 'industrial'" t-call="ranvals_document_studio.rds_layout_industrial"/>
         <t t-elif="rds_template.layout_style == 'eco'" t-call="ranvals_document_studio.rds_layout_eco"/>
-        <t t-else="" t-call="ranvals_document_studio.rds_layout_furniture"/>
+        <t t-elif="rds_template.layout_style == 'furniture'" t-call="ranvals_document_studio.rds_layout_furniture"/>
+        <t t-elif="rds_template.layout_style == 'noir_executive'" t-call="ranvals_document_studio.rds_layout_noir_executive"/>
+        <t t-elif="rds_template.layout_style == 'royal_ledger'" t-call="ranvals_document_studio.rds_layout_royal_ledger"/>
+        <t t-elif="rds_template.layout_style == 'swiss_grid'" t-call="ranvals_document_studio.rds_layout_swiss_grid"/>
+        <t t-elif="rds_template.layout_style == 'arctic_minimal'" t-call="ranvals_document_studio.rds_layout_arctic_minimal"/>
+        <t t-elif="rds_template.layout_style == 'indigo_flow'" t-call="ranvals_document_studio.rds_layout_indigo_flow"/>
+        <t t-elif="rds_template.layout_style == 'emerald_ledger'" t-call="ranvals_document_studio.rds_layout_emerald_ledger"/>
+        <t t-elif="rds_template.layout_style == 'sandstone_classic'" t-call="ranvals_document_studio.rds_layout_sandstone_classic"/>
+        <t t-elif="rds_template.layout_style == 'graphite_copper'" t-call="ranvals_document_studio.rds_layout_graphite_copper"/>
+        <t t-else="" t-call="ranvals_document_studio.rds_layout_technology"/>
     </template>
 
 </odoo>

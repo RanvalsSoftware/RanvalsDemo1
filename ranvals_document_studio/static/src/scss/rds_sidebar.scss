@@ -1,5 +1,5 @@
 /*
- * Belge Studio action shell contract
+ * DocuCraft action shell contract
  * -----------------------------------
  * Mount RdsSidebar as the first child of `.o_rds_sidebar_layout` and put the
  * action body in `.o_rds_sidebar_layout__content`.  No generic Odoo list/form
@@ -12,7 +12,7 @@ body.o_rds_sidebar_active .o_menu_sections {
 /*
  * Odoo's action manager gives every direct `.o_action` a column flex-flow.
  * Dashboard client actions also carry `.o_action`, so use an equally scoped
- * action-manager selector to turn only the Belge Studio shell back into the
+ * action-manager selector to turn only the DocuCraft shell back into the
  * intended horizontal rail + content layout.
  */
 .o_web_client > .o_action_manager > .o_action.o_rds_sidebar_layout {

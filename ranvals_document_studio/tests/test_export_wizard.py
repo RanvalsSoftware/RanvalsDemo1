@@ -697,12 +697,28 @@ class TestRdsExportWizard(TransactionCase):
         ):
             render_editable_docx(context, "tr_TR")
 
-    def test_editable_docx_uses_layout_style_and_accent(self):
+    def test_editable_docx_supports_all_layout_profiles(self):
         from docx import Document
         from docx.oxml.ns import qn
 
+        expected_fills = {
+            "beauty": "17345F",
+            "construction": "17345F",
+            "technology": "17345F",
+            "industrial": "D33A35",
+            "eco": "17345F",
+            "furniture": "D33A35",
+            "noir_executive": "D33A35",
+            "royal_ledger": "D33A35",
+            "swiss_grid": "17345F",
+            "arctic_minimal": "17345F",
+            "indigo_flow": "D33A35",
+            "emerald_ledger": "17345F",
+            "sandstone_classic": "17345F",
+            "graphite_copper": "D33A35",
+        }
         fills = {}
-        for layout_style in ("technology", "industrial"):
+        for layout_style in expected_fills:
             context = self._editable_context()
             context["layout_style"] = layout_style
             document = Document(
@@ -718,8 +734,7 @@ class TestRdsExportWizard(TransactionCase):
             )
             fills[layout_style] = shading.get(qn("w:fill"))
 
-        self.assertEqual(fills["technology"], "17345F")
-        self.assertEqual(fills["industrial"], "D33A35")
+        self.assertEqual(fills, expected_fills)
 
     def test_editable_docx_renders_all_business_connector_contexts(self):
         partner = self.env["res.partner"].create(

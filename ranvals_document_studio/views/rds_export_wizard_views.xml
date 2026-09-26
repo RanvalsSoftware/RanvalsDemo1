@@ -4,8 +4,15 @@
         <field name="name">rds.export.wizard.form</field>
         <field name="model">rds.export.wizard</field>
         <field name="arch" type="xml">
-            <form string="DocuCraft" class="rds-export-wizard">
+            <form string="DocuCraft Yazdır" class="rds-export-wizard">
                 <sheet class="rds-export-wizard__sheet">
+                    <div class="rds-export-wizard__intro">
+                        <span class="rds-export-wizard__intro-icon" aria-hidden="true"><i class="fa fa-print" title="DocuCraft Yazdır"/></span>
+                        <div>
+                            <h2>DocuCraft Yazdır</h2>
+                            <p>Kurumsal tasarımınızı, belge dilini ve çıktı biçimini tek yerden seçin.</p>
+                        </div>
+                    </div>
                     <group>
                         <group>
                             <field name="res_model"/>

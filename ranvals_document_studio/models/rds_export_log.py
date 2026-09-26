@@ -9,7 +9,7 @@ from ..tools.common import check_record_access
 
 class RdsExportLog(models.Model):
     _name = "rds.export.log"
-    _description = "Belge Studio Dışa Aktarım Geçmişi"
+    _description = "DocuCraft Dışa Aktarım Geçmişi"
     _order = "create_date desc, id desc"
 
     name = fields.Char(required=True)
@@ -22,8 +22,8 @@ class RdsExportLog(models.Model):
     output_format = fields.Selection(
         [
             ("pdf", "PDF"),
-            ("docx", "Word / DOCX (PDF görünümü)"),
-            ("docx_editable", "Word / DOCX (düzenlenebilir)"),
+            ("docx_editable", "Word / DOCX – Düzenlenebilir"),
+            ("docx", "Word / DOCX – Tasarımı Birebir Korur"),
             ("png", "PNG"),
             ("zip", "ZIP"),
         ],

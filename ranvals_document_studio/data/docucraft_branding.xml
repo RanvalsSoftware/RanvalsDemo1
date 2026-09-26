@@ -2,12 +2,14 @@
 <odoo>
     <!-- User-facing branding. Technical module names and XML IDs stay unchanged. -->
     <record id="module_category_rds" model="ir.module.category">
-        <field name="name">DocuCraft – PDF, Word &amp; Document Designer for Odoo</field>
+        <!-- Odoo 19 builds the user-rights arch from this value without XML
+             escaping it. Keep the category name free of XML metacharacters. -->
+        <field name="name">DocuCraft</field>
         <field name="description">DocuCraft belge şablonları, PDF / DOCX / PNG dışa aktarımı ve erişim yetkileri</field>
     </record>
 
     <record id="privilege_rds" model="res.groups.privilege">
-        <field name="name">DocuCraft – PDF, Word &amp; Document Designer for Odoo</field>
+        <field name="name">DocuCraft Yönetimi</field>
         <field name="description">DocuCraft belge şablonları ve dışa aktarım yetkileri</field>
     </record>
 
@@ -27,7 +29,7 @@
         <field name="name">DocuCraft Bağlayıcıları</field>
     </record>
     <record id="action_rds_template" model="ir.actions.act_window">
-        <field name="name">DocuCraft PDF Şablonları</field>
+        <field name="name">DocuCraft Şablonları</field>
     </record>
     <record id="action_rds_export_log" model="ir.actions.act_window">
         <field name="name">DocuCraft Dışa Aktarım Geçmişi</field>

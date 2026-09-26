@@ -125,7 +125,7 @@ class IrActionsReport(models.Model):
     def rds_apply_design(self, record_id=False, template_id=False):
         record, company = self._rds_sidebar_scope(record_id)
         if not self._rds_can_manage_design():
-            raise AccessError(_("Tasarım seçimini kaydetmek için Belge Studio yöneticisi olmalısınız."))
+            raise AccessError(_("Tasarım seçimini kaydetmek için DocuCraft yöneticisi olmalısınız."))
         template_id = self._rds_positive_id(template_id, allow_empty=True)
         template = self.env["rds.template"]
         if template_id:

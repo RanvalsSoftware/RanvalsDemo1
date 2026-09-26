@@ -96,7 +96,7 @@ class IrActionsReportLanguage(models.Model):
             return result
         record, company = self._rds_sidebar_scope(record_id)
         if not self._rds_can_manage_design():
-            raise AccessError(_("Tasarım seçimini kaydetmek için Belge Studio yöneticisi olmalısınız."))
+            raise AccessError(_("Tasarım seçimini kaydetmek için DocuCraft yöneticisi olmalısınız."))
         if language_code and (language_code not in RDS_LANGUAGE_CODES or not self.env["res.lang"].search_count([
             ("code", "=", language_code), ("active", "=", True)])):
             raise ValidationError(_("Bu dil henüz etkin değil veya desteklenmiyor."))

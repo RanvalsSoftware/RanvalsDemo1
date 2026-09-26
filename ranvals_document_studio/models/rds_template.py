@@ -15,7 +15,7 @@ from ..tools.common import format_date_value, lang_code, normalize_hex, plain_te
 FONT_SELECTION = [
     ("serif", "Kurumsal Serif"),
     ("sans", "Modern Sans Serif"),
-    ("technical", "Teknik / Endüstriyel"),
+    ("technical", "Teknik Sans Serif"),
     ("editorial", "Editoryal"),
 ]
 
@@ -55,17 +55,25 @@ class RdsTemplate(models.Model):
         string="Hedef Model",
         domain="[('transient', '=', False)]",
         ondelete="cascade",
-        help="Boş bırakılırsa şablon, Belge Studio bağlayıcısı olan tüm modellerde kullanılabilir.",
+        help="Boş bırakılırsa şablon, DocuCraft bağlayıcısı olan tüm modellerde kullanılabilir.",
     )
     is_default = fields.Boolean(string="Varsayılan")
     layout_style = fields.Selection(
         [
-            ("beauty", "Premium Bordo / Güzellik"),
-            ("construction", "Kurumsal Lacivert / İnşaat"),
-            ("technology", "Modern Mavi / Teknoloji"),
-            ("industrial", "Endüstriyel / Üretim"),
-            ("eco", "Doğal Yeşil / Mimarlık"),
-            ("furniture", "Terakota / Mobilya"),
+            ("beauty", "Signature Burgundy"),
+            ("construction", "Executive Navy"),
+            ("technology", "Horizon Blue"),
+            ("industrial", "Atlas Steel"),
+            ("eco", "Sage Reserve"),
+            ("furniture", "Copper Atelier"),
+            ("noir_executive", "Noir Executive"),
+            ("royal_ledger", "Royal Ledger"),
+            ("swiss_grid", "Swiss Grid"),
+            ("arctic_minimal", "Arctic Minimal"),
+            ("indigo_flow", "Indigo Flow"),
+            ("emerald_ledger", "Emerald Ledger"),
+            ("sandstone_classic", "Sandstone Classic"),
+            ("graphite_copper", "Graphite Copper"),
         ],
         required=True,
         default="technology",
@@ -177,7 +185,17 @@ class RdsTemplate(models.Model):
             record.heading_font_css = FONT_CSS.get(record.heading_font, FONT_CSS["sans"])
             record.body_font_css = FONT_CSS.get(record.body_font, FONT_CSS["sans"])
 
-    @api.depends("preview_path", "name")
+    @api.depends(
+        "preview_path",
+        "name",
+        "primary_color",
+        "secondary_color",
+        "accent_color",
+        "text_color",
+        "heading_font",
+        "body_font",
+        "tagline",
+    )
     def _compute_preview_html(self):
         for record in self:
             if record.preview_path and record._is_safe_preview_path(record.preview_path):
@@ -187,9 +205,43 @@ class RdsTemplate(models.Model):
                     "</div>"
                 ) % (escape(record.preview_path), escape(record.name or "Template"))
             else:
-                record.preview_html = Markup(
-                    '<div class="text-muted" style="padding:24px;text-align:center;">Önizleme bulunmuyor.</div>'
-                )
+                record.preview_html = record._rds_dynamic_preview_html()
+
+    def _rds_dynamic_preview_html(self):
+        """Return a safe, useful preview when a static screenshot is absent."""
+        self.ensure_one()
+        theme = self.get_theme()
+        return Markup(
+            """
+            <div style="max-width:520px;margin:8px auto;background:#fff;color:{text};border:1px solid #dce2e7;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.08);font-family:{body_font};">
+                <div style="height:9px;background:{accent};"></div>
+                <div style="padding:22px 24px;background:{secondary};border-bottom:1px solid #dce2e7;">
+                    <div style="font-family:{heading_font};font-size:23px;line-height:1.1;font-weight:800;color:{primary};">{name}</div>
+                    <div style="margin-top:7px;font-size:11px;color:{text};">{tagline}</div>
+                </div>
+                <div style="padding:18px 24px;">
+                    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+                        <tr><td style="width:48%;height:52px;border:1px solid #dce2e7;background:{secondary};"></td><td style="width:4%;"></td><td style="width:48%;height:52px;border:1px solid #dce2e7;"></td></tr>
+                    </table>
+                    <table style="width:100%;border-collapse:collapse;margin-top:16px;">
+                        <tr style="background:{primary};color:#fff;"><td style="padding:7px 9px;">01</td><td style="padding:7px 9px;">Document item</td><td style="padding:7px 9px;text-align:right;">1,000.00</td></tr>
+                        <tr><td colspan="3" style="height:34px;border:1px solid #e4e8ec;"></td></tr>
+                        <tr><td colspan="3" style="height:34px;border:1px solid #e4e8ec;background:{secondary};"></td></tr>
+                    </table>
+                    <div style="width:42%;margin:16px 0 0 auto;padding:9px 12px;background:{accent};color:#fff;text-align:right;font-weight:800;">TOTAL&nbsp;&nbsp;1,000.00</div>
+                </div>
+            </div>
+            """
+        ).format(
+            primary=theme["primary"],
+            secondary=theme["secondary"],
+            accent=theme["accent"],
+            text=theme["text"],
+            heading_font=theme["heading_font"],
+            body_font=theme["body_font"],
+            name=self.name or "DocuCraft",
+            tagline=self.tagline or "Professional document design",
+        )
 
     @api.model
     def _is_safe_preview_path(self, value):

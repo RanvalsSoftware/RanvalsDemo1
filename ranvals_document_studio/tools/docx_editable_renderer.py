@@ -63,6 +63,28 @@ _PAGE_LABELS = {
     "ar": "صفحة",
 }
 
+# Native Word keeps one robust, editable document structure while each QWeb
+# layout supplies a deliberate colour hierarchy.  Values refer to keys in the
+# resolved template theme; keeping the profile declarative makes new styles
+# explicit and prevents an unknown layout from silently adopting an arbitrary
+# appearance.
+_LAYOUT_PROFILES = {
+    "beauty": ("accent", "primary", "primary"),
+    "construction": ("primary", "primary", "primary"),
+    "technology": ("primary", "primary", "primary"),
+    "industrial": ("primary", "accent", "accent"),
+    "eco": ("primary", "primary", "primary"),
+    "furniture": ("accent", "accent", "primary"),
+    "noir_executive": ("primary", "accent", "accent"),
+    "royal_ledger": ("primary", "accent", "primary"),
+    "swiss_grid": ("accent", "primary", "accent"),
+    "arctic_minimal": ("accent", "primary", "primary"),
+    "indigo_flow": ("primary", "accent", "primary"),
+    "emerald_ledger": ("primary", "primary", "accent"),
+    "sandstone_classic": ("accent", "primary", "accent"),
+    "graphite_copper": ("primary", "accent", "accent"),
+}
+
 
 class EditableDocxError(RuntimeError):
     """Raised when a native DOCX cannot be produced or validated safely."""
@@ -1135,14 +1157,7 @@ def render_editable_docx(context, language_code=None):
     budget = _TextBudget()
     theme = _mapping(context.get("theme"))
     layout_style = context.get("layout_style")
-    if layout_style not in {
-        "beauty",
-        "construction",
-        "technology",
-        "industrial",
-        "eco",
-        "furniture",
-    }:
+    if layout_style not in _LAYOUT_PROFILES:
         layout_style = "technology"
     resolved_code = language_code or context.get("lang_code") or "tr_TR"
     locale = _LOCALES.get(resolved_code, "ar-SA" if str(resolved_code).startswith("ar") else "en-US")
@@ -1150,6 +1165,7 @@ def render_editable_docx(context, language_code=None):
     primary = _color(theme.get("primary"), "17345F")
     secondary = _color(theme.get("secondary"), "F4F7FA")
     accent = _color(theme.get("accent"), "D33A35")
+    profile = _LAYOUT_PROFILES[layout_style]
     style = {
         "primary": primary,
         "secondary": secondary,
@@ -1161,13 +1177,9 @@ def render_editable_docx(context, language_code=None):
         "rtl": rtl,
         "language_prefix": str(resolved_code).split("_", 1)[0].lower(),
         "layout_style": layout_style,
-        "title_fill": accent
-        if layout_style in {"beauty", "furniture"}
-        else primary,
-        "line_header_fill": accent
-        if layout_style in {"industrial", "furniture"}
-        else primary,
-        "total_fill": accent if layout_style == "industrial" else primary,
+        "title_fill": {"primary": primary, "accent": accent}[profile[0]],
+        "line_header_fill": {"primary": primary, "accent": accent}[profile[1]],
+        "total_fill": {"primary": primary, "accent": accent}[profile[2]],
     }
     show_company = bool(context.get("show_company", True))
     logo = (

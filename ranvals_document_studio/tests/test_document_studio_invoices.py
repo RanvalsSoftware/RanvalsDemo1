@@ -112,7 +112,8 @@ class TestRdsDocumentStudioInvoices(TransactionCase):
 
         self.assertEqual(server_action.model_id.model, "account.move")
         self.assertEqual(server_action.binding_model_id.model, "account.move")
-        self.assertEqual(server_action.binding_type, "action")
+        self.assertEqual(server_action.binding_type, "report")
+        self.assertEqual(server_action.name, "DocuCraft Yazdır")
         self.assertIn(
             self.env.ref("account.group_account_invoice"), server_action.group_ids
         )

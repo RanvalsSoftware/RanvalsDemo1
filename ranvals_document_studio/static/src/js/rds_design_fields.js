@@ -9,7 +9,7 @@ const HEX_RE = /^#[0-9A-F]{6}$/;
 const FONT_OPTIONS = [
     ["serif", "Kurumsal Serif"],
     ["sans", "Modern Sans Serif"],
-    ["technical", "Teknik / Endüstriyel"],
+    ["technical", "Teknik Sans Serif"],
     ["editorial", "Editoryal"],
 ];
 const FONT_VALUES = new Set(FONT_OPTIONS.map(([value]) => value));

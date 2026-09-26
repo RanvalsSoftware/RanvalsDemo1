@@ -6,30 +6,14 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_rds_download_pdf"
-                        type="object"
-                        string="PDF İndir"
-                        icon="fa-file-pdf-o"
-                        class="btn-secondary"
-                        invisible="not id"
-                        groups="sales_team.group_sale_salesman"
-                        help="Etkin DocuCraft tasarımını müşteri dilinde doğrudan PDF olarak indirin."/>
-                <button name="action_rds_download_editable_word"
-                        type="object"
-                        string="Word İndir"
-                        icon="fa-file-word-o"
-                        class="btn-primary"
-                        invisible="not id"
-                        groups="sales_team.group_sale_salesman"
-                        help="Etkin DocuCraft tasarımını düzenlenebilir Word belgesi olarak indirin."/>
                 <button name="action_open_rds_export"
                         type="object"
-                        string="Diğer Biçimler"
-                        icon="fa-ellipsis-h"
-                        class="btn-link"
+                        string="DocuCraft Yazdır"
+                        icon="fa-print"
+                        class="btn-primary rds-docucraft-print-button"
                         invisible="not id"
                         groups="sales_team.group_sale_salesman"
-                        help="Tasarım seçerek PDF, Word veya PNG oluşturun. Hazır PDF tasarımları Yazdır menüsünde de yer alır."/>
+                        help="Tasarım, belge dili ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>
@@ -40,20 +24,13 @@
         <field name="inherit_id" ref="sale.sale_order_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//list/header" position="inside">
-                <button name="action_rds_download_pdf"
+                <button name="action_open_rds_export"
                         type="object"
-                        string="PDF İndir"
-                        icon="fa-file-pdf-o"
-                        class="btn-secondary"
+                        string="DocuCraft Yazdır"
+                        icon="fa-print"
+                        class="btn-primary rds-docucraft-print-button"
                         groups="sales_team.group_sale_salesman"
-                        help="Seçilen belgeleri PDF olarak indirin."/>
-                <button name="action_rds_download_editable_word"
-                        type="object"
-                        string="Word İndir"
-                        icon="fa-file-word-o"
-                        class="btn-secondary"
-                        groups="sales_team.group_sale_salesman"
-                        help="Seçilen belgeleri düzenlenebilir Word olarak indirin."/>
+                        help="Seçilen belgeler için tasarım ve çıktı biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>

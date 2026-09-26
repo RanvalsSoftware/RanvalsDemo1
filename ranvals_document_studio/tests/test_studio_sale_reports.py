@@ -21,6 +21,14 @@ class TestRdsStudioSaleReports(TransactionCase):
         "industrial": "template_industrial_red",
         "eco": "template_eco_green",
         "furniture": "template_furniture_terracotta",
+        "noir_executive": "template_noir_executive",
+        "royal_ledger": "template_royal_ledger",
+        "swiss_grid": "template_swiss_grid",
+        "arctic_minimal": "template_arctic_minimal",
+        "indigo_flow": "template_indigo_flow",
+        "emerald_ledger": "template_emerald_ledger",
+        "sandstone_classic": "template_sandstone_classic",
+        "graphite_copper": "template_graphite_copper",
     }
 
     @classmethod
@@ -33,24 +41,23 @@ class TestRdsStudioSaleReports(TransactionCase):
             }
         )
 
-    def test_each_design_is_a_bound_sale_order_report(self):
+    def test_legacy_design_reports_are_kept_but_unbound(self):
         for action_xmlid in self.REPORT_ACTION_XMLIDS.values():
             action = self.env.ref("ranvals_document_studio.%s" % action_xmlid)
-            self.assertEqual(action.binding_model_id.model, "sale.order")
+            self.assertFalse(action.binding_model_id)
             self.assertEqual(action.binding_type, "report")
             self.assertEqual(action.binding_view_types, "list,form")
 
-    def test_all_design_reports_are_returned_by_runtime_bindings(self):
-        expected_action_ids = {
+    def test_legacy_design_reports_do_not_clutter_runtime_bindings(self):
+        legacy_action_ids = {
             self.env.ref("ranvals_document_studio.%s" % xmlid).id
             for xmlid in self.REPORT_ACTION_XMLIDS.values()
         }
         bindings = self.env["ir.actions.actions"].get_bindings("sale.order")
         report_binding_ids = {binding["id"] for binding in bindings.get("report", [])}
-        self.assertEqual(
-            expected_action_ids & report_binding_ids,
-            expected_action_ids,
-            "All six Document Studio designs must be present in sale.order report bindings.",
+        self.assertFalse(
+            legacy_action_ids & report_binding_ids,
+            "Legacy per-theme reports must not clutter the sale.order Print menu.",
         )
 
     def test_standard_sale_report_action_is_not_repointed(self):
@@ -97,18 +104,53 @@ class TestRdsStudioSaleReports(TransactionCase):
         self.assertEqual(selector_action.binding_type, "report")
         self.assertEqual(selector_action.binding_view_types, "list,form")
 
-    def test_each_template_routes_to_its_studio_report(self):
+    def test_each_template_routes_to_a_compatible_studio_report(self):
         order = self.env["sale.order"].create(
             {"partner_id": self.partner.id}
         )
         for layout_style, template_xmlid in self.TEMPLATE_XMLIDS.items():
             template = self.env.ref("ranvals_document_studio.%s" % template_xmlid)
             self.assertEqual(template.layout_style, layout_style)
-            self.assertEqual(
-                order._rds_report_action_xmlid(template),
-                "ranvals_document_studio.%s"
-                % self.REPORT_ACTION_XMLIDS[layout_style],
+            expected = self.REPORT_ACTION_XMLIDS.get(layout_style)
+            expected_xmlid = (
+                "ranvals_document_studio.%s" % expected
+                if expected
+                else "ranvals_document_studio.action_report_rds_sale_document"
             )
+            self.assertEqual(order._rds_report_action_xmlid(template), expected_xmlid)
+
+    def test_seeded_template_names_are_sector_neutral(self):
+        expected_names = {
+            "beauty": "Signature Burgundy",
+            "construction": "Executive Navy",
+            "technology": "Horizon Blue",
+            "industrial": "Atlas Steel",
+            "eco": "Sage Reserve",
+            "furniture": "Copper Atelier",
+            "noir_executive": "Noir Executive",
+            "royal_ledger": "Royal Ledger",
+            "swiss_grid": "Swiss Grid",
+            "arctic_minimal": "Arctic Minimal",
+            "indigo_flow": "Indigo Flow",
+            "emerald_ledger": "Emerald Ledger",
+            "sandstone_classic": "Sandstone Classic",
+            "graphite_copper": "Graphite Copper",
+        }
+        for layout_style, template_xmlid in self.TEMPLATE_XMLIDS.items():
+            template = self.env.ref("ranvals_document_studio.%s" % template_xmlid)
+            self.assertEqual(template.name, expected_names[layout_style])
+
+    def test_all_templates_have_safe_dynamic_previews(self):
+        for layout_style in self.TEMPLATE_XMLIDS:
+            template = self.env.ref(
+                "ranvals_document_studio.%s"
+                % self.TEMPLATE_XMLIDS[layout_style]
+            )
+            preview = str(template.preview_html)
+            self.assertFalse(template.preview_path)
+            self.assertIn(template.name, preview)
+            self.assertIn(template.primary_color, preview)
+            self.assertNotIn("Önizleme bulunmuyor", preview)
 
     def test_document_context_keeps_customer_invoice_and_delivery_addresses(self):
         invoice_partner = self.env["res.partner"].create(

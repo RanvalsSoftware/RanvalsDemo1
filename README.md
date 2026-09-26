@@ -4,7 +4,7 @@ Odoo 19 demo addon deposu.
 
 ## DocuCraft All-in-One
 
-`ranvals_document_studio` sürüm `19.0.3.0.0`; belge tasarım motorunu,
+`ranvals_document_studio` sürüm `19.0.3.1.0`; belge tasarım motorunu,
 Satış, Muhasebe, Satın Alma ve Odoo Studio entegrasyonlarını tek addon altında
 toplar.
 
@@ -15,6 +15,8 @@ toplar.
 - PDF görünümünü koruyan Word/DOCX
 - PNG
 - Tüm biçimleri içeren ZIP
+- 14 farklı kurumsal belge tasarımı
+- Satış, fatura ve satın almada tek **DocuCraft Yazdır** deneyimi
 
 Modül Odoo 19 Enterprise ve `web_studio` gerektirir. Demo kurulumu öncesinde
 kök dizindeki Python bağımlılıkları yüklenmelidir:

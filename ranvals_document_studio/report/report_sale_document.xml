@@ -49,6 +49,30 @@
     <template id="rds_sale_layout_furniture"
               inherit_id="ranvals_document_studio.rds_layout_furniture"
               primary="True"/>
+    <template id="rds_sale_layout_noir_executive"
+              inherit_id="ranvals_document_studio.rds_layout_noir_executive"
+              primary="True"/>
+    <template id="rds_sale_layout_royal_ledger"
+              inherit_id="ranvals_document_studio.rds_layout_royal_ledger"
+              primary="True"/>
+    <template id="rds_sale_layout_swiss_grid"
+              inherit_id="ranvals_document_studio.rds_layout_swiss_grid"
+              primary="True"/>
+    <template id="rds_sale_layout_arctic_minimal"
+              inherit_id="ranvals_document_studio.rds_layout_arctic_minimal"
+              primary="True"/>
+    <template id="rds_sale_layout_indigo_flow"
+              inherit_id="ranvals_document_studio.rds_layout_indigo_flow"
+              primary="True"/>
+    <template id="rds_sale_layout_emerald_ledger"
+              inherit_id="ranvals_document_studio.rds_layout_emerald_ledger"
+              primary="True"/>
+    <template id="rds_sale_layout_sandstone_classic"
+              inherit_id="ranvals_document_studio.rds_layout_sandstone_classic"
+              primary="True"/>
+    <template id="rds_sale_layout_graphite_copper"
+              inherit_id="ranvals_document_studio.rds_layout_graphite_copper"
+              primary="True"/>
 
     <template id="rds_sale_layout_router">
         <t t-if="rds_template.layout_style == 'beauty'" t-call="ranvals_document_studio.rds_sale_layout_beauty"/>
@@ -56,7 +80,16 @@
         <t t-elif="rds_template.layout_style == 'technology'" t-call="ranvals_document_studio.rds_sale_layout_technology"/>
         <t t-elif="rds_template.layout_style == 'industrial'" t-call="ranvals_document_studio.rds_sale_layout_industrial"/>
         <t t-elif="rds_template.layout_style == 'eco'" t-call="ranvals_document_studio.rds_sale_layout_eco"/>
-        <t t-else="" t-call="ranvals_document_studio.rds_sale_layout_furniture"/>
+        <t t-elif="rds_template.layout_style == 'furniture'" t-call="ranvals_document_studio.rds_sale_layout_furniture"/>
+        <t t-elif="rds_template.layout_style == 'noir_executive'" t-call="ranvals_document_studio.rds_sale_layout_noir_executive"/>
+        <t t-elif="rds_template.layout_style == 'royal_ledger'" t-call="ranvals_document_studio.rds_sale_layout_royal_ledger"/>
+        <t t-elif="rds_template.layout_style == 'swiss_grid'" t-call="ranvals_document_studio.rds_sale_layout_swiss_grid"/>
+        <t t-elif="rds_template.layout_style == 'arctic_minimal'" t-call="ranvals_document_studio.rds_sale_layout_arctic_minimal"/>
+        <t t-elif="rds_template.layout_style == 'indigo_flow'" t-call="ranvals_document_studio.rds_sale_layout_indigo_flow"/>
+        <t t-elif="rds_template.layout_style == 'emerald_ledger'" t-call="ranvals_document_studio.rds_sale_layout_emerald_ledger"/>
+        <t t-elif="rds_template.layout_style == 'sandstone_classic'" t-call="ranvals_document_studio.rds_sale_layout_sandstone_classic"/>
+        <t t-elif="rds_template.layout_style == 'graphite_copper'" t-call="ranvals_document_studio.rds_sale_layout_graphite_copper"/>
+        <t t-else="" t-call="ranvals_document_studio.rds_sale_layout_technology"/>
     </template>
 
     <template id="report_saleorder_document_rds_bridge"
@@ -361,7 +394,7 @@
     </template>
 
     <record id="action_report_rds_sale_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Varsayılan Tasarım</field>
+        <field name="name">DocuCraft Belgesi – Varsayılan</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_document</field>
@@ -371,80 +404,80 @@
     </record>
 
     <record id="action_report_rds_sale_beauty_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Premium Bordo / Güzellik ve Sağlık</field>
+        <field name="name">DocuCraft – Signature Burgundy</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_beauty_document</field>
         <field name="report_file">ranvals_document_studio.report_sale_beauty_document</field>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="binding_view_types">list,form</field>
         <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
-        <field name="print_report_name">(object.name or 'Sale_Document') + '_Premium_Bordo'</field>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Signature_Burgundy'</field>
     </record>
 
     <record id="action_report_rds_sale_construction_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Kurumsal Lacivert / İnşaat ve Mühendislik</field>
+        <field name="name">DocuCraft – Executive Navy</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_construction_document</field>
         <field name="report_file">ranvals_document_studio.report_sale_construction_document</field>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="binding_view_types">list,form</field>
         <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
-        <field name="print_report_name">(object.name or 'Sale_Document') + '_Kurumsal_Lacivert'</field>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Executive_Navy'</field>
     </record>
 
     <record id="action_report_rds_sale_technology_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Modern Mavi / Teknoloji ve Yazılım</field>
+        <field name="name">DocuCraft – Horizon Blue</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_technology_document</field>
         <field name="report_file">ranvals_document_studio.report_sale_technology_document</field>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="binding_view_types">list,form</field>
         <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
-        <field name="print_report_name">(object.name or 'Sale_Document') + '_Modern_Mavi'</field>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Horizon_Blue'</field>
     </record>
 
     <record id="action_report_rds_sale_industrial_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Endüstriyel / Üretim ve Makine</field>
+        <field name="name">DocuCraft – Atlas Steel</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_industrial_document</field>
         <field name="report_file">ranvals_document_studio.report_sale_industrial_document</field>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="binding_view_types">list,form</field>
         <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
-        <field name="print_report_name">(object.name or 'Sale_Document') + '_Endustriyel'</field>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Atlas_Steel'</field>
     </record>
 
     <record id="action_report_rds_sale_eco_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Doğal Yeşil / Mimarlık ve Sürdürülebilirlik</field>
+        <field name="name">DocuCraft – Sage Reserve</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_eco_document</field>
         <field name="report_file">ranvals_document_studio.report_sale_eco_document</field>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="binding_view_types">list,form</field>
         <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
-        <field name="print_report_name">(object.name or 'Sale_Document') + '_Dogal_Yesil'</field>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Sage_Reserve'</field>
     </record>
 
     <record id="action_report_rds_sale_furniture_document" model="ir.actions.report">
-        <field name="name">Belge Studio – Terakota / Mobilya ve İç Mimarlık</field>
+        <field name="name">DocuCraft – Copper Atelier</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_sale_furniture_document</field>
         <field name="report_file">ranvals_document_studio.report_sale_furniture_document</field>
-        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="binding_view_types">list,form</field>
         <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
-        <field name="print_report_name">(object.name or 'Sale_Document') + '_Terakota'</field>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Copper_Atelier'</field>
     </record>
 </odoo>

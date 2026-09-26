@@ -1,4 +1,4 @@
-/* Belge Studio's navy/plum/teal palette, isolated to the added Studio card.
+/* DocuCraft's navy/plum/teal palette, isolated to the added Studio card.
  * Use explicit foregrounds: Studio does NOT set an inheritable white text
  * colour on its sidebar. Backend CSS also loads before Studio's lazy bundle.
  * All rules stay below this two-class scope; native fields/buttons are intact.
@@ -231,14 +231,12 @@
     background: #7f3087;
     border-color: #b278b8;
 }
-.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--download,
 .o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--retry {
     color: var(--rds-design-text);
     -webkit-text-fill-color: var(--rds-design-text);
     background: #123f43;
     border-color: #459c92;
 }
-.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--download:hover:not(:disabled),
 .o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--retry:hover:not(:disabled) {
     color: #ffffff;
     background: #195359;
@@ -291,35 +289,6 @@
 }
 .o_web_studio_sidebar .rds-studio-design-selector .rds-design-message .rds-design-button--retry {
     margin-top: 8px;
-}
-.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid var(--rds-design-border);
-}
-.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-title {
-    margin-bottom: 6px;
-    color: var(--rds-design-text);
-    font-size: 12px;
-    font-weight: 600;
-}
-.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    gap: 8px;
-}
-.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-controls .rds-design-format {
-    flex: 1 1 120px;
-    width: auto;
-    min-width: 0;
-    margin: 0;
-}
-.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-controls .rds-design-button--download {
-    flex: 1 0 82px;
-}
-.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download + .rds-design-hint {
-    margin: 10px 0 0;
 }
 .o_web_studio_sidebar .rds-studio-design-selector .rds-design-version {
     margin-top: 14px;

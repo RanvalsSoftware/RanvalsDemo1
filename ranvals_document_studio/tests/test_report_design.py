@@ -115,8 +115,23 @@ class TestStudioReportDesign(TransactionCase):
         self.report.rds_apply_design(self.order.id, False)
         self.assertFalse(self.report.rds_get_design_options(self.order.id)["has_saved_configuration"])
 
-    def test_all_six_designs_render_real_html(self):
-        for suffix in ("beauty_premium", "construction_navy", "technology_blue", "industrial_red", "eco_green", "furniture_terracotta"):
+    def test_all_fourteen_designs_render_real_html(self):
+        for suffix in (
+            "beauty_premium",
+            "construction_navy",
+            "technology_blue",
+            "industrial_red",
+            "eco_green",
+            "furniture_terracotta",
+            "noir_executive",
+            "royal_ledger",
+            "swiss_grid",
+            "arctic_minimal",
+            "indigo_flow",
+            "emerald_ledger",
+            "sandstone_classic",
+            "graphite_copper",
+        ):
             template = self.env.ref("ranvals_document_studio.template_%s" % suffix)
             self.report.rds_apply_design(self.order.id, template.id)
             content, kind = self.env["ir.actions.report"]._render_qweb_html(self.report.id, self.order.ids)

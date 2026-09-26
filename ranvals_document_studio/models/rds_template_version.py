@@ -286,7 +286,20 @@ class RdsTemplateVersioning(models.Model):
         ):
             raise ValidationError(_("Şablon sırası geçerli bir tam sayı olmalıdır."))
         if template_values["layout_style"] not in {
-            "beauty", "construction", "technology", "industrial", "eco", "furniture"
+            "beauty",
+            "construction",
+            "technology",
+            "industrial",
+            "eco",
+            "furniture",
+            "noir_executive",
+            "royal_ledger",
+            "swiss_grid",
+            "arctic_minimal",
+            "indigo_flow",
+            "emerald_ledger",
+            "sandstone_classic",
+            "graphite_copper",
         }:
             raise ValidationError(_("Şablon yerleşim stili desteklenmiyor."))
         for color_name in ("primary_color", "secondary_color", "accent_color", "text_color"):

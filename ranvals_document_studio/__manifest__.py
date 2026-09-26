@@ -4,11 +4,12 @@
     "description": (
         "DocuCraft All-in-One; satış teklifleri, faturalar ve satın alma belgeleri "
         "için PDF, düzenlenebilir DOCX, PDF görünümünde DOCX, PNG ve ZIP çıktıları, "
-        "tek tık indirme, arka plan kuyruğu, dinamik alanlar, çok şirketli "
-        "şablonlar, belge dili ve Odoo Studio rapor seçicisini tek kurulumda sunar. "
+        "tek DocuCraft Yazdır akışı, 14 kurumsal tasarım, arka plan kuyruğu, "
+        "dinamik alanlar, çok şirketli şablonlar, belge dili ve Odoo Studio "
+        "rapor seçicisini tek kurulumda sunar. "
         "Bu birleşik sürüm Odoo Enterprise Studio ile birlikte kurulur."
     ),
-    "version": "19.0.3.0.0",
+    "version": "19.0.3.1.0",
     "category": "Productivity/Documents",
     "author": "Ranvals Software",
     "website": "https://odooranvals.com",
@@ -112,8 +113,6 @@
         "static/description/product_showcase.png",
         "static/description/promo_hero.png",
         "static/description/promo_features.png",
-        "static/description/promo_templates_1.png",
-        "static/description/promo_templates_2.png",
         "static/description/promo_formats.png",
     ],
     "application": True,

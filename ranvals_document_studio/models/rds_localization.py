@@ -1,5 +1,4 @@
 """Explicit user-language settings. Never switch another user or overwrite terms."""
-from markupsafe import Markup, escape
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, UserError
 
@@ -94,13 +93,23 @@ class RdsLanguageWizard(models.TransientModel):
 class RdsTemplateLocalization(models.Model):
     _inherit = "rds.template"
 
-    @api.depends("preview_path", "name")
+    @api.depends(
+        "preview_path",
+        "name",
+        "primary_color",
+        "secondary_color",
+        "accent_color",
+        "text_color",
+        "heading_font",
+        "body_font",
+        "tagline",
+    )
     @api.depends_context("lang")
     def _compute_preview_html(self):
+        # The base model renders a safe palette-driven preview whenever a
+        # static screenshot is unavailable.  Keep language invalidation but
+        # do not replace that useful fallback with an empty-state message.
         super()._compute_preview_html()
-        for record in self:
-            if not record.preview_path or not record._is_safe_preview_path(record.preview_path):
-                record.preview_html = Markup('<div class="text-muted p-4 text-center">%s</div>') % escape(_("Önizleme bulunmuyor."))
 
     def base_context(self, record, lang=None):
         localized = self.with_context(lang=lang) if lang else self

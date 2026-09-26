@@ -16,8 +16,8 @@ const RDS_ACTIVE_MENU_KEY_BY_MODEL = Object.freeze({
 
 const RDS_LIST_HERO_BY_MODEL = Object.freeze({
     "rds.template": Object.freeze({
-        title: "PDF Şablonları",
-        subtitle: "PDF belgeleri için şablonları yönetin ve yapılandırın.",
+        title: "DocuCraft Şablonları",
+        subtitle: "PDF, Word ve görsel çıktılar için şablonları yönetin.",
         icon: "13_pdf_file.svg",
     }),
     "account.move": Object.freeze({

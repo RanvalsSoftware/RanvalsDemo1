@@ -6,38 +6,38 @@
         <field name="inherit_id" ref="ranvals_document_studio.view_sale_order_form_rds"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_open_rds_export']" position="attributes">
-                <attribute name="string">DocuCraft / Özel Yazdır</attribute>
-                <attribute name="help">DocuCraft tasarımı seçerek PDF, Word / DOCX veya PNG oluşturun.</attribute>
+                <attribute name="string">DocuCraft Yazdır</attribute>
+                <attribute name="help">Tasarım, dil ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin.</attribute>
             </xpath>
         </field>
     </record>
 
     <record id="server_action_sale_rds_export" model="ir.actions.server">
-        <field name="name">DocuCraft</field>
+        <field name="name">DocuCraft Uyumluluk – Seçici</field>
     </record>
     <record id="server_action_sale_rds_print" model="ir.actions.server">
-        <field name="name">DocuCraft – Özel Yazdır</field>
+        <field name="name">DocuCraft Yazdır</field>
     </record>
 
     <record id="action_report_rds_sale_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Varsayılan Tasarım</field>
+        <field name="name">DocuCraft Belgesi – Varsayılan</field>
     </record>
     <record id="action_report_rds_sale_beauty_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Premium Bordo / Güzellik ve Sağlık</field>
+        <field name="name">DocuCraft – Signature Burgundy</field>
     </record>
     <record id="action_report_rds_sale_construction_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Kurumsal Lacivert / İnşaat ve Mühendislik</field>
+        <field name="name">DocuCraft – Executive Navy</field>
     </record>
     <record id="action_report_rds_sale_technology_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Modern Mavi / Teknoloji ve Yazılım</field>
+        <field name="name">DocuCraft – Horizon Blue</field>
     </record>
     <record id="action_report_rds_sale_industrial_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Endüstriyel / Üretim ve Makine</field>
+        <field name="name">DocuCraft – Atlas Steel</field>
     </record>
     <record id="action_report_rds_sale_eco_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Doğal Yeşil / Mimarlık ve Sürdürülebilirlik</field>
+        <field name="name">DocuCraft – Sage Reserve</field>
     </record>
     <record id="action_report_rds_sale_furniture_document" model="ir.actions.report">
-        <field name="name">DocuCraft – Terakota / Mobilya ve İç Mimarlık</field>
+        <field name="name">DocuCraft – Copper Atelier</field>
     </record>
 </odoo>

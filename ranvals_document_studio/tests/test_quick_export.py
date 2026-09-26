@@ -149,7 +149,7 @@ class TestRdsQuickExport(TransactionCase):
         with self.assertRaises(AccessError):
             self.orders[0].with_user(internal_user).action_rds_download_pdf()
 
-    def test_quick_server_actions_are_group_limited_report_entries(self):
+    def test_quick_server_actions_remain_callable_but_are_not_menu_entries(self):
         cases = (
             (
                 "sale",
@@ -175,13 +175,14 @@ class TestRdsQuickExport(TransactionCase):
                         f"server_action_{prefix}_rds_quick_{suffix}"
                     )
                     self.assertEqual(action.binding_type, "report")
-                    self.assertEqual(action.binding_model_id.model, model_name)
+                    self.assertFalse(action.binding_model_id)
+                    self.assertEqual(action.model_id.model, model_name)
                     self.assertEqual(
                         set(action.binding_view_types.split(",")), {"list", "form"}
                     )
                     self.assertIn(self.env.ref(group_xmlid), action.group_ids)
 
-    def test_forms_expose_pdf_word_and_selector_without_replacing_print(self):
+    def test_forms_expose_one_docucraft_print_button_without_replacing_native_print(self):
         for view_xmlid in (
             "ranvals_document_studio.view_sale_order_form_rds",
             "ranvals_document_studio.view_account_move_form_rds",
@@ -191,7 +192,7 @@ class TestRdsQuickExport(TransactionCase):
                 arch = etree.fromstring(self.env.ref(view_xmlid).arch_db.encode())
                 self.assertEqual(
                     len(arch.xpath(".//button[@name='action_rds_download_pdf']")),
-                    1,
+                    0,
                 )
                 self.assertEqual(
                     len(
@@ -199,12 +200,31 @@ class TestRdsQuickExport(TransactionCase):
                             ".//button[@name='action_rds_download_editable_word']"
                         )
                     ),
-                    1,
+                    0,
                 )
                 self.assertEqual(
                     len(arch.xpath(".//button[@name='action_open_rds_export']")),
                     1,
                 )
+                button = arch.xpath(
+                    ".//button[@name='action_open_rds_export']"
+                )[0]
+                # View architecture is translated when a language catalogue
+                # is installed; keep this assertion locale-neutral.
+                self.assertIn("DocuCraft", button.get("string"))
+                self.assertEqual(button.get("icon"), "fa-print")
+
+        print_actions = (
+            ("server_action_sale_rds_print", "sale.order"),
+            ("server_action_account_rds_export", "account.move"),
+            ("server_action_purchase_rds_export", "purchase.order"),
+        )
+        for xmlid, model_name in print_actions:
+            with self.subTest(action=xmlid):
+                action = self.env.ref(f"ranvals_document_studio.{xmlid}")
+                self.assertEqual(action.name, "DocuCraft Yazdır")
+                self.assertEqual(action.binding_type, "report")
+                self.assertEqual(action.binding_model_id.model, model_name)
 
         native_sale_report = self.env.ref("sale.action_report_saleorder")
         self.assertEqual(native_sale_report.report_type, "qweb-pdf")

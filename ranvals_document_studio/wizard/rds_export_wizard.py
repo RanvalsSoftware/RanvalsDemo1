@@ -44,8 +44,8 @@ class RdsExportWizard(models.TransientModel):
     output_format = fields.Selection(
         [
             ("pdf", "PDF"),
-            ("docx", "Word / DOCX (PDF görünümü)"),
-            ("docx_editable", "Word / DOCX (düzenlenebilir)"),
+            ("docx_editable", "Word / DOCX – Düzenlenebilir"),
+            ("docx", "Word / DOCX – Tasarımı Birebir Korur"),
             ("png", "PNG"),
             ("zip", "ZIP – PDF + 2 Word türü + PNG"),
         ],
@@ -177,7 +177,7 @@ class RdsExportWizard(models.TransientModel):
         check_record_access(records)
         return {
             "type": "ir.actions.act_window",
-            "name": _("DocuCraft"),
+            "name": _("DocuCraft Yazdır"),
             "res_model": "rds.export.wizard",
             "view_mode": "form",
             "target": "new",
@@ -365,11 +365,18 @@ class RdsExportWizard(models.TransientModel):
     def _export_record(self, record, language_code):
         prefix = safe_filename(self.file_name_prefix) if self.file_name_prefix else ""
         record_name = safe_filename(getattr(record, "display_name", False) or getattr(record, "name", False) or str(record.id))
-        template_code = safe_filename(self.template_id.code)
+        # Keep technical template codes stable for integrations, but expose
+        # the polished template name in files users download.  The database
+        # ID keeps names unique even when two translated labels are equal.
+        template_label = safe_filename(
+            self.template_id.name or self.template_id.code
+        )[:48].rstrip("._-")
         # Preserve the record ID in the suffix.  Truncating the fully joined
         # name could otherwise remove the only unique part when a prefix or
         # display name is long, making multi-record ZIP members collide.
-        identity_suffix = safe_filename("ID%s_%s" % (record.id, template_code))
+        identity_suffix = safe_filename(
+            "ID%s_T%s_%s" % (record.id, self.template_id.id, template_label)
+        )
         descriptive = safe_filename(
             "_".join(part for part in (prefix, record_name) if part)
         )

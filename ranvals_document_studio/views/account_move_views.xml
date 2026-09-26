@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--
-        Belge Studio has its own invoice browser so users do not need to leave
+        DocuCraft has its own invoice browser so users do not need to leave
         the app before choosing records and opening the export wizard.  The
         normal account.move record rules still provide company/access
         isolation; the action only narrows the model to commercial documents.
@@ -15,26 +15,15 @@
                   delete="false"
                   multi_edit="false"
                   js_class="rds_sidebar_list"
-                  class="rds-invoice-list">
+                class="rds-invoice-list">
                 <header>
-                    <button name="action_rds_download_pdf"
-                            type="object"
-                            string="PDF İndir"
-                            icon="fa-file-pdf-o"
-                            class="btn-secondary"
-                            groups="account.group_account_invoice"/>
-                    <button name="action_rds_download_editable_word"
-                            type="object"
-                            string="Word İndir"
-                            icon="fa-file-word-o"
-                            class="btn-primary"
-                            groups="account.group_account_invoice"/>
                     <button name="action_open_rds_export"
                             type="object"
-                            string="Diğer Biçimler"
-                            icon="fa-ellipsis-h"
-                            class="btn-link"
-                            groups="account.group_account_invoice"/>
+                            string="DocuCraft Yazdır"
+                            icon="fa-print"
+                            class="btn-primary rds-docucraft-print-button"
+                            groups="account.group_account_invoice"
+                            help="Seçilen faturalar için tasarım ve çıktı biçimini tek pencereden seçin."/>
                 </header>
                 <field name="name" string="Fatura No"/>
                 <field name="move_type" string="Belge Türü"/>
@@ -89,8 +78,8 @@
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'))]</field>
         <field name="context">{'default_move_type': 'out_invoice', 'rds_sidebar_menu': 'ranvals_document_studio.menu_rds_invoices'}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Belge oluşturmak için bir fatura seçin</p>
-            <p>PDF, Word veya PNG çıktısı için kayıtları seçip <strong>Belge Oluştur</strong> düğmesini kullanın.</p>
+            <p class="o_view_nocontent_smiling_face">DocuCraft ile yazdırmak için bir fatura seçin</p>
+            <p>PDF, Word, PNG veya ZIP çıktısı için kayıtları seçip <strong>DocuCraft Yazdır</strong> düğmesini kullanın.</p>
         </field>
     </record>
 
@@ -136,29 +125,14 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_rds_download_pdf"
-                        type="object"
-                        string="PDF İndir"
-                        icon="fa-file-pdf-o"
-                        class="btn-secondary"
-                        groups="account.group_account_invoice"
-                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
-                        help="Etkin DocuCraft tasarımını belge dilinde doğrudan PDF olarak indirin."/>
-                <button name="action_rds_download_editable_word"
-                        type="object"
-                        string="Word İndir"
-                        icon="fa-file-word-o"
-                        class="btn-primary"
-                        groups="account.group_account_invoice"
-                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
-                        help="Faturayı düzenlenebilir Word belgesi olarak indirin."/>
                 <button name="action_open_rds_export"
                         type="object"
-                        string="Diğer Biçimler"
-                        icon="fa-ellipsis-h"
-                        class="btn-link"
+                        string="DocuCraft Yazdır"
+                        icon="fa-print"
+                        class="btn-primary rds-docucraft-print-button"
                         groups="account.group_account_invoice"
-                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
+                        help="Tasarım, belge dili ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>
@@ -169,20 +143,14 @@
         <field name="inherit_id" ref="account.view_invoice_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//list/header" position="inside">
-                <button name="action_rds_download_pdf"
+                <button name="action_open_rds_export"
                         type="object"
-                        string="PDF İndir"
-                        icon="fa-file-pdf-o"
-                        class="btn-secondary"
+                        string="DocuCraft Yazdır"
+                        icon="fa-print"
+                        class="btn-primary rds-docucraft-print-button"
                         groups="account.group_account_invoice"
-                        invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
-                <button name="action_rds_download_editable_word"
-                        type="object"
-                        string="Word İndir"
-                        icon="fa-file-word-o"
-                        class="btn-secondary"
-                        groups="account.group_account_invoice"
-                        invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+                        invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
+                        help="Seçilen faturalar için tasarım ve çıktı biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>

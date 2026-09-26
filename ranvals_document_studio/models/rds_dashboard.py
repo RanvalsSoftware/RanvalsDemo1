@@ -56,7 +56,7 @@ OUTPUT_FORMAT_LABELS = {
 
 class RdsDashboard(models.AbstractModel):
     _name = "rds.dashboard"
-    _description = "Belge Studio Gösterge Ekranı"
+    _description = "DocuCraft Gösterge Ekranı"
 
     @api.model
     def _get_connector_specs(self):

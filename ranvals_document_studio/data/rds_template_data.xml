@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
     <record id="template_beauty_premium" model="rds.template">
-        <field name="name">Premium Bordo – Güzellik ve Sağlık</field>
+        <field name="name">Signature Burgundy</field>
         <field name="code">FREE_BEAUTY_PREMIUM</field>
         <field name="sequence">10</field>
         <field name="layout_style">beauty</field>
@@ -11,13 +11,12 @@
         <field name="text_color">#332B2B</field>
         <field name="heading_font">serif</field>
         <field name="body_font">sans</field>
-        <field name="tagline">Lüks ve Bütünsel Hizmet</field>
-        <field name="footer_text">Bizi tercih ettiğiniz için teşekkür ederiz.</field>
-        <field name="preview_path">/ranvals_document_studio/static/description/templates/beauty.jpg</field>
+        <field name="tagline">Distinctive documents. Lasting confidence.</field>
+        <field name="footer_text">Prepared with care by DocuCraft.</field>
     </record>
 
     <record id="template_construction_navy" model="rds.template">
-        <field name="name">Kurumsal Lacivert – İnşaat ve Mühendislik</field>
+        <field name="name">Executive Navy</field>
         <field name="code">FREE_CONSTRUCTION_NAVY</field>
         <field name="sequence">20</field>
         <field name="layout_style">construction</field>
@@ -27,13 +26,12 @@
         <field name="text_color">#24313D</field>
         <field name="heading_font">technical</field>
         <field name="body_font">sans</field>
-        <field name="tagline">İnşaat • Mimarlık • Mühendislik</field>
-        <field name="footer_text">Güvenli yapılar, kalıcı çözümler.</field>
-        <field name="preview_path">/ranvals_document_studio/static/description/templates/construction.jpg</field>
+        <field name="tagline">Clarity for every business decision.</field>
+        <field name="footer_text">Professional documents, delivered with confidence.</field>
     </record>
 
     <record id="template_technology_blue" model="rds.template">
-        <field name="name">Modern Mavi – Teknoloji ve Yazılım</field>
+        <field name="name">Horizon Blue</field>
         <field name="code">FREE_TECHNOLOGY_BLUE</field>
         <field name="sequence">30</field>
         <field name="layout_style">technology</field>
@@ -43,14 +41,13 @@
         <field name="text_color">#17263B</field>
         <field name="heading_font">sans</field>
         <field name="body_font">sans</field>
-        <field name="tagline">Modern İşletmeler İçin Akıllı Belgeler</field>
-        <field name="footer_text">Dijital iş süreçleriniz için teşekkür ederiz.</field>
+        <field name="tagline">Clear thinking. Modern business.</field>
+        <field name="footer_text">Thank you for choosing a smarter document experience.</field>
         <field name="is_default" eval="True"/>
-        <field name="preview_path">/ranvals_document_studio/static/description/templates/technology.jpg</field>
     </record>
 
     <record id="template_industrial_red" model="rds.template">
-        <field name="name">Endüstriyel – Üretim ve Makine</field>
+        <field name="name">Atlas Steel</field>
         <field name="code">FREE_INDUSTRIAL_RED</field>
         <field name="sequence">40</field>
         <field name="layout_style">industrial</field>
@@ -60,13 +57,12 @@
         <field name="text_color">#202A34</field>
         <field name="heading_font">technical</field>
         <field name="body_font">sans</field>
-        <field name="tagline">Güçlü Çözümler, Sağlam Yarınlar</field>
-        <field name="footer_text">Teknik çözüm ortağınız.</field>
-        <field name="preview_path">/ranvals_document_studio/static/description/templates/industrial.jpg</field>
+        <field name="tagline">Structured for precision and performance.</field>
+        <field name="footer_text">Reliable details. Decisive results.</field>
     </record>
 
     <record id="template_eco_green" model="rds.template">
-        <field name="name">Doğal Yeşil – Mimarlık ve Sürdürülebilirlik</field>
+        <field name="name">Sage Reserve</field>
         <field name="code">FREE_ECO_GREEN</field>
         <field name="sequence">50</field>
         <field name="layout_style">eco</field>
@@ -76,13 +72,12 @@
         <field name="text_color">#26372B</field>
         <field name="heading_font">serif</field>
         <field name="body_font">sans</field>
-        <field name="tagline">Sürdürülebilir Mekânlar, Kalıcı Değerler</field>
-        <field name="footer_text">Doğaya saygılı, insan odaklı, geleceğe değer.</field>
-        <field name="preview_path">/ranvals_document_studio/static/description/templates/eco.jpg</field>
+        <field name="tagline">Balanced presentation. Enduring value.</field>
+        <field name="footer_text">A considered document for lasting partnerships.</field>
     </record>
 
     <record id="template_furniture_terracotta" model="rds.template">
-        <field name="name">Terakota – Mobilya ve İç Mimarlık</field>
+        <field name="name">Copper Atelier</field>
         <field name="code">FREE_FURNITURE_TERRACOTTA</field>
         <field name="sequence">60</field>
         <field name="layout_style">furniture</field>
@@ -92,8 +87,127 @@
         <field name="text_color">#292B2D</field>
         <field name="heading_font">editorial</field>
         <field name="body_font">sans</field>
-        <field name="tagline">Mekâna Karakter Katan Tasarımlar</field>
-        <field name="footer_text">Teşekkür ederiz.</field>
-        <field name="preview_path">/ranvals_document_studio/static/description/templates/furniture.jpg</field>
+        <field name="tagline">Crafted detail for remarkable business.</field>
+        <field name="footer_text">Designed to leave a refined impression.</field>
+    </record>
+
+    <record id="template_noir_executive" model="rds.template">
+        <field name="name">Noir Executive</field>
+        <field name="code">FREE_NOIR_EXECUTIVE</field>
+        <field name="sequence">70</field>
+        <field name="layout_style">noir_executive</field>
+        <field name="primary_color">#111827</field>
+        <field name="secondary_color">#F8FAFC</field>
+        <field name="accent_color">#C8A96B</field>
+        <field name="text_color">#1F2937</field>
+        <field name="heading_font">serif</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Decisive documents for ambitious business.</field>
+        <field name="footer_text">Confidential. Professional. Precisely presented.</field>
+    </record>
+
+    <record id="template_royal_ledger" model="rds.template">
+        <field name="name">Royal Ledger</field>
+        <field name="code">FREE_ROYAL_LEDGER</field>
+        <field name="sequence">80</field>
+        <field name="layout_style">royal_ledger</field>
+        <field name="primary_color">#14213D</field>
+        <field name="secondary_color">#F8F5EE</field>
+        <field name="accent_color">#C49A44</field>
+        <field name="text_color">#202838</field>
+        <field name="heading_font">serif</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">A formal standard for trusted transactions.</field>
+        <field name="footer_text">Prepared for your records with distinction.</field>
+    </record>
+
+    <record id="template_swiss_grid" model="rds.template">
+        <field name="name">Swiss Grid</field>
+        <field name="code">FREE_SWISS_GRID</field>
+        <field name="sequence">90</field>
+        <field name="layout_style">swiss_grid</field>
+        <field name="primary_color">#111111</field>
+        <field name="secondary_color">#F7F7F5</field>
+        <field name="accent_color">#E53935</field>
+        <field name="text_color">#222222</field>
+        <field name="heading_font">sans</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Information, ordered with purpose.</field>
+        <field name="footer_text">Simple structure. Clear communication.</field>
+    </record>
+
+    <record id="template_arctic_minimal" model="rds.template">
+        <field name="name">Arctic Minimal</field>
+        <field name="code">FREE_ARCTIC_MINIMAL</field>
+        <field name="sequence">100</field>
+        <field name="layout_style">arctic_minimal</field>
+        <field name="primary_color">#234E70</field>
+        <field name="secondary_color">#F5FAFD</field>
+        <field name="accent_color">#38BDF8</field>
+        <field name="text_color">#1E293B</field>
+        <field name="heading_font">sans</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Space to focus on what matters.</field>
+        <field name="footer_text">A clear document for a clear next step.</field>
+    </record>
+
+    <record id="template_indigo_flow" model="rds.template">
+        <field name="name">Indigo Flow</field>
+        <field name="code">FREE_INDIGO_FLOW</field>
+        <field name="sequence">110</field>
+        <field name="layout_style">indigo_flow</field>
+        <field name="primary_color">#312E81</field>
+        <field name="secondary_color">#F5F3FF</field>
+        <field name="accent_color">#8B5CF6</field>
+        <field name="text_color">#1F2937</field>
+        <field name="heading_font">sans</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Momentum, translated into clarity.</field>
+        <field name="footer_text">Designed for smooth, confident decisions.</field>
+    </record>
+
+    <record id="template_emerald_ledger" model="rds.template">
+        <field name="name">Emerald Ledger</field>
+        <field name="code">FREE_EMERALD_LEDGER</field>
+        <field name="sequence">120</field>
+        <field name="layout_style">emerald_ledger</field>
+        <field name="primary_color">#064E3B</field>
+        <field name="secondary_color">#F2F8F5</field>
+        <field name="accent_color">#C6A15B</field>
+        <field name="text_color">#26352E</field>
+        <field name="heading_font">serif</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Measured detail. Enduring confidence.</field>
+        <field name="footer_text">A dependable record of shared value.</field>
+    </record>
+
+    <record id="template_sandstone_classic" model="rds.template">
+        <field name="name">Sandstone Classic</field>
+        <field name="code">FREE_SANDSTONE_CLASSIC</field>
+        <field name="sequence">130</field>
+        <field name="layout_style">sandstone_classic</field>
+        <field name="primary_color">#4A4038</field>
+        <field name="secondary_color">#FBF7EF</field>
+        <field name="accent_color">#B77945</field>
+        <field name="text_color">#302B27</field>
+        <field name="heading_font">serif</field>
+        <field name="body_font">serif</field>
+        <field name="tagline">Timeless form for important business.</field>
+        <field name="footer_text">Presented with tradition, care and clarity.</field>
+    </record>
+
+    <record id="template_graphite_copper" model="rds.template">
+        <field name="name">Graphite Copper</field>
+        <field name="code">FREE_GRAPHITE_COPPER</field>
+        <field name="sequence">140</field>
+        <field name="layout_style">graphite_copper</field>
+        <field name="primary_color">#252A2E</field>
+        <field name="secondary_color">#F5F2EE</field>
+        <field name="accent_color">#B56E4A</field>
+        <field name="text_color">#252A2E</field>
+        <field name="heading_font">technical</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Technical precision with a refined edge.</field>
+        <field name="footer_text">Built for accurate, professional communication.</field>
     </record>
 </odoo>

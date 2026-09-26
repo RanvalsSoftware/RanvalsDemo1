@@ -22,17 +22,19 @@ olduğunu ayrıca denetler.
 
 Satış siparişi, fatura/iade veya satın alma siparişi formunda:
 
-- **PDF İndir** seçilen etkin/koşullu DocuCraft tasarımını üretir.
-- **Word İndir** metin ve tabloları düzenlenebilir native DOCX üretir.
-- **Diğer Biçimler** penceresi PDF, düzenlenebilir Word, PDF görünümünü birebir
-  koruyan Word, PNG ve tümünü içeren ZIP seçeneklerini açar.
+- Tek **DocuCraft Yazdır** düğmesi tasarım, belge dili ve çıktı biçimi
+  seçeneklerini açar.
+- Aynı pencereden PDF, düzenlenebilir native Word, PDF görünümünü birebir
+  koruyan Word, PNG veya tümünü içeren ZIP oluşturulur.
+- Altı yenilenmiş imza tasarımı ve sekiz yeni kurumsal tasarımla toplam 14
+  yerleşim kullanılabilir.
 
-Aynı işlemler liste görünümünde seçili belgeler için Yazdır menüsündedir. Üçten
-fazla kayıt veya ZIP otomatik olarak **Arka Plan İşlerim** kuyruğuna alınır;
+Aynı tek işlem liste görünümünde ve Yazdır menüsünde seçili belgeler için de
+kullanılabilir. Üçten fazla kayıt veya ZIP otomatik olarak **Arka Plan İşlerim** kuyruğuna alınır;
 kullanıcı hazır olduğunda bildirim alır ve dosyayı yalnız kendi yetkileriyle
 indirebilir.
 
-Belge Studio yöneticileri koşullu şablon kuralları, sürüm geçmişi, güvenli JSON
+DocuCraft yöneticileri koşullu şablon kuralları, sürüm geçmişi, güvenli JSON
 içe/dışa aktarma ve gerçek kayıtla önizlemeyi kullanabilir. Veritabanı
 yöneticileri Yönetim altında Sistem Sağlığı ve genel Saklama Politikası
 ekranlarını görür.
@@ -51,3 +53,9 @@ yeniden başlatın.
 alın, bu klasörü değiştirin ve yalnız `ranvals_document_studio` modülünü
 yükseltin. Migrasyon mevcut şablonlar için başlangıç sürümü oluşturur; hiçbir
 belge veya şablon verisini sessizce kesmez.
+
+19.0.3.0.0 sürümünden 19.0.3.1.0'a yükseltme; Odoo 19 kullanıcı yetkileri
+ekranını bozan eski kategori çevirilerini güvenli adlarla değiştirir, eski
+sektörel tasarım adlarını yeniler ve fazla PDF/Word menü bağlarını kaldırır.
+Değişikliğin veritabanına uygulanması için yalnız kodu çekmek yerine modülü
+mutlaka yükseltin ve Odoo çalışanlarını yeniden başlatın.

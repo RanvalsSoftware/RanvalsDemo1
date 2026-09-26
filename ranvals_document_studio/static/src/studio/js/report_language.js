@@ -10,7 +10,7 @@ patch(RdsReportDesignSelector.prototype, {
         super.setup(...arguments);
         Object.assign(this.state, { languages: [], languageCode: "", savedLanguageCode: "" });
         // Wrap only this component's ORM facade; never mutate Odoo's shared
-        // ORM service. The old tested save/staleness/download flow is unchanged.
+        // ORM service. The tested save, preview and staleness flow is unchanged.
         const orm = this.orm;
         this.orm = { call: (model, method, args, kwargs) => {
             if (model === "ir.actions.report" && method === "rds_apply_design") {

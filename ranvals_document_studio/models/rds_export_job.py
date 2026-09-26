@@ -93,8 +93,8 @@ class RdsExportJob(models.Model):
     output_format = fields.Selection(
         [
             ("pdf", "PDF"),
-            ("docx", "Word / DOCX – PDF ile Birebir"),
             ("docx_editable", "Word / DOCX – Düzenlenebilir"),
+            ("docx", "Word / DOCX – Tasarımı Birebir Korur"),
             ("png", "PNG"),
             ("zip", "Tüm Formatlar / ZIP"),
         ],

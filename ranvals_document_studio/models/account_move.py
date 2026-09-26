@@ -12,7 +12,7 @@ class AccountMove(models.Model):
         supported_types = ("out_invoice", "out_refund", "in_invoice", "in_refund")
         unsupported = self.filtered(lambda move: move.move_type not in supported_types)
         if unsupported:
-            raise UserError(_("Belge Studio yalnız fatura ve iade faturalarında kullanılabilir."))
+            raise UserError(_("DocuCraft yalnız fatura ve iade faturalarında kullanılabilir."))
         return self.env["rds.export.wizard"].open_for_records(self)
 
     def _rds_report_action_xmlid(self, template=None):

@@ -164,7 +164,7 @@
     </record>
 
     <record id="action_rds_template" model="ir.actions.act_window">
-        <field name="name">PDF Şablonları</field>
+        <field name="name">DocuCraft Şablonları</field>
         <field name="res_model">rds.template</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_rds_template_search"/>

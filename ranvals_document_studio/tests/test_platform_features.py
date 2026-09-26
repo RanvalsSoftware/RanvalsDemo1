@@ -4,6 +4,8 @@ import json
 from datetime import timedelta
 from unittest.mock import patch
 
+from lxml import etree
+
 from odoo import Command, fields
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import TransactionCase, tagged
@@ -189,6 +191,25 @@ class TestPlatformFeatures(TransactionCase):
         }]
         with self.assertRaises(ValidationError):
             self.env["rds.template"]._rds_decode_payload(json.dumps(payload))
+
+    def test_05c_json_accepts_every_supported_layout_style(self):
+        styles = {
+            key
+            for key, _label in self.env["rds.template"]._fields[
+                "layout_style"
+            ].selection
+        }
+        self.assertEqual(len(styles), 14)
+        for layout_style in styles:
+            with self.subTest(layout_style=layout_style):
+                payload = self.template._rds_portable_payload()
+                payload["template"]["layout_style"] = layout_style
+                decoded = self.env["rds.template"]._rds_decode_payload(
+                    json.dumps(payload)
+                )
+                self.assertEqual(
+                    decoded["template"]["layout_style"], layout_style
+                )
 
     def test_06_real_record_preview_delegates_without_audit_blob(self):
         language = self.env["res.lang"].search([("active", "=", True)], limit=1)
@@ -605,3 +626,22 @@ class TestPlatformFeatures(TransactionCase):
         )
         with self.assertRaises(ValidationError):
             self.env["rds.template"]._rds_decode_payload(raw)
+
+    def test_19_user_rights_category_is_safe_for_odoo_dynamic_xml(self):
+        category = self.env.ref("ranvals_document_studio.module_category_rds")
+        privilege = self.env.ref("ranvals_document_studio.privilege_rds")
+        stored_values = {
+            "category": category._fields["name"]._get_stored_translations(category),
+            "privilege": privilege._fields["name"]._get_stored_translations(privilege),
+        }
+
+        # Inspect raw JSONB values rather than only active languages.  A stale
+        # inactive translation must not resurrect the Owl crash when enabled.
+        for record_name, translations in stored_values.items():
+            self.assertIn("en_US", translations)
+            for language_code, value in translations.items():
+                with self.subTest(record=record_name, language=language_code):
+                    self.assertNotRegex(value, r'[&<"]')
+                    etree.fromstring(
+                        ('<group string="%s"/>' % value).encode("utf-8")
+                    )

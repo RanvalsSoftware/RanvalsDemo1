@@ -1,4 +1,4 @@
-/* Belge Studio native list/form views — scoped to the custom controllers. */
+/* DocuCraft native list/form views — scoped to the custom controllers. */
 .o_rds_sidebar_view {
     --rds-view-bg: #fbfcfe;
     --rds-view-border: #dce2ea;
@@ -559,6 +559,74 @@
     }
 }
 
+// One clear entry point replaces the former PDF / Word / More trio.  Keep it
+// recognisably native to Odoo while giving DocuCraft a restrained brand cue.
+.rds-docucraft-print-button.btn-primary {
+    --rds-print-start: #5138c8;
+    --rds-print-end: #2166c2;
+
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--rds-print-start), var(--rds-print-end));
+    box-shadow: 0 4px 12px rgba(55, 66, 170, 0.22);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: box-shadow 140ms ease, filter 140ms ease, transform 140ms ease;
+
+    &:hover,
+    &:focus-visible {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--rds-print-start), var(--rds-print-end));
+        box-shadow: 0 6px 16px rgba(55, 66, 170, 0.3);
+        filter: brightness(1.06);
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    .fa {
+        margin-inline-end: 0.35rem;
+    }
+}
+
+.rds-export-wizard__intro {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 18px;
+    padding: 16px 18px;
+    border: 1px solid rgba(81, 56, 200, 0.16);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(81, 56, 200, 0.09), rgba(33, 102, 194, 0.06));
+
+    &-icon {
+        display: inline-flex;
+        flex: 0 0 46px;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        color: #fff;
+        background: linear-gradient(135deg, #5138c8, #2166c2);
+        box-shadow: 0 5px 14px rgba(55, 66, 170, 0.24);
+        font-size: 20px;
+    }
+
+    h2 {
+        margin: 0 0 3px;
+        color: var(--rds-view-text, #1f2937);
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0;
+        color: var(--rds-view-muted, #64748b);
+    }
+}
+
 @media (max-width: 1199.98px) {
     .o_rds_sidebar_list_view:has(> .o_rds_sidebar_host) {
         grid-template-columns: 72px minmax(0, 1fr);
@@ -627,6 +695,10 @@
 
 @media (prefers-reduced-motion: reduce) {
     .o_rds_sidebar_list_view .o_list_table tbody tr {
+        transition: none;
+    }
+
+    .rds-docucraft-print-button.btn-primary {
         transition: none;
     }
 }

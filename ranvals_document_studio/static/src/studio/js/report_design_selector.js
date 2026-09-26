@@ -7,7 +7,6 @@ import { ReportEditorWysiwyg } from "@web_studio/client_action/report_editor/rep
 import { runSelectorOperation } from "./selector_flow";
 
 const SUPPORTED_REPORT_MODELS = new Set(["sale.order", "account.move", "purchase.order"]);
-const OUTPUT_FORMATS = new Set(["pdf", "docx_editable", "docx", "png", "zip"]);
 const MAX_ODOO_ID = 2147483647;
 
 function positiveInteger(value) {
@@ -24,10 +23,9 @@ export class RdsReportDesignSelector extends Component {
 
     setup() {
         this.orm = useService("orm");
-        this.action = useService("action");
         this.notification = useService("notification");
         this.state = useState({ ready: false, supported: false, canManage: false, busy: false,
-            templateId: "", savedId: "", templates: [], company: "", format: "pdf", error: "",
+            templateId: "", savedId: "", templates: [], company: "", error: "",
             hasSavedConfiguration: false });
         this.generation = 0;
         this.alive = true;
@@ -56,12 +54,6 @@ export class RdsReportDesignSelector extends Component {
         return this.state.ready && this.state.supported && this.state.canManage &&
             !this.state.busy && this.hasRecord &&
             (this.hasTemplates || !!this.state.savedId || this.state.hasSavedConfiguration);
-    }
-
-    get canDownload() {
-        return this.state.ready && this.state.supported && !this.state.busy &&
-            this.hasRecord && this.hasTemplates && OUTPUT_FORMATS.has(this.state.format) &&
-            (!this.changed || this.state.canManage);
     }
 
     get selectedName() {
@@ -126,19 +118,15 @@ export class RdsReportDesignSelector extends Component {
         }
     }
 
-    async run(mode) {
-        if (mode !== "apply" && mode !== "export") return;
-        if (mode === "apply" ? !this.canApply : !this.canDownload) return;
+    async apply() {
+        if (!this.canApply) return;
         const model = this.props.reportModel;
         const key = this.key;
         const recordId = this.recordId;
         const reportId = this.reportId;
         const templateId = this.state.templateId ? Number(this.state.templateId) : false;
-        const format = this.state.format;
-        const changed = this.changed;
         const context = this.callContext;
-        if (!reportId || !recordId || (mode === "export" && !OUTPUT_FORMATS.has(format))) return;
-        if ((mode === "apply" || changed) && !this.state.canManage) return;
+        if (!reportId || !recordId || !this.state.canManage) return;
         this.state.busy = true;
         try {
             const result = await runSelectorOperation({
@@ -146,11 +134,9 @@ export class RdsReportDesignSelector extends Component {
                 isDirty: () => !!model.isDirty,
                 isCurrent: () => this.alive && key === this.key,
                 perform: async () => {
-                    if (mode === "apply" || changed) {
-                        const saved = await this.orm.call("ir.actions.report", "rds_apply_design",
-                            [[reportId], recordId, templateId], { context });
-                        if (this.alive && key === this.key) this.acceptOptions(saved);
-                    }
+                    const saved = await this.orm.call("ir.actions.report", "rds_apply_design",
+                        [[reportId], recordId, templateId], { context });
+                    if (this.alive && key === this.key) this.acceptOptions(saved);
                 },
                 reload: async () => {
                     // Supplying resId bypasses Studio's cached HTML. The native
@@ -168,22 +154,13 @@ export class RdsReportDesignSelector extends Component {
                 }
                 return;
             }
-            if (mode === "export") {
-                const action = await this.orm.call("ir.actions.report", "rds_export_design",
-                    [[reportId], recordId, format], { context });
-                if (this.alive && key === this.key) await this.action.doAction(action);
-            } else {
-                this.notification.add(_t("Bu rapor ve şirket için tasarım kaydedildi."), { type: "success" });
-            }
+            this.notification.add(_t("Bu rapor ve şirket için tasarım kaydedildi."), { type: "success" });
         } catch (error) {
             if (this.alive) this.notification.add(error.data?.message || error.message || _t("İşlem tamamlanamadı."), { type: "danger" });
         } finally {
             if (this.alive) this.state.busy = false;
         }
     }
-
-    apply() { return this.run("apply"); }
-    exportFile() { return this.run("export"); }
 }
 
 ReportEditorWysiwyg.components = { ...ReportEditorWysiwyg.components, RdsReportDesignSelector };
