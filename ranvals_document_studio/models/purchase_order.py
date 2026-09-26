@@ -7,8 +7,54 @@ from odoo.addons.ranvals_document_studio.tools.common import lang_code, plain_te
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
+    _RDS_EXPORT_METADATA_FIELDS = (
+        {"key": "builtin:metadata:name", "field_path": "name", "label_key": "document_no", "alignment": "center"},
+        {
+            "key": "builtin:metadata:order_date",
+            "field_path": "date_approve",
+            "fallback_paths": ("date_order",),
+            "label_key": "date",
+            "alignment": "center",
+        },
+        {"key": "builtin:metadata:date_planned", "field_path": "date_planned", "label_key": "delivery_date", "alignment": "center"},
+        {"key": "builtin:metadata:user_id", "field_path": "user_id", "label_key": "buyer", "alignment": "center"},
+        {"key": "builtin:metadata:partner_ref", "field_path": "partner_ref", "label_key": "reference", "alignment": "center"},
+        {"key": "builtin:metadata:payment_term_id", "field_path": "payment_term_id", "label_key": "payment_terms", "alignment": "center"},
+        {"key": "builtin:metadata:dest_address_id", "field_path": "dest_address_id", "alignment": "center", "context_only": True},
+    )
+    _RDS_EXPORT_LINE_FIELDS = (
+        {"key": "builtin:line:description", "field_path": "name", "label_key": "description", "alignment": "left"},
+        {"key": "builtin:line:quantity", "field_path": "product_qty", "label_key": "quantity", "alignment": "right"},
+        {"key": "builtin:line:unit_price", "field_path": "price_unit", "label_key": "unit_price", "alignment": "right"},
+        {"key": "builtin:line:discount", "field_path": "discount", "label_key": "discount", "alignment": "right"},
+        {"key": "builtin:line:tax", "field_path": "tax_ids", "label_key": "tax", "alignment": "right"},
+        {"key": "builtin:line:amount", "field_path": "price_subtotal", "label_key": "amount", "alignment": "right"},
+    )
+
     def action_open_rds_export(self):
         return self.env["rds.export.wizard"].open_for_records(self)
+
+    def _rds_export_field_config(self):
+        return {
+            "metadata": {
+                "model": "purchase.order",
+                "relation_field": False,
+                "view_id": self.env.ref("purchase.purchase_order_form"),
+                "builtin_fields": self._RDS_EXPORT_METADATA_FIELDS,
+            },
+            "line": {
+                "model": "purchase.order.line",
+                "relation_field": "order_line",
+                "view_id": self.env.ref("purchase.purchase_order_form"),
+                "builtin_fields": self._RDS_EXPORT_LINE_FIELDS,
+            },
+        }
+
+    def _rds_export_line_records(self):
+        self.ensure_one()
+        return self.order_line.filtered(
+            lambda line: line.display_type or line.product_qty != 0
+        )
 
     def _rds_report_action_xmlid(self, template=None):
         self.ensure_one()
@@ -168,7 +214,14 @@ class PurchaseOrder(models.Model):
         )
         metadata_specs = [
             {"label_key": "document_no", "path": "name", "icon": "fa-file-text-o"},
-            {"label_key": "date", "path": order_date_field, "value_type": "date", "icon": "fa-calendar"},
+            {
+                "label_key": "date",
+                "key": "builtin:metadata:order_date",
+                "path": order_date_field,
+                "field_path": "date_approve",
+                "value_type": "date",
+                "icon": "fa-calendar",
+            },
             {"label_key": "delivery_date", "path": "date_planned", "value_type": "date", "icon": "fa-truck"},
             {"label_key": "buyer", "path": "user_id", "icon": "fa-user"},
             {"label_key": "reference", "path": "partner_ref", "icon": "fa-bookmark-o"},
@@ -180,7 +233,10 @@ class PurchaseOrder(models.Model):
 
         shipping_partner = order.dest_address_id
         context["shipping_partner_info"] = template.partner_info(shipping_partner)
-        if shipping_partner:
+        custom_metadata = template.has_configured_fields(
+            "purchase.order", "metadata"
+        )
+        if not custom_metadata and shipping_partner:
             shipping_label = order._fields["dest_address_id"].get_description(
                 order.env, attributes={"string"}
             ).get("string", "Shipping Address")
@@ -194,6 +250,8 @@ class PurchaseOrder(models.Model):
                         "value": shipping_text,
                         "icon": "fa-truck",
                         "align": "center",
+                        "key": "builtin:metadata:dest_address_id",
+                        "field_path": "dest_address_id",
                     }
                 )
 
@@ -205,29 +263,45 @@ class PurchaseOrder(models.Model):
             currency=order.currency_id,
             lang=resolved_lang,
         )
-        if custom_columns:
+        custom_line_configured = template.has_configured_fields(
+            report_lines._name, "line"
+        )
+        if custom_line_configured:
             columns, lines = custom_columns, custom_lines
         else:
+            uom_field = "product_uom_id" if "product_uom_id" in report_lines._fields else "product_uom"
+            tax_field = "tax_ids" if "tax_ids" in report_lines._fields else "taxes_id"
             columns = [
-                {"label": tr_label("description", code), "align": "left", "width": 34},
-                {"label": tr_label("quantity", code), "align": "right", "width": 12},
-                {"label": tr_label("unit_price", code), "align": "right", "width": 14},
-                {"label": tr_label("discount", code), "align": "right", "width": 10},
-                {"label": tr_label("tax", code), "align": "right", "width": 12},
-                {"label": tr_label("amount", code), "align": "right", "width": 18},
+                {"label": tr_label("description", code), "align": "left", "width": 34, "key": "builtin:line:description", "field_path": "name"},
+                {"label": tr_label("quantity", code), "align": "right", "width": 12, "key": "builtin:line:quantity", "field_path": "product_qty"},
+                {"label": tr_label("unit_price", code), "align": "right", "width": 14, "key": "builtin:line:unit_price", "field_path": "price_unit"},
+                {"label": tr_label("discount", code), "align": "right", "width": 10, "key": "builtin:line:discount", "field_path": "discount"},
+                {"label": tr_label("tax", code), "align": "right", "width": 12, "key": "builtin:line:tax", "field_path": tax_field},
+                {"label": tr_label("amount", code), "align": "right", "width": 18, "key": "builtin:line:amount", "field_path": "price_subtotal"},
             ]
             lines = []
             for line in report_lines:
+                source_reference = template._export_line_reference(line)
                 display_type = getattr(line, "display_type", False)
                 if display_type in ("line_section", "line_subsection", "section", "subsection"):
-                    lines.append({"is_section": True, "description": plain_text(line.name)})
+                    lines.append(
+                        {
+                            "is_section": True,
+                            "description": plain_text(line.name),
+                            **source_reference,
+                        }
+                    )
                     continue
                 if display_type in ("line_note", "note"):
-                    lines.append({"is_note": True, "description": plain_text(line.name)})
+                    lines.append(
+                        {
+                            "is_note": True,
+                            "description": plain_text(line.name),
+                            **source_reference,
+                        }
+                    )
                     continue
-                uom_field = "product_uom_id" if "product_uom_id" in line._fields else "product_uom"
                 uom = line[uom_field]
-                tax_field = "tax_ids" if "tax_ids" in line._fields else "taxes_id"
                 taxes = line[tax_field] if tax_field in line._fields else self.env["account.tax"]
                 tax_text = ", ".join(
                     tax.tax_label or tax.name for tax in taxes if tax.tax_label or tax.name
@@ -270,11 +344,14 @@ class PurchaseOrder(models.Model):
                                 "bold": True,
                                 "highlight": template.layout_style == "industrial",
                             },
-                        ]
+                        ],
+                        **source_reference,
                     }
                 )
         context["columns"] = columns
         context["lines"] = lines
+        context["show_lines"] = bool(columns)
+        context["_line_records"] = report_lines
         context["totals"] = order._rds_totals_context(
             template, code, lang=resolved_lang
         )
@@ -294,4 +371,12 @@ class PurchaseOrder(models.Model):
         # buyer-company bank account here is neither part of Odoo's standard
         # purchase report nor a reliable payment destination for this order.
         context["bank"] = {}
+        field_specs = order.env.context.get("rds_export_field_specs")
+        if field_specs is not None:
+            template.apply_export_field_specs(
+                context,
+                order,
+                field_specs,
+                lang=resolved_lang,
+            )
         return context

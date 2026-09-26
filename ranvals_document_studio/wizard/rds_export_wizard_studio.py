@@ -1,5 +1,5 @@
-from odoo import fields, models, _
-from odoo.exceptions import ValidationError, UserError
+from odoo import _, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 
 class RdsExportWizard(models.TransientModel):
@@ -20,10 +20,32 @@ class RdsExportWizard(models.TransientModel):
         report = self._rds_source_report(record)
         if not report:
             return super()._render_pdf(record, language_code)
-        # The selected report action is kept; its per-company design is resolved
-        # by the integration. No explicit theme is forced over the native report.
+        # Keep the selected source action so report ACLs and pro-forma semantics
+        # remain intact.  In inherited mode its per-company design is resolved
+        # exactly as before; a custom field selection explicitly chooses the
+        # wizard's DocuCraft template below.
+        data = {"lang": language_code}
+        field_specs = self._selected_field_specs(
+            record=record,
+            language_code=language_code,
+        )
+        if field_specs is not None:
+            # A per-export field choice belongs to the selected DocuCraft
+            # design, not to the arbitrary QWeb source report that opened the
+            # wizard.  Supplying the explicit template lets the report bridge
+            # route PDF (and therefore pixel-perfect Word/PNG) through the
+            # same layout/context as live preview and editable Word.  With
+            # inherited fields we deliberately omit it, preserving the
+            # source report's historical native/saved-design behaviour.
+            data.update(
+                {
+                    "rds_template_id": self.template_id.id,
+                    "model_name": record._name,
+                    "rds_export_field_specs": field_specs,
+                }
+            )
         content, _kind = self.env["ir.actions.report"].with_context(lang=language_code)._render_qweb_pdf(
-            report.id, res_ids=[record.id], data={"lang": language_code}
+            report.id, res_ids=[record.id], data=data
         )
         if not content or not content.startswith(b"%PDF"):
             raise UserError(_("PDF motoru geçerli bir PDF çıktısı döndürmedi."))

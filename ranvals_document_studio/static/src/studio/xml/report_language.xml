@@ -11,6 +11,6 @@
             <p class="rds-design-hint">Belge dili önizleme ve çıktıya uygulanır; arayüz dilini değiştirmez.</p>
         </xpath>
         <xpath expr="//div[hasclass('rds-design-version')]" position="before"><div class="mt-3"><RdsLanguageButton beforeOpen.bind="prepareLanguageChange"/></div></xpath>
-        <xpath expr="//div[hasclass('rds-design-version')]" position="replace"><div class="rds-design-version">DocuCraft · 19.0.3.1.0</div></xpath>
+        <xpath expr="//div[hasclass('rds-design-version')]" position="replace"><div class="rds-design-version">DocuCraft · 19.0.3.2.0</div></xpath>
     </t>
 </templates>

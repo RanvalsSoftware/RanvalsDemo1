@@ -7,6 +7,25 @@ from odoo.addons.ranvals_document_studio.tools.common import lang_code, plain_te
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    _RDS_EXPORT_METADATA_FIELDS = (
+        {"key": "builtin:metadata:name", "field_path": "name", "label_key": "document_no", "alignment": "center"},
+        {"key": "builtin:metadata:date_order", "field_path": "date_order", "label_key": "date", "alignment": "center"},
+        {"key": "builtin:metadata:validity_date", "field_path": "validity_date", "label_key": "validity", "alignment": "center"},
+        {"key": "builtin:metadata:user_id", "field_path": "user_id", "label_key": "salesperson", "alignment": "center"},
+        {"key": "builtin:metadata:client_order_ref", "field_path": "client_order_ref", "label_key": "reference", "alignment": "center"},
+        {"key": "builtin:metadata:commitment_date", "field_path": "commitment_date", "label_key": "delivery_date", "alignment": "center"},
+        {"key": "builtin:metadata:partner_invoice_id", "field_path": "partner_invoice_id", "alignment": "center", "context_only": True},
+        {"key": "builtin:metadata:partner_shipping_id", "field_path": "partner_shipping_id", "alignment": "center", "context_only": True},
+    )
+    _RDS_EXPORT_LINE_FIELDS = (
+        {"key": "builtin:line:description", "field_path": "name", "label_key": "description", "alignment": "left"},
+        {"key": "builtin:line:quantity", "field_path": "product_uom_qty", "label_key": "quantity", "alignment": "right"},
+        {"key": "builtin:line:unit_price", "field_path": "price_unit", "label_key": "unit_price", "alignment": "right"},
+        {"key": "builtin:line:discount", "field_path": "discount", "label_key": "discount", "alignment": "right"},
+        {"key": "builtin:line:tax", "field_path": "tax_ids", "label_key": "tax", "alignment": "right"},
+        {"key": "builtin:line:amount", "field_path": "price_subtotal", "label_key": "amount", "alignment": "right"},
+    )
+
     _RDS_STUDIO_REPORT_ACTIONS = {
         "beauty": "ranvals_document_studio.action_report_rds_sale_beauty_document",
         "construction": "ranvals_document_studio.action_report_rds_sale_construction_document",
@@ -18,6 +37,26 @@ class SaleOrder(models.Model):
 
     def action_open_rds_export(self):
         return self.env["rds.export.wizard"].open_for_records(self)
+
+    def _rds_export_field_config(self):
+        return {
+            "metadata": {
+                "model": "sale.order",
+                "relation_field": False,
+                "view_id": self.env.ref("sale.view_order_form"),
+                "builtin_fields": self._RDS_EXPORT_METADATA_FIELDS,
+            },
+            "line": {
+                "model": "sale.order.line",
+                "relation_field": "order_line",
+                "view_id": self.env.ref("sale.view_order_form"),
+                "builtin_fields": self._RDS_EXPORT_LINE_FIELDS,
+            },
+        }
+
+    def _rds_export_line_records(self):
+        self.ensure_one()
+        return self._get_order_lines_to_report()
 
     def _rds_standard_report_template(self):
         """Return the design used by Odoo's native quotation/order report.
@@ -217,7 +256,10 @@ class SaleOrder(models.Model):
         context["metadata"] = template.get_metadata_context(
             order, metadata_specs, lang=resolved_lang
         )
-        if invoice_partner and invoice_partner != customer_partner:
+        custom_metadata = template.has_configured_fields(
+            "sale.order", "metadata"
+        )
+        if not custom_metadata and invoice_partner and invoice_partner != customer_partner:
             invoice_label = order._fields["partner_invoice_id"].get_description(
                 order.env, attributes={"string"}
             ).get("string", "Invoice Address")
@@ -231,10 +273,13 @@ class SaleOrder(models.Model):
                         "value": invoice_text,
                         "icon": "fa-file-text-o",
                         "align": "center",
+                        "key": "builtin:metadata:partner_invoice_id",
+                        "field_path": "partner_invoice_id",
                     }
                 )
         if (
-            shipping_partner
+            not custom_metadata
+            and shipping_partner
             and shipping_partner != customer_partner
             and shipping_partner != invoice_partner
         ):
@@ -251,6 +296,8 @@ class SaleOrder(models.Model):
                         "value": shipping_text,
                         "icon": "fa-truck",
                         "align": "center",
+                        "key": "builtin:metadata:partner_shipping_id",
+                        "field_path": "partner_shipping_id",
                     }
                 )
 
@@ -263,34 +310,51 @@ class SaleOrder(models.Model):
             currency=order.currency_id,
             lang=resolved_lang,
         )
-        if custom_columns:
+        custom_line_configured = template.has_configured_fields(
+            custom_line_records._name, "line"
+        )
+        if custom_line_configured:
             columns, lines = custom_columns, custom_lines
+            rendered_line_records = custom_line_records
         else:
-            columns = [
-                {"label": tr_label("description", code), "align": "left", "width": 34},
-                {"label": tr_label("quantity", code), "align": "right", "width": 12},
-                {"label": tr_label("unit_price", code), "align": "right", "width": 14},
-                {"label": tr_label("discount", code), "align": "right", "width": 10},
-                {"label": tr_label("tax", code), "align": "right", "width": 12},
-                {"label": tr_label("amount", code), "align": "right", "width": 18},
-            ]
-            lines = []
+            tax_field = "tax_ids" if "tax_ids" in report_lines._fields else "tax_id"
             price_field = (
                 "price_total"
                 if order.company_price_include == "tax_included"
                 else "price_subtotal"
             )
+            columns = [
+                {"label": tr_label("description", code), "align": "left", "width": 34, "key": "builtin:line:description", "field_path": "name"},
+                {"label": tr_label("quantity", code), "align": "right", "width": 12, "key": "builtin:line:quantity", "field_path": "product_uom_qty"},
+                {"label": tr_label("unit_price", code), "align": "right", "width": 14, "key": "builtin:line:unit_price", "field_path": "price_unit"},
+                {"label": tr_label("discount", code), "align": "right", "width": 10, "key": "builtin:line:discount", "field_path": "discount"},
+                {"label": tr_label("tax", code), "align": "right", "width": 12, "key": "builtin:line:tax", "field_path": tax_field},
+                {"label": tr_label("amount", code), "align": "right", "width": 18, "key": "builtin:line:amount", "field_path": price_field},
+            ]
+            lines = []
             for line in report_lines:
+                source_reference = template._export_line_reference(line)
                 display_type = getattr(line, "display_type", False)
                 if display_type in ("line_section", "line_subsection", "section", "subsection"):
-                    lines.append({"is_section": True, "description": plain_text(line.name)})
+                    lines.append(
+                        {
+                            "is_section": True,
+                            "description": plain_text(line.name),
+                            **source_reference,
+                        }
+                    )
                     continue
                 if display_type in ("line_note", "note"):
-                    lines.append({"is_note": True, "description": plain_text(line.name)})
+                    lines.append(
+                        {
+                            "is_note": True,
+                            "description": plain_text(line.name),
+                            **source_reference,
+                        }
+                    )
                     continue
                 uom_field = "product_uom_id" if "product_uom_id" in line._fields else "product_uom"
                 uom = line[uom_field]
-                tax_field = "tax_ids" if "tax_ids" in line._fields else "tax_id"
                 taxes = line[tax_field]
                 tax_text = ", ".join(
                     tax.tax_label or tax.name for tax in taxes if tax.tax_label or tax.name
@@ -342,11 +406,15 @@ class SaleOrder(models.Model):
                                 "highlight": not hide_prices
                                 and template.layout_style == "industrial",
                             },
-                        ]
+                        ],
+                        **source_reference,
                     }
                 )
+            rendered_line_records = report_lines
         context["columns"] = columns
         context["lines"] = lines
+        context["show_lines"] = bool(columns)
+        context["_line_records"] = rendered_line_records
         context["totals"] = order._rds_totals_context(
             template, code, lang=resolved_lang
         )
@@ -363,4 +431,12 @@ class SaleOrder(models.Model):
             )
         context["notes"] = notes
         context["bank"] = template.bank_info(order.company_id, order.currency_id) if template.show_bank else {}
+        field_specs = order.env.context.get("rds_export_field_specs")
+        if field_specs is not None:
+            template.apply_export_field_specs(
+                context,
+                order,
+                field_specs,
+                lang=resolved_lang,
+            )
         return context

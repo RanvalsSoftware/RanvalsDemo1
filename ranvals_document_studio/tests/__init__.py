@@ -9,3 +9,5 @@ from . import test_report_design
 from . import test_platform_features
 from . import test_quick_export
 from . import test_export_job
+from . import test_export_field_selection
+from . import test_export_field_ownership

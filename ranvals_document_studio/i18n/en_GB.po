@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
-"POT-Creation-Date: 2026-09-26 22:29+0000\n"
-"PO-Revision-Date: 2026-09-27 00:00+0300\n"
+"POT-Creation-Date: 2026-09-26 23:35+0000\n"
+"PO-Revision-Date: 2026-09-27 02:35+0300\n"
 "Language: en_GB\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -31,6 +31,12 @@ msgid ""
 "%(name)s — hedef: %(model)s — %(count)s dinamik alan. Pasif bir kopya "
 "oluşturulacak; şirket ve varsayılan seçimi aktarılmayacak."
 msgstr ""
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "%(section)s bölümünde en fazla %(limit)s alan seçilebilir."
+msgstr "A maximum of %(limit)s fields can be selected in %(section)s."
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -212,11 +218,34 @@ msgid "96 DPI – Ekran"
 msgstr "96 DPI – Screen"
 
 #. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "<i class=\"fa fa-check-circle\" title=\"Açık alanlar\"/>"
+msgstr "<i class=\"fa fa-check-circle\" title=\"Enabled fields\"/>"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<i class=\"fa fa-id-card-o\" title=\"Belge bilgileri\"/>\n"
+"                                Belge bilgileri"
+msgstr ""
+"<i class=\"fa fa-id-card-o\" title=\"Document information\"/>\n"
+"                                Document information"
+
+#. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form_dynamic_design
 msgid ""
-"<i class=\"fa fa-info-circle\"/><span>Renk karesine tıklayın veya HEX kodunu "
-"doğrudan yazın.</span>"
+"<i class=\"fa fa-info-circle\"/><span>Renk karesine tıklayın veya HEX kodunu"
+" doğrudan yazın.</span>"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<i class=\"fa fa-list-alt\" title=\"Satır sütunları\"/>\n"
+"                                Satır sütunları"
+msgstr ""
+"<i class=\"fa fa-list-alt\" title=\"Line columns\"/>\n"
+"                                Line columns"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.rds_external_layout
@@ -239,7 +268,9 @@ msgstr ""
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form_dynamic_design
-msgid "<span class=\"rds-control-label\"><i class=\"fa fa-quote-left\"/> Slogan</span>"
+msgid ""
+"<span class=\"rds-control-label\"><i class=\"fa fa-quote-left\"/> "
+"Slogan</span>"
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -287,7 +318,7 @@ msgstr ""
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form_dynamic_design
 msgid "<span class=\"rds-design-live-preview__badge\">Canlı</span>"
-msgstr ""
+msgstr "<span class=\"rds-design-live-preview__badge\">Live</span>"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form_dynamic_design
@@ -298,6 +329,77 @@ msgid ""
 "                                <small>Stili seçin, renk karesine tıklayın, yazı tiplerini değiştirin ve sonucu anında önizleyin.</small>\n"
 "                            </span>"
 msgstr ""
+"<span class=\"rds-design-toolbar__icon\"><i class=\"fa fa-magic\" title=\"Tasarım araçları\"/></span>\n"
+"                            <span>\n"
+"                                <strong>Live Şablon Tasarımcısı</strong>\n"
+"                                <small>Stili seçin, renk karesine tıklayın, yazı tiplerini değiştirin ve sonucu anında önizleyin.</small>\n"
+"                            </span>"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<span class=\"rds-export-fields-panel__icon\">\n"
+"                                    <i class=\"fa fa-sliders\" title=\"Belge alanları\"/>\n"
+"                                </span>\n"
+"                                <span>\n"
+"                                    <strong>Belgede Gösterilecek Alanlar</strong>\n"
+"                                    <small>Yeşil alanlar PDF, Word, PNG ve ZIP çıktısına eklenir; gri alanlar dışarıda kalır. Başlığı düzenleyebilir ve sürükleyerek sıralayabilirsiniz. En fazla 24 belge bilgisi ve 12 satır sütunu seçilebilir.</small>\n"
+"                                </span>"
+msgstr ""
+"<span class=\"rds-export-fields-panel__icon\">\n"
+"                                    <i class=\"fa fa-sliders\" title=\"Document fields\"/>\n"
+"                                </span>\n"
+"                                <span>\n"
+"                                    <strong>Fields Shown in the Document</strong>\n"
+"                                    <small>Green fields are included in PDF, Word, PNG and ZIP output; grey fields are excluded. You can edit labels and drag to reorder. Up to 24 document fields and 12 line columns can be selected.</small>\n"
+"                                </span>"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<span class=\"rds-export-option-card__icon rds-export-option-card__icon--format\">\n"
+"                                    <i class=\"fa fa-download\" title=\"Çıktı seçenekleri\"/>\n"
+"                                </span>\n"
+"                                <span>\n"
+"                                    <strong>Çıktı Seçenekleri</strong>\n"
+"                                    <small>Dosya türünü ve indirme davranışını seçin.</small>\n"
+"                                </span>"
+msgstr ""
+"<span class=\"rds-export-option-card__icon rds-export-option-card__icon--format\">\n"
+"                                    <i class=\"fa fa-download\" title=\"Output options\"/>\n"
+"                                </span>\n"
+"                                <span>\n"
+"                                    <strong>Output Options</strong>\n"
+"                                    <small>Choose the file type and download behaviour.</small>\n"
+"                                </span>"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<span class=\"rds-export-option-card__icon\">\n"
+"                                    <i class=\"fa fa-file-text-o\" title=\"Belge ve tasarım\"/>\n"
+"                                </span>\n"
+"                                <span>\n"
+"                                    <strong>Belge ve Tasarım</strong>\n"
+"                                    <small>Şablonu ve müşteri dilini belirleyin.</small>\n"
+"                                </span>"
+msgstr ""
+"<span class=\"rds-export-option-card__icon\">\n"
+"                                    <i class=\"fa fa-file-text-o\" title=\"Document and design\"/>\n"
+"                                </span>\n"
+"                                <span>\n"
+"                                    <strong>Document and Design</strong>\n"
+"                                    <small>Choose the template and customer language.</small>\n"
+"                                </span>"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<span class=\"rds-export-wizard__intro-icon\" aria-hidden=\"true\"><i "
+"class=\"fa fa-print\" title=\"DocuCraft Yazdır\"/></span>"
+msgstr ""
+"<span class=\"rds-export-wizard__intro-icon\" aria-hidden=\"true\"><i "
+"class=\"fa fa-print\" title=\"Print with DocuCraft\"/></span>"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form
@@ -342,6 +444,21 @@ msgid ""
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid ""
+"<span>\n"
+"                                <strong>Tasarım Önizlemesi</strong>\n"
+"                                <small>Seçili belgenin gerçek verileri, dili, tasarımı ve açık alanları gösterilir.</small>\n"
+"                            </span>\n"
+"                            <span class=\"rds-export-preview__badge\">Canlı</span>"
+msgstr ""
+"<span>\n"
+"                                <strong>Design Preview</strong>\n"
+"                                <small>Shows the selected document's real data, language, design and enabled fields.</small>\n"
+"                            </span>\n"
+"                            <span class=\"rds-export-preview__badge\">Live</span>"
+
+#. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form_dynamic_design
 msgid "<span>mm</span>"
 msgstr ""
@@ -352,6 +469,8 @@ msgid ""
 "<strong>Canlı Belge Önizlemesi</strong>\n"
 "                                <small>Renk, stil, font, slogan ve alt bilgi değişiklikleri bu örneğe uygulanır.</small>"
 msgstr ""
+"<strong>Live Belge Önizlemesi</strong>\n"
+"                                <small>Renk, stil, font, slogan ve alt bilgi değişiklikleri bu örneğe uygulanır.</small>"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form
@@ -419,8 +538,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_template_field.py:0
 msgid ""
-"Aktif tablo kolonlarının toplam genişliği yüzde 100'ü aşamaz. Mevcut toplam: "
-"%s"
+"Aktif tablo kolonlarının toplam genişliği yüzde 100'ü aşamaz. Mevcut toplam:"
+" %s"
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -457,6 +576,11 @@ msgstr ""
 #: code:addons/ranvals_document_studio/models/rds_template_field_insight.py:0
 msgid "Alan yolu artık çözümlenemiyor."
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "Alan özeti"
+msgstr "Field summary"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template__field_ids
@@ -516,8 +640,8 @@ msgid ""
 "kullanıcılar ve müşterinin belge dili etkilenmez. Uygularken sayfa yeniden "
 "yüklenir."
 msgstr ""
-"Interface language changes your own Odoo preference. Other users and customer"
-" document languages are unchanged. Applying reloads the page."
+"Interface language changes your own Odoo preference. Other users and "
+"customer document languages are unchanged. Applying reloads the page."
 
 #. module: ranvals_document_studio
 #. odoo-javascript
@@ -574,7 +698,8 @@ msgstr "The background job's source report information is inconsistent."
 #. module: ranvals_document_studio
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_export_job.py:0
-msgid "Arka plan işleri yalnız güvenli dışa aktarım akışından oluşturulabilir."
+msgid ""
+"Arka plan işleri yalnız güvenli dışa aktarım akışından oluşturulabilir."
 msgstr "Background jobs can only be created through the secure export flow."
 
 #. module: ranvals_document_studio
@@ -631,6 +756,11 @@ msgstr "Attachment"
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__attempts
 msgid "Attempts"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__auto_label
+msgid "Auto Label"
+msgstr "Auto Label"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__available_template_ids
@@ -691,8 +821,8 @@ msgstr "Balanced presentation. Enduring value."
 #. module: ranvals_document_studio
 #: model:ir.model.fields,help:ranvals_document_studio.field_rds_template_field__field_path
 msgid ""
-"Basit alan için örn. name; ilişkili alan için örn. partner_id.vat. En fazla 4"
-" seviye desteklenir; ara ilişkiler Many2one olmalıdır."
+"Basit alan için örn. name; ilişkili alan için örn. partner_id.vat. En fazla "
+"4 seviye desteklenir; ara ilişkiler Many2one olmalıdır."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -776,6 +906,12 @@ msgid "Başlangıç sürümü"
 msgstr "Baseline Version"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__label
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "Başlık"
+msgstr "Label"
+
+#. module: ranvals_document_studio
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_export_job.py:0
 msgid ""
@@ -784,10 +920,26 @@ msgid ""
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__field_selection_json
+msgid "Belge Alanı Seçimi"
+msgstr "Document Field Selection"
+
+#. module: ranvals_document_studio
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_field_add_wizard__section__metadata
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_template_field__section__metadata
 msgid "Belge Bilgi Kartı"
 msgstr ""
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Belge Bilgileri"
+msgstr "Belge Bilgileri"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_field_line__section__metadata
+msgid "Belge Bilgisi"
+msgstr "Belge Bilgisi"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__language_id
@@ -801,6 +953,52 @@ msgid "Belge Türü"
 msgstr "Document Type"
 
 #. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
+msgid "Belge alanı anahtarı geçersiz."
+msgstr "The document field key is invalid."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+#: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
+msgid "Belge alanı başlığı 1 ile 200 karakter arasında olmalıdır."
+msgstr "The document field label must be between 1 and 200 characters."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+#: code:addons/ranvals_document_studio/models/report_invoice_document.py:0
+#: code:addons/ranvals_document_studio/models/report_purchase_document.py:0
+#: code:addons/ranvals_document_studio/models/report_sale_document.py:0
+msgid "Belge alanı seçimi geçerli bir liste olmalıdır."
+msgstr "The document field selection must be a valid list."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Belge alanı seçimi geçersiz."
+msgstr "The document field selection is invalid."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_export_job.py:0
+msgid "Belge alanı seçimi izin verilen sınırı aşıyor."
+msgstr "The document field selection exceeds the allowed limit."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_export_job.py:0
+msgid "Belge alanı seçimi okunamadı."
+msgstr "The document field selection could not be read."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
+msgid "Belge alanı yolu geçersiz."
+msgstr "The document field path is invalid."
+
+#. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_language.xml:0
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_report_language__language_code
@@ -812,6 +1010,12 @@ msgstr "Document language"
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_language.xml:0
 msgid "Belge dili önizleme ve çıktıya uygulanır; arayüz dilini değiştirmez."
 msgstr "Document language applies to previews and exports, not the interface."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Belge kalemi"
+msgstr "Document item"
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -1002,8 +1206,8 @@ msgstr "Restore This Version"
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_template_field_insight.py:0
 msgid ""
-"Bu alan grup tabanlı erişim kısıtına sahiptir; belge motoru mevcut kullanıcı "
-"yetkisini uygular."
+"Bu alan grup tabanlı erişim kısıtına sahiptir; belge motoru mevcut kullanıcı"
+" yetkisini uygular."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -1052,8 +1256,8 @@ msgstr "This language is not active yet."
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_language_wizard
 msgid ""
-"Bu dil henüz etkin değil. Sistem yöneticisi aşağıdaki düğmeyle dili ve yüklü "
-"modüllerin çevirilerini etkinleştirebilir."
+"Bu dil henüz etkin değil. Sistem yöneticisi aşağıdaki düğmeyle dili ve yüklü"
+" modüllerin çevirilerini etkinleştirebilir."
 msgstr ""
 "This language is inactive. An administrator can activate it and module "
 "translations below."
@@ -1090,8 +1294,8 @@ msgid ""
 "Bu işin kaynak Studio raporu artık mevcut değil; güvenli bir çıktı "
 "üretilemedi."
 msgstr ""
-"This job's source Studio report no longer exists, so a safe output could not "
-"be produced."
+"This job's source Studio report no longer exists, so a safe output could not"
+" be produced."
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -1118,7 +1322,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_report_language.py:0
 msgid ""
-"Bu panel yalnız satış, fatura ve satın alma QWeb raporlarında kullanılabilir."
+"Bu panel yalnız satış, fatura ve satın alma QWeb raporlarında "
+"kullanılabilir."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -1152,11 +1357,16 @@ msgid ""
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_wizard__field_selection_mode__custom
+msgid "Bu Çıktının Alanları"
+msgstr "Fields for This Export"
+
+#. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_design_selector.xml:0
 msgid ""
-"Bu şirket ve belge modeli için etkin şablon bulunamadı. DocuCraft → Şablonlar"
-" bölümünü kontrol edin."
+"Bu şirket ve belge modeli için etkin şablon bulunamadı. DocuCraft → "
+"Şablonlar bölümünü kontrol edin."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -1256,6 +1466,7 @@ msgid "Crafted detail for remarkable business."
 msgstr "Crafted detail for remarkable business."
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__create_uid
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__create_uid
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_log__create_uid
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__create_uid
@@ -1276,6 +1487,7 @@ msgid "Created by"
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__create_date
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__create_date
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_log__create_date
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__create_date
@@ -1326,8 +1538,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_retention_settings_form
 msgid ""
 "Denetim kayıtları silinmez. Yalnız eski dosya içeriği, "
-"tamamlanmış/başarısız/iptal edilmiş arka plan işlerinin çıktıları ve seçenek "
-"açıksa DocuCraft'ın oluşturduğu doğrulanmış belge ekleri temizlenir. "
+"tamamlanmış/başarısız/iptal edilmiş arka plan işlerinin çıktıları ve seçenek"
+" açıksa DocuCraft'ın oluşturduğu doğrulanmış belge ekleri temizlenir. "
 "Kuyruktaki ve çalışan işlere dokunulmaz."
 msgstr ""
 
@@ -1541,6 +1753,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_ir_http__display_name
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_purchase_order__display_name
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_dashboard__display_name
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__display_name
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__display_name
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_log__display_name
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__display_name
@@ -1644,6 +1857,11 @@ msgstr ""
 #: model:ir.model,name:ranvals_document_studio.model_rds_export_wizard
 msgid "DocuCraft Dışa Aktarım"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model:ir.model,name:ranvals_document_studio.model_rds_export_field_line
+msgid "DocuCraft Dışa Aktarım Alanı"
+msgstr "DocuCraft Export Field"
 
 #. module: ranvals_document_studio
 #: model:ir.actions.act_window,name:ranvals_document_studio.action_rds_export_log
@@ -1854,8 +2072,8 @@ msgstr "DocuCraft can only be used for invoices and credit notes."
 #. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_language.xml:0
-msgid "DocuCraft · 19.0.3.1.0"
-msgstr ""
+msgid "DocuCraft · 19.0.3.2.0"
+msgstr "DocuCraft · 19.0.3.2.0"
 
 #. module: ranvals_document_studio
 #. odoo-javascript
@@ -2082,6 +2300,12 @@ msgstr ""
 #. module: ranvals_document_studio
 #. odoo-python
 #: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
+msgid "Dışa aktarım alanı başka bir işleme taşınamaz."
+msgstr "An export field cannot be moved to another operation."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
 msgid "Dışa aktarım dosya adı geçersiz."
 msgstr ""
 
@@ -2158,6 +2382,11 @@ msgid "Ekli"
 msgstr "Attached"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_field_line__origin__screen
+msgid "Ekran"
+msgstr "Ekran"
+
+#. module: ranvals_document_studio
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_health.py:0
 msgid "Eksik: %s"
@@ -2168,6 +2397,11 @@ msgstr ""
 #: model:rds.template,name:ranvals_document_studio.template_emerald_ledger
 msgid "Emerald Ledger"
 msgstr "Emerald Ledger"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__enabled_field_count
+msgid "Enabled Field Count"
+msgstr "Enabled Field Count"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_language_wizard__language_code__en_gb
@@ -2265,9 +2499,20 @@ msgid "Field"
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__field_key
+msgid "Field Key"
+msgstr "Field Key"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__field_path
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template_field__field_path
 msgid "Field Path"
 msgstr "Field Path"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__field_selection_mode
+msgid "Field Selection Mode"
+msgstr "Field Selection Mode"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__file_data
@@ -2583,6 +2828,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_ir_http__id
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_purchase_order__id
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_dashboard__id
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__id
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__id
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_log__id
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__id
@@ -2780,8 +3026,8 @@ msgid ""
 "Koşullu şablon kuralları yalnız satış, fatura ve satın alma belgelerinde "
 "kullanılabilir."
 msgstr ""
-"Conditional template rules are available only for sales, invoice and purchase"
-" documents."
+"Conditional template rules are available only for sales, invoice and "
+"purchase documents."
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -2848,13 +3094,20 @@ msgstr "Corporate Serif"
 
 #. module: ranvals_document_studio
 #. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Kurumsal belge tasarımı"
+msgstr "Corporate document design"
+
+#. module: ranvals_document_studio
+#. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_template_ui.py:0
 msgid "Kurumsal belge tasarımınızı anında özelleştirin."
 msgstr ""
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
-msgid "Kurumsal tasarımınızı, belge dilini ve çıktı biçimini tek yerden seçin."
+msgid ""
+"Kurumsal tasarımınızı, belge dilini ve çıktı biçimini tek yerden seçin."
 msgstr ""
 "Choose your corporate design, document language and output format in one "
 "place."
@@ -2868,8 +3121,8 @@ msgstr "Queued"
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_background_form
 msgid ""
-"Küçük belgeler hemen indirilir; büyük, çok kayıtlı veya tüm-format işlemleri "
-"otomatik olarak arka plana alınır."
+"Küçük belgeler hemen indirilir; büyük, çok kayıtlı veya tüm-format işlemleri"
+" otomatik olarak arka plana alınır."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -2895,6 +3148,7 @@ msgid "Language Active"
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__write_uid
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__write_uid
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_log__write_uid
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__write_uid
@@ -2915,6 +3169,7 @@ msgid "Last Updated by"
 msgstr ""
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__write_date
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__write_date
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_log__write_date
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__write_date
@@ -2943,6 +3198,11 @@ msgstr "Layout Style"
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_system_health__line_ids
 msgid "Line"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__line_field_count
+msgid "Line Field Count"
+msgstr "Line Field Count"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.rds_logo
@@ -3001,6 +3261,11 @@ msgid "Menüyü kapat"
 msgstr "Close menu"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__metadata_field_count
+msgid "Metadata Field Count"
+msgstr "Metadata Field Count"
+
+#. module: ranvals_document_studio
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_field_add_wizard__value_type__text
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_template_field__value_type__text
 msgid "Metin"
@@ -3051,6 +3316,18 @@ msgstr ""
 #: model:rds.template,tagline:ranvals_document_studio.template_indigo_flow
 msgid "Momentum, translated into clarity."
 msgstr "Momentum, translated into clarity."
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Müşteri"
+msgstr "Customer"
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Müşteri Bilgileri"
+msgstr "Customer Information"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_account_move_search_rds
@@ -3113,6 +3390,7 @@ msgstr ""
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template_field__field_id
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
 msgid "Odoo Alanı"
 msgstr "Odoo Field"
 
@@ -3130,7 +3408,8 @@ msgstr "Generate and Download"
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/xml/rds_dashboards.xml:0
 msgid ""
-"Oluşturulan PDF, Word, PNG ve ZIP belgelerini görüntüleyin ve tekrar indirin."
+"Oluşturulan PDF, Word, PNG ve ZIP belgelerini görüntüleyin ve tekrar "
+"indirin."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -3146,6 +3425,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_template_field__value_type__float
 msgid "Ondalık Sayı"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__origin
+msgid "Origin"
+msgstr "Origin"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_field_add_wizard__alignment__center
@@ -3219,8 +3503,8 @@ msgstr "PDF Design"
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
 msgid ""
-"PDF görünümündeki Word, tasarımı birebir korur; sayfalar yüksek çözünürlüklü "
-"görsel olduğu için metinler düzenlenemez."
+"PDF görünümündeki Word, tasarımı birebir korur; sayfalar yüksek çözünürlüklü"
+" görsel olduğu için metinler düzenlenemez."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -3256,8 +3540,8 @@ msgstr ""
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_language_wizard
 msgid ""
-"PDF, Word ve PNG için belge dilini dışa aktarım penceresinden veya DocuCraft "
-"Studio tasarım panelinden ayrıca seçebilirsiniz."
+"PDF, Word ve PNG için belge dilini dışa aktarım penceresinden veya DocuCraft"
+" Studio tasarım panelinden ayrıca seçebilirsiniz."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -3266,8 +3550,8 @@ msgid ""
 "PDF, Word, PNG veya ZIP çıktısı için kayıtları seçip <strong>DocuCraft "
 "Yazdır</strong> düğmesini kullanın."
 msgstr ""
-"Select records and use <strong>Print with DocuCraft</strong> for PDF, Word, "
-"PNG or ZIP output."
+"PDF, Word, PNG veya ZIP çıktısı için kayıtları seçip <strong>Print with "
+"DocuCraft</strong> düğmesini kullanın."
 
 #. module: ranvals_document_studio
 #. odoo-javascript
@@ -3576,6 +3860,17 @@ msgid "Satır / Tablo Kolonu"
 msgstr ""
 
 #. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Satır Sütunları"
+msgstr "Line Columns"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_field_line__section__line
+msgid "Satır Sütunu"
+msgstr "Line Column"
+
+#. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template_preview_wizard__sale_order_id
 msgid "Satış Belgesi"
 msgstr ""
@@ -3604,12 +3899,14 @@ msgid "Secondary Color"
 msgstr "Secondary Colour"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__section
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_field_add_wizard__section
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template_field__section
 msgid "Section"
 msgstr "Section"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__sequence
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_field_add_wizard__sequence
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template__sequence
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template_field__sequence
@@ -3652,6 +3949,12 @@ msgstr ""
 
 #. module: ranvals_document_studio
 #. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Seçilen belge alanı artık kullanılamıyor."
+msgstr "The selected document field is no longer available."
+
+#. module: ranvals_document_studio
+#. odoo-python
 #: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
 msgid "Seçilen belge dili etkin değil."
 msgstr ""
@@ -3671,7 +3974,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_sale_order_list_rds_quick_export
 msgid "Seçilen belgeler için tasarım ve çıktı biçimini tek pencereden seçin."
 msgstr ""
-"Choose the design and output format for the selected documents in one window."
+"Choose the design and output format for the selected documents in one "
+"window."
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -3845,6 +4149,7 @@ msgid "Sonraki"
 msgstr "Next"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__source_model
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_field_add_wizard__source_model_id
 msgid "Source Model"
 msgstr ""
@@ -3853,6 +4158,11 @@ msgstr ""
 #: model:rds.template,tagline:ranvals_document_studio.template_arctic_minimal
 msgid "Space to focus on what matters."
 msgstr "Space to focus on what matters."
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_field_line__origin__builtin
+msgid "Standart"
+msgstr "Standart"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__started_at
@@ -3874,6 +4184,11 @@ msgstr ""
 #: model:rds.template,tagline:ranvals_document_studio.template_industrial_red
 msgid "Structured for precision and performance."
 msgstr "Structured for precision and performance."
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__is_custom
+msgid "Studio Alanı"
+msgstr "Studio Field"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_job__source_report_expected
@@ -4015,10 +4330,11 @@ msgstr "You must be a DocuCraft manager to save the design selection."
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_purchase_order_form_rds
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_sale_order_form_rds
 msgid ""
-"Tasarım, belge dili ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin."
+"Tasarım, belge dili ve PDF, Word, PNG veya ZIP biçimini tek pencereden "
+"seçin."
 msgstr ""
-"Choose the design, document language and PDF, Word, PNG or ZIP format in one "
-"window."
+"Choose the design, document language and PDF, Word, PNG or ZIP format in one"
+" window."
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_account_move_form_rds_docucraft_branding
@@ -4059,6 +4375,12 @@ msgstr "Technical precision with a refined edge."
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_account_move_search_rds
 msgid "Tedarikçi Faturaları"
 msgstr "Vendor Bills"
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Tek belgede çok fazla alan seçildi."
+msgstr "Too many fields were selected for one document."
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -4144,6 +4466,8 @@ msgid "Timeless form for important business."
 msgstr "Timeless form for important business."
 
 #. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_account_move_list_rds
 msgid "Toplam"
 msgstr "Total"
@@ -4167,8 +4491,13 @@ msgid ""
 "Toplu indirme için aynı şirkete ait belgeleri seçin. Farklı şirketleri ayrı "
 "işlemlerde indirebilirsiniz."
 msgstr ""
-"Select documents from the same company for a batch download. Export different"
-" companies separately."
+"Select documents from the same company for a batch download. Export "
+"different companies separately."
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__total_field_count
+msgid "Total Field Count"
+msgstr "Total Field Count"
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -4263,6 +4592,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_template_field__width_percent
 msgid "Width Percent"
 msgstr "Width (%)"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__wizard_id
+msgid "Wizard"
+msgstr "Wizard"
 
 #. module: ranvals_document_studio
 #. odoo-javascript
@@ -4440,14 +4774,19 @@ msgstr ""
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
 msgid ""
-"ZIP paketi seçilen her kayıt için PDF, düzenlenebilir Word, PDF görünümündeki"
-" Word ve yüksek çözünürlüklü PNG sayfalarını birlikte içerir."
+"ZIP paketi seçilen her kayıt için PDF, düzenlenebilir Word, PDF "
+"görünümündeki Word ve yüksek çözünürlüklü PNG sayfalarını birlikte içerir."
 msgstr ""
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_wizard__output_format__zip
 msgid "ZIP – PDF + 2 Word türü + PNG"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "açık"
+msgstr "enabled"
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -4466,6 +4805,11 @@ msgstr ""
 #: code:addons/ranvals_document_studio/models/rds_health.py:0
 msgid "sürüm bilgisi yok"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "toplam"
+msgstr "total"
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -4506,8 +4850,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_template_field_insight.py:0
 msgid ""
-"Çoklu ilişki en fazla 100 görünen değerle sınırlandırılır ve büyük kayıtlarda"
-" pahalı olabilir."
+"Çoklu ilişki en fazla 100 görünen değerle sınırlandırılır ve büyük "
+"kayıtlarda pahalı olabilir."
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -4516,12 +4860,43 @@ msgid "Çıktı"
 msgstr "Output"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_wizard__field_line_ids
+msgid "Çıktı Alanları"
+msgstr "Export Fields"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "Çıktıda"
+msgstr "In Output"
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
+msgid ""
+"Çıktısı oluşturulmuş bir işlemde belge alanları değiştirilemez. Yeni bir "
+"dışa aktarım penceresi açın."
+msgstr ""
+"Document fields cannot be changed after output has been generated. Open a "
+"new export dialog."
+
+#. module: ranvals_document_studio
 #. odoo-python
 #: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
 msgid ""
 "Çıktısı oluşturulmuş bir işlemde kaynak kayıtlar değiştirilemez. Yeni bir "
 "dışa aktarım penceresi açın."
 msgstr ""
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
+msgid "Çıktısı oluşturulmuş bir işleme alan eklenemez."
+msgstr "A field cannot be added after output has been generated."
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__enabled
+msgid "Çıktıya Ekle"
+msgstr "Include in Output"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_account_move_list_rds
@@ -4597,6 +4972,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_field_add_wizard_form
 msgid "Örn. partner_id.vat"
 msgstr ""
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields,field_description:ranvals_document_studio.field_rds_export_field_line__sample_value
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "Örnek Değer"
+msgstr "Sample Value"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_wizard_form
+msgid "Özel"
+msgstr "Custom"
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -4684,6 +5070,15 @@ msgid "İş Ortağı"
 msgstr "Partner"
 
 #. module: ranvals_document_studio
+#: model:ir.model.fields,help:ranvals_document_studio.field_rds_export_job__field_selection_json
+msgid ""
+"İş oluşturulurken doğrulanan alan seçiminin değiştirilemez kopyası. Boş "
+"değer eski işler için şablon varsayılanlarını kullanır."
+msgstr ""
+"Immutable snapshot of the field selection validated when the job was "
+"created. An empty value uses template defaults for legacy jobs."
+
+#. module: ranvals_document_studio
 #. odoo-python
 #: code:addons/ranvals_document_studio/models/rds_export_job.py:0
 msgid "İşi isteyen kullanıcı artık etkin bir iç kullanıcı değil."
@@ -4712,6 +5107,7 @@ msgstr "The operation could not be completed."
 #. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/xml/rds_dashboards.xml:0
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_field_line__origin__template
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_export_log_search
 msgid "Şablon"
 msgstr "Template"
@@ -4736,6 +5132,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_portability_form
 msgid "Şablon Taşıma"
 msgstr "Template Portability"
+
+#. module: ranvals_document_studio
+#: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_export_wizard__field_selection_mode__inherit
+msgid "Şablon Varsayılanları"
+msgstr "Template Defaults"
 
 #. module: ranvals_document_studio
 #. odoo-python
@@ -5032,6 +5433,12 @@ msgid "Şirket"
 msgstr "Company"
 
 #. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Şirket Bilgileri"
+msgstr "Company Information"
+
+#. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_design_selector.xml:0
 msgid "Şirket:"
@@ -5064,6 +5471,12 @@ msgstr ""
 #: code:addons/ranvals_document_studio/wizard/rds_export_wizard.py:0
 msgid "Şirkete özel şablon şirket alanı olmayan bir modelde kullanılamaz."
 msgstr ""
+
+#. module: ranvals_document_studio
+#. odoo-python
+#: code:addons/ranvals_document_studio/models/rds_template.py:0
+msgid "Şirketiniz"
+msgstr "Your Company"
 
 #. module: ranvals_document_studio
 #. odoo-javascript

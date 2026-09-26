@@ -1201,7 +1201,8 @@ def render_editable_docx(context, language_code=None):
     _render_footer(section, context, budget, style)
     _render_title(document, context, budget, style)
     _render_party_and_metadata(document, context, budget, style)
-    _render_lines(document, context, budget, style)
+    if context.get("show_lines", True):
+        _render_lines(document, context, budget, style)
     _render_totals(document, context, budget, style)
     _render_notes_and_bank(document, context, budget, style)
 

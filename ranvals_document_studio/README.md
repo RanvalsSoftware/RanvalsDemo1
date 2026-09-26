@@ -26,6 +26,13 @@ Satış siparişi, fatura/iade veya satın alma siparişi formunda:
   seçeneklerini açar.
 - Aynı pencereden PDF, düzenlenebilir native Word, PDF görünümünü birebir
   koruyan Word, PNG veya tümünü içeren ZIP oluşturulur.
+- Ön izlemenin üstündeki **Belgede Gösterilecek Alanlar** tablosu, açık satış,
+  fatura veya satın alma ekranındaki standart ve Studio alanlarını otomatik
+  getirir. Yeşil alanlar çıktıya girer, gri alanlar dışarıda kalır; başlıklar
+  düzenlenebilir ve alanlar sürüklenerek sıralanabilir.
+- Canlı ön izleme örnek kutular yerine seçili gerçek belgenin değerlerini ve
+  seçilen kurumsal tasarımı gösterir. Aynı alan seçimi PDF, iki Word türü,
+  PNG, ZIP ve arka plan işlerinde korunur.
 - Altı yenilenmiş imza tasarımı ve sekiz yeni kurumsal tasarımla toplam 14
   yerleşim kullanılabilir.
 
@@ -59,3 +66,9 @@ ekranını bozan eski kategori çevirilerini güvenli adlarla değiştirir, eski
 sektörel tasarım adlarını yeniler ve fazla PDF/Word menü bağlarını kaldırır.
 Değişikliğin veritabanına uygulanması için yalnız kodu çekmek yerine modülü
 mutlaka yükseltin ve Odoo çalışanlarını yeniden başlatın.
+
+19.0.3.1.0 sürümünden 19.0.3.2.0'a yükseltirken de aynı şekilde veritabanı ve
+filestore yedeği alın, kodu değiştirin ve `ranvals_document_studio` modülünü
+yükseltin. Yükseltme; geçici alan seçici modelini ve arka plan işleri için
+değiştirilemez alan seçimi anlık görüntüsünü otomatik oluşturur. Ardından Odoo
+çalışanlarını yeniden başlatıp tarayıcıda sert yenileme yapın.

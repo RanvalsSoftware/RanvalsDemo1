@@ -34,6 +34,10 @@ class ReportRdsInvoiceDocument(models.AbstractModel):
             )
             if not is_active_language:
                 raise UserError(_("Seçilen belge dili etkin veya geçerli değildir."))
+        if "rds_export_field_specs" in values and not isinstance(
+            values["rds_export_field_specs"], (list, tuple)
+        ):
+            raise UserError(_("Belge alanı seçimi geçerli bir liste olmalıdır."))
         return values
 
     @api.model
@@ -73,6 +77,14 @@ class ReportRdsInvoiceDocument(models.AbstractModel):
                 raise UserError(_("Seçilen şablon bu belge modeli için tanımlı değildir."))
             if template.company_id and docs.filtered(lambda record: record.company_id != template.company_id):
                 raise UserError(_("Şirkete özel şablon başka bir şirketin belgesinde kullanılamaz."))
+        if docs and template and "rds_export_field_specs" in data:
+            normalized_specs = template.normalize_export_field_specs(
+                docs[:1],
+                data["rds_export_field_specs"],
+                lang=data.get("lang"),
+            )
+            data["rds_export_field_specs"] = normalized_specs
+            docs = docs.with_context(rds_export_field_specs=normalized_specs)
         return {
             "doc_ids": docs.ids,
             "doc_model": "account.move",

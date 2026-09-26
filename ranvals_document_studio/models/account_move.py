@@ -8,12 +8,50 @@ from odoo.addons.ranvals_document_studio.tools.common import lang_code, plain_te
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    _RDS_EXPORT_METADATA_FIELDS = (
+        {"key": "builtin:metadata:name", "field_path": "name", "label_key": "document_no", "alignment": "center"},
+        {"key": "builtin:metadata:invoice_date", "field_path": "invoice_date", "label_key": "date", "alignment": "center"},
+        {"key": "builtin:metadata:invoice_date_due", "field_path": "invoice_date_due", "label_key": "due_date", "alignment": "center"},
+        {"key": "builtin:metadata:invoice_user_id", "field_path": "invoice_user_id", "label_key": "salesperson", "alignment": "center", "fallback_paths": ("user_id",)},
+        {"key": "builtin:metadata:ref", "field_path": "ref", "label_key": "reference", "alignment": "center"},
+        {"key": "builtin:metadata:invoice_payment_term_id", "field_path": "invoice_payment_term_id", "label_key": "payment_terms", "alignment": "center"},
+        {"key": "builtin:metadata:partner_shipping_id", "field_path": "partner_shipping_id", "alignment": "center", "context_only": True},
+    )
+    _RDS_EXPORT_LINE_FIELDS = (
+        {"key": "builtin:line:description", "field_path": "name", "label_key": "description", "alignment": "left"},
+        {"key": "builtin:line:quantity", "field_path": "quantity", "label_key": "quantity", "alignment": "right"},
+        {"key": "builtin:line:unit_price", "field_path": "price_unit", "label_key": "unit_price", "alignment": "right"},
+        {"key": "builtin:line:discount", "field_path": "discount", "label_key": "discount", "alignment": "right"},
+        {"key": "builtin:line:tax", "field_path": "tax_ids", "label_key": "tax", "alignment": "right"},
+        {"key": "builtin:line:amount", "field_path": "price_subtotal", "label_key": "amount", "alignment": "right"},
+    )
+
     def action_open_rds_export(self):
         supported_types = ("out_invoice", "out_refund", "in_invoice", "in_refund")
         unsupported = self.filtered(lambda move: move.move_type not in supported_types)
         if unsupported:
             raise UserError(_("DocuCraft yalnız fatura ve iade faturalarında kullanılabilir."))
         return self.env["rds.export.wizard"].open_for_records(self)
+
+    def _rds_export_field_config(self):
+        return {
+            "metadata": {
+                "model": "account.move",
+                "relation_field": False,
+                "view_id": self.env.ref("account.view_move_form"),
+                "builtin_fields": self._RDS_EXPORT_METADATA_FIELDS,
+            },
+            "line": {
+                "model": "account.move.line",
+                "relation_field": "invoice_line_ids",
+                "view_id": self.env.ref("account.view_move_form"),
+                "builtin_fields": self._RDS_EXPORT_LINE_FIELDS,
+            },
+        }
+
+    def _rds_export_line_records(self):
+        self.ensure_one()
+        return self._get_move_lines_to_report()
 
     def _rds_report_action_xmlid(self, template=None):
         self.ensure_one()
@@ -220,6 +258,7 @@ class AccountMove(models.Model):
             {
                 "label_key": "document_no",
                 "value": context["number"],
+                "field_path": "name",
                 "icon": "fa-file-text-o",
             },
             {"label_key": "date", "path": "invoice_date", "value_type": "date", "icon": "fa-calendar"},
@@ -234,7 +273,10 @@ class AccountMove(models.Model):
 
         shipping_partner = move.partner_shipping_id
         context["shipping_partner_info"] = template.partner_info(shipping_partner)
-        if shipping_partner and shipping_partner != move.partner_id:
+        custom_metadata = template.has_configured_fields(
+            "account.move", "metadata"
+        )
+        if not custom_metadata and shipping_partner and shipping_partner != move.partner_id:
             shipping_label = move._fields["partner_shipping_id"].get_description(
                 move.env, attributes={"string"}
             ).get("string", "Delivery Address")
@@ -248,6 +290,8 @@ class AccountMove(models.Model):
                         "value": shipping_text,
                         "icon": "fa-truck",
                         "align": "center",
+                        "key": "builtin:metadata:partner_shipping_id",
+                        "field_path": "partner_shipping_id",
                     }
                 )
 
@@ -257,25 +301,46 @@ class AccountMove(models.Model):
             currency=move.currency_id,
             lang=resolved_lang,
         )
-        if custom_columns:
+        custom_line_configured = template.has_configured_fields(
+            invoice_lines._name, "line"
+        )
+        if custom_line_configured:
             columns, lines = custom_columns, custom_lines
         else:
+            price_field = (
+                "price_total"
+                if move.company_price_include == "tax_included"
+                else "price_subtotal"
+            )
             columns = [
-                {"label": tr_label("description", code), "align": "left", "width": 34},
-                {"label": tr_label("quantity", code), "align": "right", "width": 12},
-                {"label": tr_label("unit_price", code), "align": "right", "width": 14},
-                {"label": tr_label("discount", code), "align": "right", "width": 10},
-                {"label": tr_label("tax", code), "align": "right", "width": 12},
-                {"label": tr_label("amount", code), "align": "right", "width": 18},
+                {"label": tr_label("description", code), "align": "left", "width": 34, "key": "builtin:line:description", "field_path": "name"},
+                {"label": tr_label("quantity", code), "align": "right", "width": 12, "key": "builtin:line:quantity", "field_path": "quantity"},
+                {"label": tr_label("unit_price", code), "align": "right", "width": 14, "key": "builtin:line:unit_price", "field_path": "price_unit"},
+                {"label": tr_label("discount", code), "align": "right", "width": 10, "key": "builtin:line:discount", "field_path": "discount"},
+                {"label": tr_label("tax", code), "align": "right", "width": 12, "key": "builtin:line:tax", "field_path": "tax_ids"},
+                {"label": tr_label("amount", code), "align": "right", "width": 18, "key": "builtin:line:amount", "field_path": price_field},
             ]
             lines = []
             for line in invoice_lines:
+                source_reference = template._export_line_reference(line)
                 display_type = getattr(line, "display_type", False)
                 if display_type in ("line_section", "line_subsection", "section", "subsection"):
-                    lines.append({"is_section": True, "description": plain_text(line.name)})
+                    lines.append(
+                        {
+                            "is_section": True,
+                            "description": plain_text(line.name),
+                            **source_reference,
+                        }
+                    )
                     continue
                 if display_type in ("line_note", "note"):
-                    lines.append({"is_note": True, "description": plain_text(line.name)})
+                    lines.append(
+                        {
+                            "is_note": True,
+                            "description": plain_text(line.name),
+                            **source_reference,
+                        }
+                    )
                     continue
                 if display_type not in (False, "product"):
                     continue
@@ -287,11 +352,6 @@ class AccountMove(models.Model):
                 quantity_text = "%s %s" % (
                     move._rds_format_quantity(line.quantity, lang=resolved_lang),
                     uom.display_name if uom else "",
-                )
-                price_field = (
-                    "price_total"
-                    if move.company_price_include == "tax_included"
-                    else "price_subtotal"
                 )
                 lines.append(
                     {
@@ -326,11 +386,14 @@ class AccountMove(models.Model):
                                 "bold": True,
                                 "highlight": template.layout_style == "industrial",
                             },
-                        ]
+                        ],
+                        **source_reference,
                     }
                 )
         context["columns"] = columns
         context["lines"] = lines
+        context["show_lines"] = bool(columns)
+        context["_line_records"] = invoice_lines
         context["totals"] = move._rds_totals_context(
             template, code, lang=resolved_lang
         )
@@ -349,4 +412,12 @@ class AccountMove(models.Model):
             )
         context["notes"] = notes
         context["bank"] = move._rds_bank_context(template)
+        field_specs = move.env.context.get("rds_export_field_specs")
+        if field_specs is not None:
+            template.apply_export_field_specs(
+                context,
+                move,
+                field_specs,
+                lang=resolved_lang,
+            )
         return context

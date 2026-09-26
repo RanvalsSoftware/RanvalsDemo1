@@ -1,3 +1,6 @@
+import json
+from unittest.mock import patch
+
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase, tagged
 
@@ -239,3 +242,84 @@ class TestRdsStudioSaleReports(TransactionCase):
         for payload in malformed_payloads:
             with self.subTest(payload=payload), self.assertRaises(UserError):
                 provider._get_report_values([], payload)
+
+    def test_source_report_custom_fields_force_the_selected_docucraft_design(self):
+        order = self.env["sale.order"].create({"partner_id": self.partner.id})
+        template = self.env.ref(
+            "ranvals_document_studio.template_graphite_copper"
+        )
+        source_report = self.env.ref("sale.action_report_saleorder")
+        wizard = self.env["rds.export.wizard"].create(
+            {
+                "res_model": order._name,
+                "res_ids_json": json.dumps(order.ids),
+                "template_id": template.id,
+                "output_format": "pdf",
+                "field_selection_mode": "custom",
+                # An empty custom list is intentional: it means that both
+                # metadata and line fields are disabled for this export.
+                "rds_source_report_id": source_report.id,
+            }
+        )
+        captured = {}
+
+        def render_pdf(_service, report_ref, res_ids=None, data=None):
+            captured.update(
+                {
+                    "report_ref": report_ref,
+                    "res_ids": res_ids,
+                    "data": data,
+                }
+            )
+            return b"%PDF-docucraft-custom-fields", "pdf"
+
+        report_model = type(self.env["ir.actions.report"])
+        with patch.object(
+            report_model,
+            "_render_qweb_pdf",
+            autospec=True,
+            side_effect=render_pdf,
+        ):
+            content = wizard._render_pdf(order, "en_US")
+
+        self.assertTrue(content.startswith(b"%PDF"))
+        self.assertEqual(captured["report_ref"], source_report.id)
+        self.assertEqual(captured["res_ids"], order.ids)
+        self.assertEqual(captured["data"]["rds_template_id"], template.id)
+        self.assertEqual(captured["data"]["model_name"], order._name)
+        self.assertEqual(captured["data"]["rds_export_field_specs"], [])
+
+    def test_source_report_inherited_fields_keep_native_report_behaviour(self):
+        order = self.env["sale.order"].create({"partner_id": self.partner.id})
+        template = self.env.ref(
+            "ranvals_document_studio.template_graphite_copper"
+        )
+        source_report = self.env.ref("sale.action_report_saleorder")
+        wizard = self.env["rds.export.wizard"].create(
+            {
+                "res_model": order._name,
+                "res_ids_json": json.dumps(order.ids),
+                "template_id": template.id,
+                "output_format": "pdf",
+                "field_selection_mode": "inherit",
+                "rds_source_report_id": source_report.id,
+            }
+        )
+        captured = {}
+
+        def render_pdf(_service, report_ref, res_ids=None, data=None):
+            captured.update({"report_ref": report_ref, "data": data})
+            return b"%PDF-native-source-report", "pdf"
+
+        report_model = type(self.env["ir.actions.report"])
+        with patch.object(
+            report_model,
+            "_render_qweb_pdf",
+            autospec=True,
+            side_effect=render_pdf,
+        ):
+            content = wizard._render_pdf(order, "en_US")
+
+        self.assertTrue(content.startswith(b"%PDF"))
+        self.assertEqual(captured["report_ref"], source_report.id)
+        self.assertEqual(captured["data"], {"lang": "en_US"})

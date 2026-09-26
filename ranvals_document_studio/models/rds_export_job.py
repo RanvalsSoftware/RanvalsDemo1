@@ -15,6 +15,7 @@ MAX_JOB_BYTES = 100 * 1024 * 1024
 MAX_PENDING_JOBS_PER_USER = 20
 MAX_JOB_ATTEMPTS = 3
 MAX_ERROR_MESSAGE = 1000
+MAX_FIELD_SELECTION_JSON_CHARS = 32_768
 ALLOWED_OUTPUT_FORMATS = {
     "pdf",
     "docx",
@@ -111,6 +112,15 @@ class RdsExportJob(models.Model):
     language_id = fields.Many2one("res.lang", readonly=True, ondelete="restrict")
     attach_to_record = fields.Boolean(readonly=True)
     file_name_prefix = fields.Char(readonly=True)
+    field_selection_json = fields.Text(
+        string="Belge Alanı Seçimi",
+        readonly=True,
+        copy=False,
+        help=(
+            "İş oluşturulurken doğrulanan alan seçiminin değiştirilemez kopyası. "
+            "Boş değer eski işler için şablon varsayılanlarını kullanır."
+        ),
+    )
     attempts = fields.Integer(readonly=True, default=0)
     requested_at = fields.Datetime(readonly=True, default=fields.Datetime.now, index=True)
     started_at = fields.Datetime(readonly=True)
@@ -224,6 +234,25 @@ class RdsExportJob(models.Model):
                 % MAX_PENDING_JOBS_PER_USER
             )
         names = ", ".join(records.mapped("display_name"))
+        language_code = (
+            wizard.language_id.code
+            if wizard.language_id
+            else caller_env.user.lang
+        )
+        field_specs = wizard._selected_field_specs(
+            record=records[:1],
+            language_code=language_code,
+        )
+        field_selection_json = (
+            json.dumps(field_specs, ensure_ascii=False, separators=(",", ":"))
+            if field_specs is not None
+            else False
+        )
+        if (
+            field_selection_json
+            and len(field_selection_json) > MAX_FIELD_SELECTION_JSON_CHARS
+        ):
+            raise ValidationError(_("Belge alanı seçimi izin verilen sınırı aşıyor."))
         job = Job.sudo().create(
             {
                 "user_id": caller_env.user.id,
@@ -240,6 +269,7 @@ class RdsExportJob(models.Model):
                 "language_id": wizard.language_id.id or False,
                 "attach_to_record": wizard.attach_to_record,
                 "file_name_prefix": wizard.file_name_prefix,
+                "field_selection_json": field_selection_json,
             }
         )
         return job.with_user(caller_env.user)
@@ -293,6 +323,39 @@ class RdsExportJob(models.Model):
             # manually altered row.  Legitimate jobs always set both values in
             # ``create``/``_enqueue_from_wizard``.
             raise AccessError(_("Arka plan işinin kaynak rapor bilgisi tutarsız."))
+        field_specs = None
+        if job.field_selection_json:
+            if len(job.field_selection_json) > MAX_FIELD_SELECTION_JSON_CHARS:
+                raise ValidationError(_("Belge alanı seçimi izin verilen sınırı aşıyor."))
+            try:
+                field_specs = json.loads(job.field_selection_json)
+            except (TypeError, ValueError) as error:
+                raise ValidationError(_("Belge alanı seçimi okunamadı.")) from error
+            field_specs = job.template_id.normalize_export_field_specs(
+                records[:1],
+                field_specs,
+                lang=job.language_id.code if job.language_id else job.env.user.lang,
+            )
+        field_line_commands = [
+            (
+                0,
+                0,
+                {
+                    "section": item["section"],
+                    "enabled": True,
+                    "sequence": index * 10 + 10,
+                    "source_model": item["source_model"],
+                    "field_key": item["key"],
+                    "field_path": item["field_path"],
+                    "label": item["label"],
+                    "auto_label": item["label"],
+                    "sample_value": "-",
+                    "origin": "screen",
+                    "is_custom": item["field_path"].startswith("x_"),
+                },
+            )
+            for index, item in enumerate(field_specs or [])
+        ]
         wizard = job.env["rds.export.wizard"].create(
             {
                 "res_model": job.res_model,
@@ -304,6 +367,10 @@ class RdsExportJob(models.Model):
                 "language_id": job.language_id.id or False,
                 "attach_to_record": job.attach_to_record,
                 "file_name_prefix": job.file_name_prefix,
+                "field_selection_mode": (
+                    "custom" if field_specs is not None else "inherit"
+                ),
+                "field_line_ids": field_line_commands,
                 # The queue worker must always execute the payload now.  If
                 # ``auto`` were left as the default, a ZIP or a job with more
                 # than three records would enqueue itself again indefinitely.

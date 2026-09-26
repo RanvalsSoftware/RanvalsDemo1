@@ -3,10 +3,11 @@ import binascii
 import re
 from datetime import date, datetime
 
+from lxml import etree
 from markupsafe import Markup, escape
 
 from odoo import api, fields, models, _
-from odoo.exceptions import AccessError, MissingError, ValidationError
+from odoo.exceptions import AccessError, MissingError, UserError, ValidationError
 from odoo.tools.misc import formatLang
 
 from ..tools.common import format_date_value, lang_code, normalize_hex, plain_text, tr_label
@@ -29,6 +30,54 @@ FONT_CSS = {
 MAX_FIELD_PATH_DEPTH = 4
 MAX_RELATIONAL_VALUES = 100
 MAX_FIELD_TEXT_LENGTH = 10000
+MAX_EXPORT_FIELD_CANDIDATES = 160
+MAX_EXPORT_METADATA_FIELDS = 24
+MAX_EXPORT_LINE_FIELDS = 12
+EXPORT_FIELD_TYPES = {
+    "boolean",
+    "char",
+    "date",
+    "datetime",
+    "float",
+    "html",
+    "integer",
+    "many2many",
+    "many2one",
+    "monetary",
+    "selection",
+    "text",
+}
+EXPORT_FIELD_EXCLUDED_NAMES = {
+    "access_token",
+    "access_url",
+    "create_date",
+    "create_uid",
+    "display_name",
+    "id",
+    "message_attachment_count",
+    "message_follower_ids",
+    "message_has_error",
+    "message_has_error_counter",
+    "message_has_sms_error",
+    "message_ids",
+    "website_message_ids",
+    "write_date",
+    "write_uid",
+}
+EXPORT_FIELD_EXCLUDED_PREFIXES = (
+    "activity_",
+    "message_",
+    "website_message_",
+)
+EXPORT_FIELD_SECRET_PARTS = (
+    "api_key",
+    "credential",
+    "password",
+    "private_key",
+    "secret",
+    "session",
+    "token",
+)
 SAFE_PREVIEW_PATH = re.compile(
     r"^/[A-Za-z0-9_]+/static/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.(?:jpe?g|png|webp)$",
     re.IGNORECASE,
@@ -221,14 +270,24 @@ class RdsTemplate(models.Model):
                 </div>
                 <div style="padding:18px 24px;">
                     <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
-                        <tr><td style="width:48%;height:52px;border:1px solid #dce2e7;background:{secondary};"></td><td style="width:4%;"></td><td style="width:48%;height:52px;border:1px solid #dce2e7;"></td></tr>
+                        <tr>
+                            <td style="width:48%;height:52px;padding:10px 12px;border:1px solid #dce2e7;background:{secondary};">
+                                <div style="font-size:8px;font-weight:800;text-transform:uppercase;color:{primary};">{company_label}</div>
+                                <div style="margin-top:7px;font-size:10px;">{company_value}</div>
+                            </td>
+                            <td style="width:4%;"></td>
+                            <td style="width:48%;height:52px;padding:10px 12px;border:1px solid #dce2e7;">
+                                <div style="font-size:8px;font-weight:800;text-transform:uppercase;color:{primary};">{customer_label}</div>
+                                <div style="margin-top:7px;font-size:10px;">{customer_value}</div>
+                            </td>
+                        </tr>
                     </table>
                     <table style="width:100%;border-collapse:collapse;margin-top:16px;">
-                        <tr style="background:{primary};color:#fff;"><td style="padding:7px 9px;">01</td><td style="padding:7px 9px;">Document item</td><td style="padding:7px 9px;text-align:right;">1,000.00</td></tr>
+                        <tr style="background:{primary};color:#fff;"><td style="padding:7px 9px;">01</td><td style="padding:7px 9px;">{document_item}</td><td style="padding:7px 9px;text-align:right;">1,000.00</td></tr>
                         <tr><td colspan="3" style="height:34px;border:1px solid #e4e8ec;"></td></tr>
                         <tr><td colspan="3" style="height:34px;border:1px solid #e4e8ec;background:{secondary};"></td></tr>
                     </table>
-                    <div style="width:42%;margin:16px 0 0 auto;padding:9px 12px;background:{accent};color:#fff;text-align:right;font-weight:800;">TOTAL&nbsp;&nbsp;1,000.00</div>
+                    <div style="width:42%;margin:16px 0 0 auto;padding:9px 12px;background:{accent};color:#fff;text-align:right;font-weight:800;">{total_label}&nbsp;&nbsp;1,000.00</div>
                 </div>
             </div>
             """
@@ -240,7 +299,13 @@ class RdsTemplate(models.Model):
             heading_font=theme["heading_font"],
             body_font=theme["body_font"],
             name=self.name or "DocuCraft",
-            tagline=self.tagline or "Professional document design",
+            tagline=self.tagline or _("Kurumsal belge tasarımı"),
+            company_label=_("Şirket Bilgileri"),
+            company_value=_("Şirketiniz"),
+            customer_label=_("Müşteri Bilgileri"),
+            customer_value=_("Müşteri"),
+            document_item=_("Belge kalemi"),
+            total_label=_("Toplam"),
         )
 
     @api.model
@@ -401,6 +466,16 @@ class RdsTemplate(models.Model):
             and item.section == section
             and item.source_model_id.model == source_model_name
         ).sorted(key=lambda item: (item.sequence, item.id))
+
+    def has_configured_fields(self, source_model_name, section):
+        """Return whether a section was configured, including all-off rows."""
+        self.ensure_one()
+        return bool(
+            self.with_context(active_test=False).field_ids.filtered(
+                lambda item: item.section == section
+                and item.source_model_id.model == source_model_name
+            )
+        )
 
     def _resolve_path_info(self, record, path):
         """Resolve a configured field path and retain its terminal metadata.
@@ -588,9 +663,18 @@ class RdsTemplate(models.Model):
 
     def get_metadata_context(self, record, default_specs, lang=None):
         self.ensure_one()
-        custom = self.get_custom_fields(record._name, "metadata")
+        configured = self.with_context(active_test=False).field_ids.filtered(
+            lambda item: item.section == "metadata"
+            and item.source_model_id.model == record._name
+        )
+        custom = configured.filtered("active").sorted(
+            key=lambda item: (item.sequence, item.id)
+        )
         result = []
-        if custom:
+        # ``configured`` and ``custom`` must remain distinct: a template whose
+        # metadata rows were deliberately all disabled must render no metadata,
+        # not silently fall back to the connector defaults.
+        if configured:
             for field_record in custom:
                 value = self.get_field_display_value(record, field_record, currency=getattr(record, "currency_id", None), lang=lang)
                 if field_record.hide_if_empty and not value:
@@ -601,6 +685,9 @@ class RdsTemplate(models.Model):
                         "value": value or "-",
                         "icon": field_record.icon_class or "fa-circle-o",
                         "align": field_record.alignment,
+                        "key": "template:%s" % field_record.id,
+                        "field_path": field_record.field_path,
+                        "hide_if_empty": bool(field_record.hide_if_empty),
                     }
                 )
             return result
@@ -620,6 +707,11 @@ class RdsTemplate(models.Model):
                     "value": formatted or "-",
                     "icon": spec.get("icon", "fa-circle-o"),
                     "align": spec.get("align", "center"),
+                    "key": spec.get("key") or "builtin:metadata:%s" % (
+                        spec.get("field_path") or spec.get("path") or spec.get("label_key", "document_no")
+                    ),
+                    "field_path": spec.get("field_path") or spec.get("path"),
+                    "hide_if_empty": bool(spec.get("hide_if_empty")),
                 }
             )
         return result
@@ -629,25 +721,46 @@ class RdsTemplate(models.Model):
         if not line_records:
             return [], []
         source_model = line_records._name
-        custom = self.get_custom_fields(source_model, "line")
-        if not custom:
+        configured = self.with_context(active_test=False).field_ids.filtered(
+            lambda item: item.section == "line"
+            and item.source_model_id.model == source_model
+        )
+        custom = configured.filtered("active").sorted(
+            key=lambda item: (item.sequence, item.id)
+        )
+        if not configured:
             return [], []
         columns = [
             {
                 "label": field_record.label or field_record.field_path,
                 "align": field_record.alignment,
                 "width": field_record.width_percent,
+                "key": "template:%s" % field_record.id,
+                "field_path": field_record.field_path,
             }
             for field_record in custom
         ]
         lines = []
         for line in line_records:
+            source_reference = self._export_line_reference(line)
             display_type = getattr(line, "display_type", False)
             if display_type in ("line_section", "line_subsection", "section", "subsection"):
-                lines.append({"is_section": True, "description": plain_text(getattr(line, "name", ""))})
+                lines.append(
+                    {
+                        "is_section": True,
+                        "description": plain_text(getattr(line, "name", "")),
+                        **source_reference,
+                    }
+                )
                 continue
             if display_type in ("line_note", "note"):
-                lines.append({"is_note": True, "description": plain_text(getattr(line, "name", ""))})
+                lines.append(
+                    {
+                        "is_note": True,
+                        "description": plain_text(getattr(line, "name", "")),
+                        **source_reference,
+                    }
+                )
                 continue
             values = []
             for field_record in custom:
@@ -660,8 +773,539 @@ class RdsTemplate(models.Model):
                         "highlight": field_record.highlight,
                     }
                 )
-            lines.append({"values": values})
+            lines.append({"values": values, **source_reference})
         return columns, lines
+
+    @api.model
+    def _export_line_reference(self, line):
+        """Keep a stable source pointer beside every rendered business line.
+
+        Some Odoo report helpers omit technical/accounting rows from the
+        rendered output.  Matching the resulting dictionaries back to the
+        source record by list index would then read values from a neighbour.
+        The record reference also covers unsaved preview rows whose ``id`` is
+        a ``NewId`` rather than a database integer.
+        """
+        if not line or not hasattr(line, "_name") or len(line) != 1:
+            return {}
+        return {
+            "_source_model": line._name,
+            "_source_id": line.id,
+            "_source_record": line,
+        }
+
+    @api.model
+    def _is_export_field_name_safe(self, field_name):
+        lowered = (field_name or "").lower()
+        return bool(
+            re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", field_name or "")
+            and field_name not in EXPORT_FIELD_EXCLUDED_NAMES
+            and not field_name.startswith(EXPORT_FIELD_EXCLUDED_PREFIXES)
+            and not any(part in lowered for part in EXPORT_FIELD_SECRET_PARTS)
+        )
+
+    @api.model
+    def _node_is_statically_hidden(self, node):
+        for candidate in (node, *node.iterancestors()):
+            for attribute in ("invisible", "column_invisible"):
+                invisible = (candidate.get(attribute) or "").strip().lower()
+                if invisible in {"1", "true"}:
+                    return True
+        return False
+
+    @api.model
+    def _view_field_nodes(self, document_model, section, config):
+        """Return access-filtered form nodes for a document or its line view."""
+        view_id = config.get("view_id")
+        view = document_model.get_view(
+            view_id=view_id.id if getattr(view_id, "id", False) else view_id,
+            view_type="form",
+        )
+        try:
+            arch = etree.fromstring(view["arch"].encode())
+        except (KeyError, TypeError, ValueError, etree.XMLSyntaxError):
+            return []
+        relation_field = config.get("relation_field")
+        if section == "metadata" or not relation_field:
+            nodes = []
+            for node in arch.xpath(".//field[@name]"):
+                # Embedded list/form fields belong to the line model.  A root
+                # document field never has another field node as an ancestor.
+                if node.xpath("ancestor::field"):
+                    continue
+                nodes.append(node)
+            return nodes
+        containers = arch.xpath(
+            ".//field[@name=$field_name]", field_name=relation_field
+        )
+        nodes = []
+        for container in containers:
+            for node in container.xpath(".//field[@name]"):
+                ancestors = node.xpath("ancestor::field")
+                if ancestors and ancestors[-1] is container:
+                    nodes.append(node)
+        if nodes:
+            return nodes
+        # Some installations keep the x2many list in a separate inherited
+        # view.  Falling back to the real user's default list still preserves
+        # field-level groups and gives Studio fields a chance to appear.
+        line_model = document_model.env[config["model"]]
+        try:
+            line_arch = etree.fromstring(
+                line_model.get_view(view_type="list")["arch"].encode()
+            )
+        except (KeyError, TypeError, ValueError, etree.XMLSyntaxError):
+            return []
+        return line_arch.xpath(".//field[@name]")
+
+    @api.model
+    def _export_field_alignment(self, field_type):
+        if field_type in {"float", "integer", "monetary"}:
+            return "right"
+        if field_type in {"date", "datetime", "boolean"}:
+            return "center"
+        return "left"
+
+    @api.model
+    def _export_field_path_visible(self, user_env, model_name, path):
+        """Validate every segment with the exporting user's ``fields_get``.
+
+        The template record can legitimately be selected with ``sudo`` for a
+        portal/native report.  That elevation must never become the source of
+        truth for the field chooser, especially for Studio fields protected
+        by a group on either the document or a related model.
+        """
+        if model_name not in user_env.registry.models or not path:
+            return False
+        current_model = user_env[model_name]
+        parts = path.split(".")
+        for index, part in enumerate(parts):
+            try:
+                description = current_model.fields_get(
+                    [part], attributes=["type", "relation"]
+                ).get(part)
+            except AccessError:
+                return False
+            if not description:
+                return False
+            if index < len(parts) - 1:
+                relation = description.get("relation")
+                if (
+                    description.get("type") != "many2one"
+                    or relation not in user_env.registry.models
+                ):
+                    return False
+                current_model = user_env[relation]
+        return True
+
+    def _export_field_config(self, record):
+        self.ensure_one()
+        if hasattr(record, "_rds_export_field_config"):
+            config = record._rds_export_field_config()
+            if isinstance(config, dict):
+                return config
+        return {
+            "metadata": {"model": record._name, "relation_field": False},
+        }
+
+    def _export_base_context(self, record, lang=None):
+        self.ensure_one()
+        if not hasattr(record, "_rds_document_context"):
+            return {}
+        # ``None`` explicitly means inherit the connector/template defaults;
+        # an empty list means the user deliberately disabled every field.
+        clean_record = record.with_context(
+            lang=lang or record.env.context.get("lang"),
+            rds_export_field_specs=None,
+        )
+        return clean_record._rds_document_context(self, lang)
+
+    def get_export_field_catalog(self, record, lang=None, base_context=None):
+        """Discover printable fields from the access-filtered live form.
+
+        The returned technical key/path catalog is also the allow-list used at
+        render time.  It is intentionally produced without sudo so Studio
+        fields restricted by groups cannot leak into the chooser or output.
+        """
+        self.ensure_one()
+        record.ensure_one()
+        config = self._export_field_config(record)
+        base_context = (
+            base_context
+            if isinstance(base_context, dict)
+            else self._export_base_context(record, lang=lang)
+        )
+        catalog = []
+        by_key = {}
+        by_section_path = {}
+        visible_path_cache = {}
+
+        def path_is_visible(definition):
+            source_model = definition.get("source_model")
+            paths = [
+                definition.get("field_path"),
+                *(definition.get("fallback_paths") or []),
+            ]
+            for path in filter(None, paths):
+                cache_key = (source_model, path)
+                if cache_key not in visible_path_cache:
+                    visible_path_cache[cache_key] = self._export_field_path_visible(
+                        record.env, source_model, path
+                    )
+                if visible_path_cache[cache_key]:
+                    return True
+            return False
+
+        def add(definition):
+            access_checked = definition.pop("_access_checked", False)
+            key = definition.get("key")
+            path = definition.get("field_path")
+            section = definition.get("section")
+            if key in by_key:
+                # Runtime context owns the current label/enabled state, while
+                # connector definitions carry value-independent semantics
+                # such as conditional rich formatting and hide-if-empty.
+                existing = by_key[key]
+                for option in (
+                    "context_only",
+                    "fallback_paths",
+                    "hide_if_empty",
+                ):
+                    if option in definition:
+                        existing[option] = definition[option]
+                return
+            if (
+                not key
+                or not path
+                or (not access_checked and not path_is_visible(definition))
+                or (section, path) in by_section_path
+                or len(catalog) >= MAX_EXPORT_FIELD_CANDIDATES
+            ):
+                return
+            definition["sequence"] = len(catalog) * 10 + 10
+            catalog.append(definition)
+            by_key[key] = definition
+            by_section_path[(section, path)] = definition
+
+        for section, context_key in (("metadata", "metadata"), ("line", "columns")):
+            for item in base_context.get(context_key) or []:
+                if not isinstance(item, dict) or not item.get("field_path"):
+                    continue
+                add(
+                    {
+                        "key": item.get("key") or "builtin:%s:%s" % (
+                            section,
+                            item["field_path"],
+                        ),
+                        "section": section,
+                        "source_model": config.get(section, {}).get("model", record._name),
+                        "field_path": item["field_path"],
+                        "label": item.get("label") or item["field_path"],
+                        "enabled": True,
+                        "origin": "template" if str(item.get("key", "")).startswith("template:") else "builtin",
+                        "alignment": item.get("align") or "left",
+                        "hide_if_empty": bool(item.get("hide_if_empty")),
+                    }
+                )
+
+        # Include disabled persistent template rows.  They remain grey in the
+        # per-export chooser instead of making the defaults reappear.
+        for item in self.with_context(active_test=False).field_ids.sorted(
+            key=lambda field: (field.section, field.sequence, field.id)
+        ):
+            if item.section not in config:
+                continue
+            if item.source_model_id.model != config[item.section].get("model"):
+                continue
+            add(
+                {
+                    "key": "template:%s" % item.id,
+                    "section": item.section,
+                    "source_model": item.source_model_id.model,
+                    "field_path": item.field_path,
+                    "label": item.label or item.field_path,
+                    "enabled": bool(item.active),
+                    "origin": "template",
+                    "alignment": item.alignment,
+                    "hide_if_empty": bool(item.hide_if_empty),
+                }
+            )
+
+        # A connector's built-in fields must remain in the allow-list even
+        # when the current sample record has no value for a conditional card.
+        # Otherwise a selection made from record A can fail validation while
+        # rendering record B in the same batch.  Template rows are registered
+        # first so a configured field keeps ownership of its path even when
+        # hide-if-empty removed it from this record's runtime context.
+        for section, section_config in config.items():
+            source_model_name = section_config.get("model")
+            if source_model_name not in record.env.registry.models:
+                continue
+            source_model = record.env[source_model_name].with_context(lang=lang)
+            descriptions = source_model.fields_get(attributes=["string"])
+            for item in section_config.get("builtin_fields") or []:
+                field_path = item.get("field_path")
+                first_field = (field_path or "").split(".", 1)[0]
+                label = item.get("label")
+                if not label and item.get("label_key"):
+                    label = tr_label(item["label_key"], lang)
+                if not label:
+                    label = (
+                        descriptions.get(first_field, {}).get("string")
+                        or field_path
+                    )
+                add(
+                    {
+                        "key": item.get("key"),
+                        "section": section,
+                        "source_model": source_model_name,
+                        "field_path": field_path,
+                        "label": label,
+                        "enabled": False,
+                        "origin": "builtin",
+                        "alignment": item.get("alignment") or "left",
+                        "context_only": bool(item.get("context_only")),
+                        "fallback_paths": list(item.get("fallback_paths") or []),
+                        "hide_if_empty": bool(item.get("hide_if_empty")),
+                    }
+                )
+
+        document_model = record.env[record._name].with_context(lang=lang)
+        for section, section_config in config.items():
+            source_model_name = section_config.get("model")
+            if source_model_name not in record.env.registry.models:
+                continue
+            source_model = record.env[source_model_name].with_context(lang=lang)
+            descriptions = source_model.fields_get(
+                attributes=["string", "type", "relation"]
+            )
+            for node in self._view_field_nodes(document_model, section, section_config):
+                field_name = node.get("name")
+                description = descriptions.get(field_name)
+                field = source_model._fields.get(field_name)
+                if (
+                    not description
+                    or not field
+                    or self._node_is_statically_hidden(node)
+                    or not self._is_export_field_name_safe(field_name)
+                    or description.get("type") not in EXPORT_FIELD_TYPES
+                    or getattr(field, "exportable", True) is False
+                ):
+                    continue
+                label = node.get("string") or description.get("string") or field_name
+                add(
+                    {
+                        "key": "screen:%s:%s" % (section, field_name),
+                        "section": section,
+                        "source_model": source_model_name,
+                        "field_path": field_name,
+                        "label": label,
+                        "enabled": False,
+                        "origin": "screen",
+                        "alignment": self._export_field_alignment(description.get("type")),
+                        "field_type": description.get("type"),
+                        "is_custom": field_name.startswith(("x_", "x_studio_")),
+                        "_access_checked": True,
+                    }
+                )
+        return catalog
+
+    def normalize_export_field_specs(self, record, specs, lang=None):
+        """Validate an untrusted per-export selection against the live view."""
+        self.ensure_one()
+        record.ensure_one()
+        if not isinstance(specs, (list, tuple)):
+            raise UserError(_("Belge alanı seçimi geçerli bir liste olmalıdır."))
+        if len(specs) > MAX_EXPORT_METADATA_FIELDS + MAX_EXPORT_LINE_FIELDS:
+            raise UserError(_("Tek belgede çok fazla alan seçildi."))
+        catalog = {
+            item["key"]: item
+            for item in self.get_export_field_catalog(record, lang=lang)
+        }
+        normalized = []
+        seen = set()
+        section_counts = {"metadata": 0, "line": 0}
+        for raw in specs:
+            if not isinstance(raw, dict):
+                raise UserError(_("Belge alanı seçimi geçersiz."))
+            key = raw.get("key")
+            definition = catalog.get(key)
+            if not definition or key in seen:
+                raise UserError(_("Seçilen belge alanı artık kullanılamıyor."))
+            label = raw.get("label")
+            if not isinstance(label, str) or not label.strip() or len(label.strip()) > 200:
+                raise UserError(_("Belge alanı başlığı 1 ile 200 karakter arasında olmalıdır."))
+            section = definition["section"]
+            section_counts[section] += 1
+            limit = (
+                MAX_EXPORT_METADATA_FIELDS
+                if section == "metadata"
+                else MAX_EXPORT_LINE_FIELDS
+            )
+            if section_counts[section] > limit:
+                raise UserError(
+                    _("%(section)s bölümünde en fazla %(limit)s alan seçilebilir.")
+                    % {
+                        "section": _("Belge Bilgileri") if section == "metadata" else _("Satır Sütunları"),
+                        "limit": limit,
+                    }
+                )
+            normalized.append(
+                {
+                    "key": key,
+                    "section": section,
+                    "source_model": definition["source_model"],
+                    "field_path": definition["field_path"],
+                    "label": label.strip(),
+                    "alignment": definition.get("alignment") or "left",
+                    "context_only": bool(definition.get("context_only")),
+                    "fallback_paths": list(definition.get("fallback_paths") or []),
+                    "hide_if_empty": bool(definition.get("hide_if_empty")),
+                }
+            )
+            seen.add(key)
+        return normalized
+
+    def _selected_field_value(self, record, spec, lang=None):
+        self.ensure_one()
+        if not record:
+            return ""
+        for path in (spec["field_path"], *(spec.get("fallback_paths") or [])):
+            value, field, owner = self._resolve_path_info(record, path)
+            formatted = self.format_value(
+                value,
+                "auto",
+                currency=getattr(record, "currency_id", None),
+                lang=lang,
+                field=field,
+                owner=owner,
+            )
+            if formatted:
+                return formatted
+        return ""
+
+    def apply_export_field_specs(self, context, record, specs, lang=None):
+        """Filter/relabel rich connector context and append safe screen fields."""
+        self.ensure_one()
+        normalized = self.normalize_export_field_specs(record, specs, lang=lang)
+        metadata_specs = [item for item in normalized if item["section"] == "metadata"]
+        line_specs = [item for item in normalized if item["section"] == "line"]
+
+        metadata_by_key = {
+            item.get("key"): item
+            for item in context.get("metadata") or []
+            if isinstance(item, dict) and item.get("key")
+        }
+        metadata = []
+        for spec in metadata_specs:
+            item = dict(metadata_by_key.get(spec["key"]) or {})
+            if not item:
+                if spec.get("hide_if_empty"):
+                    continue
+                item = {
+                    "value": (
+                        "-"
+                        if spec.get("context_only")
+                        else self._selected_field_value(record, spec, lang=lang)
+                        or "-"
+                    ),
+                    "icon": "fa-circle-o",
+                    "align": spec.get("alignment") or "left",
+                    "field_path": spec["field_path"],
+                    "key": spec["key"],
+                }
+            item["label"] = spec["label"]
+            item["value"] = item.get("value") or "-"
+            metadata.append(item)
+        context["metadata"] = metadata
+        context["show_metadata"] = bool(metadata)
+
+        columns = [item for item in context.get("columns") or [] if isinstance(item, dict)]
+        column_index = {
+            item.get("key"): index
+            for index, item in enumerate(columns)
+            if item.get("key")
+        }
+        selected_columns = []
+        for spec in line_specs:
+            column = dict(columns[column_index[spec["key"]]]) if spec["key"] in column_index else {
+                "key": spec["key"],
+                "field_path": spec["field_path"],
+                "align": spec.get("alignment") or "left",
+            }
+            column["label"] = spec["label"]
+            selected_columns.append(column)
+        if selected_columns:
+            base_width, remainder = divmod(100, len(selected_columns))
+            for index, column in enumerate(selected_columns):
+                column["width"] = base_width + (1 if index < remainder else 0)
+
+        line_records = context.get("_line_records")
+        if line_records is None:
+            line_records = (
+                record._rds_export_line_records()
+                if hasattr(record, "_rds_export_line_records")
+                else self.env["res.users"].browse()
+            )
+        line_records_by_reference = {
+            (line._name, line.id): line
+            for line in line_records
+            if line.id
+        }
+        original_lines = context.get("lines") or []
+        selected_lines = []
+        for index, original in enumerate(original_lines):
+            if original.get("is_section") or original.get("is_note"):
+                selected_lines.append(dict(original))
+                continue
+            source_line = original.get("_source_record")
+            if (
+                not source_line
+                or not hasattr(source_line, "_name")
+                or len(source_line) != 1
+            ):
+                source_line = line_records_by_reference.get(
+                    (
+                        original.get("_source_model"),
+                        original.get("_source_id"),
+                    )
+                )
+            if not source_line and index < len(line_records):
+                # Compatibility fallback for third-party connectors that have
+                # not adopted the stable line reference contract yet.
+                source_line = line_records[index]
+            source_values = original.get("values") or []
+            values = []
+            for spec in line_specs:
+                existing_index = column_index.get(spec["key"])
+                if existing_index is not None and existing_index < len(source_values):
+                    values.append(dict(source_values[existing_index]))
+                    continue
+                text = self._selected_field_value(source_line, spec, lang=lang) if source_line else ""
+                values.append(
+                    {
+                        "text": text or "-",
+                        "align": spec.get("alignment") or "left",
+                    }
+                )
+            selected_lines.append(
+                {
+                    "values": values,
+                    **{
+                        key: original[key]
+                        for key in (
+                            "_source_model",
+                            "_source_id",
+                            "_source_record",
+                        )
+                        if key in original
+                    },
+                }
+            )
+        context["columns"] = selected_columns
+        context["lines"] = selected_lines if selected_columns else []
+        context["show_lines"] = bool(selected_columns)
+        return context
 
     def partner_info(self, partner):
         self.ensure_one()
@@ -803,6 +1447,7 @@ class RdsTemplate(models.Model):
             "show_company": self.show_company,
             "show_partner": self.show_partner,
             "show_metadata": self.show_metadata,
+            "show_lines": True,
             "show_notes": self.show_notes,
             "show_bank": self.show_bank,
             "show_footer": self.show_footer,

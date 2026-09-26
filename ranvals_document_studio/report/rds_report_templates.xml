@@ -64,6 +64,8 @@
             .rds-meta-table { table-layout:fixed; }
             .rds-meta-table td { text-align:center; padding:9px 5px; border-right:1px solid #dce2e7; }
             .rds-meta-table td:last-child { border-right:none; }
+            .rds-meta-table tr + tr td { border-top:1px solid #dce2e7; }
+            .rds-meta-table .rds-meta-empty { background:transparent; }
             .rds-meta-icon { font-size:14px; margin-bottom:4px; }
             .rds-meta-label { font-size:7.8px; font-weight:800; text-transform:uppercase; line-height:1.2; }
             .rds-meta-value { font-size:9px; margin-top:4px; line-height:1.25; }
@@ -153,23 +155,29 @@
     <template id="rds_metadata_strip">
         <div t-if="ctx.get('show_metadata') and ctx.get('metadata')" class="rds-meta-wrap" t-att-style="'background:%s;' % ctx['theme']['secondary']">
             <table class="rds-meta-table">
-                <tr>
-                    <t t-foreach="ctx['metadata']" t-as="item">
-                        <td>
-                            <div class="rds-meta-icon" t-att-style="'color:%s;' % ctx['theme']['primary']">
-                                <span t-attf-class="fa {{ item.get('icon') or 'fa-circle-o' }}"/>
-                            </div>
-                            <div class="rds-meta-label" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['body_font'])" t-out="item['label']"/>
-                            <div class="rds-meta-value" t-att-style="'font-family:%s;' % ctx['theme']['body_font']" t-out="item['value']"/>
-                        </td>
-                    </t>
-                </tr>
+                <t t-foreach="range(0, len(ctx['metadata']), 4)" t-as="batch_start">
+                    <t t-set="metadata_batch" t-value="ctx['metadata'][batch_start:batch_start + 4]"/>
+                    <tr>
+                        <t t-foreach="metadata_batch" t-as="item">
+                            <td style="width:25%;">
+                                <div class="rds-meta-icon" t-att-style="'color:%s;' % ctx['theme']['primary']">
+                                    <span t-attf-class="fa {{ item.get('icon') or 'fa-circle-o' }}"/>
+                                </div>
+                                <div class="rds-meta-label" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['body_font'])" t-out="item['label']"/>
+                                <div class="rds-meta-value" t-att-style="'font-family:%s;' % ctx['theme']['body_font']" t-out="item['value']"/>
+                            </td>
+                        </t>
+                        <t t-foreach="range(len(metadata_batch), 4)" t-as="empty_index">
+                            <td class="rds-meta-empty" style="width:25%;"><span>&#160;</span></td>
+                        </t>
+                    </tr>
+                </t>
             </table>
         </div>
     </template>
 
     <template id="rds_line_table">
-        <table class="rds-lines" t-att-style="'font-family:%s;' % ctx['theme']['body_font']">
+        <table t-if="ctx.get('show_lines', True) and ctx.get('columns')" class="rds-lines" t-att-style="'font-family:%s;' % ctx['theme']['body_font']">
             <thead>
                 <tr t-att-style="'background:%s;' % ctx['theme']['primary']">
                     <t t-foreach="ctx['columns']" t-as="column">
