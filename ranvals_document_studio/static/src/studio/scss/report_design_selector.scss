@@ -1,0 +1,361 @@
+/* Belge Studio's navy/plum/teal palette, isolated to the added Studio card.
+ * Use explicit foregrounds: Studio does NOT set an inheritable white text
+ * colour on its sidebar. Backend CSS also loads before Studio's lazy bundle.
+ * All rules stay below this two-class scope; native fields/buttons are intact.
+ * Flat CSS is intentional: compatible with Odoo's SCSS compiler, no imports.
+ */
+.o_web_studio_sidebar .rds-studio-design-selector {
+    --rds-design-surface: #17223b;
+    --rds-design-deep: #101a31;
+    --rds-design-raised: #22304b;
+    --rds-design-text: #f7f8fc;
+    --rds-design-muted: #b7c0d2;
+    --rds-design-border: #42516b;
+    --rds-design-control-border: #687893;
+    --rds-design-plum: #6d1f74;
+    --rds-design-teal: #7ee4d1;
+    --rds-design-focus: #86b7fe;
+    color-scheme: dark;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    margin: 6px 0 0;
+    padding: 16px;
+    color: var(--rds-design-text);
+    background: var(--rds-design-surface);
+    border: 1px solid var(--rds-design-border);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(10, 17, 32, 0.16);
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: start;
+}
+.o_web_studio_sidebar .rds-studio-design-selector *,
+.o_web_studio_sidebar .rds-studio-design-selector *::before,
+.o_web_studio_sidebar .rds-studio-design-selector *::after {
+    box-sizing: border-box;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--rds-design-text);
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    color: #ffffff;
+    background: var(--rds-design-plum);
+    border: 1px solid #914d98;
+    border-radius: 10px;
+    font-size: 17px;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-eyebrow {
+    display: block;
+    color: var(--rds-design-muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-heading strong {
+    display: block;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-count {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    padding: 3px 8px;
+    color: var(--rds-design-teal);
+    background: #153b3e;
+    border: 1px solid #367a73;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-hint {
+    margin: 0 0 14px;
+    color: var(--rds-design-muted);
+    font-size: 12px;
+    line-height: 1.6;
+    opacity: 1;
+    overflow-wrap: anywhere;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-label {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    color: var(--rds-design-text);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .form-select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    margin: 6px 0 0;
+    padding: 9px 32px 9px 11px;
+    color: var(--rds-design-text);
+    -webkit-text-fill-color: var(--rds-design-text);
+    background-color: var(--rds-design-deep);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23cbd5e1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-size: 16px 16px;
+    background-repeat: no-repeat;
+    border: 1px solid var(--rds-design-control-border);
+    border-radius: 9px;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    opacity: 1;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .form-select option {
+    color: var(--rds-design-text);
+    -webkit-text-fill-color: var(--rds-design-text);
+    background: var(--rds-design-deep);
+}
+.o_web_studio_sidebar .rds-studio-design-selector .form-select:hover:not(:disabled) {
+    border-color: #a2b2cb;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .form-select:disabled {
+    color: var(--rds-design-muted);
+    -webkit-text-fill-color: var(--rds-design-muted);
+    background-color: #2b3953;
+    cursor: not-allowed;
+    opacity: 1;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-scope {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    margin: 12px 0;
+    padding: 10px 12px;
+    color: var(--rds-design-text);
+    background: var(--rds-design-raised);
+    border-inline-start: 3px solid var(--rds-design-teal);
+    border-radius: 0 8px 8px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-scope > span {
+    color: var(--rds-design-muted);
+    font-size: 11px;
+    opacity: 1;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-scope > strong {
+    color: var(--rds-design-text);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: normal;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-company {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding-top: 6px;
+    margin-top: 4px;
+    color: var(--rds-design-muted);
+    border-top: 1px solid var(--rds-design-border);
+    font-size: 11px;
+    line-height: 1.5;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-company > i {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    color: var(--rds-design-teal);
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-company > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    margin: 0;
+    padding: 10px 12px;
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    background: var(--rds-design-plum);
+    border: 1px solid #914d98;
+    border-radius: 9px;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+    text-transform: none;
+    white-space: normal;
+    opacity: 1;
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-button--apply,
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-button--retry {
+    width: 100%;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button:hover:not(:disabled) {
+    color: #ffffff;
+    background: #7f3087;
+    border-color: #b278b8;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--download,
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--retry {
+    color: var(--rds-design-text);
+    -webkit-text-fill-color: var(--rds-design-text);
+    background: #123f43;
+    border-color: #459c92;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--download:hover:not(:disabled),
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button--retry:hover:not(:disabled) {
+    color: #ffffff;
+    background: #195359;
+    border-color: var(--rds-design-teal);
+}
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button:disabled {
+    color: var(--rds-design-muted);
+    -webkit-text-fill-color: var(--rds-design-muted);
+    background: #2b3953;
+    border-color: var(--rds-design-border);
+    opacity: 1;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-button > i {
+    flex: 0 0 auto;
+    color: inherit;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 10px 0 0;
+    color: var(--rds-design-muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-note > i {
+    margin-top: 3px;
+    color: var(--rds-design-teal);
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-message,
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-pending {
+    margin: 10px 0;
+    padding: 9px 10px;
+    color: var(--rds-design-text);
+    background: var(--rds-design-raised);
+    border: 1px solid var(--rds-design-border);
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-warning,
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-pending {
+    color: #ffe0a1;
+    background: #3a3022;
+    border-color: #87663b;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-message .rds-design-button--retry {
+    margin-top: 8px;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rds-design-border);
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-title {
+    margin-bottom: 6px;
+    color: var(--rds-design-text);
+    font-size: 12px;
+    font-weight: 600;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-controls .rds-design-format {
+    flex: 1 1 120px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download-controls .rds-design-button--download {
+    flex: 1 0 82px;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-download + .rds-design-hint {
+    margin: 10px 0 0;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .rds-design-version {
+    margin-top: 14px;
+    padding-top: 10px;
+    color: var(--rds-design-muted);
+    border-top: 1px solid var(--rds-design-border);
+    font-size: 10px;
+    line-height: 1.4;
+    opacity: 1;
+}
+.o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button:focus-visible,
+.o_web_studio_sidebar .rds-studio-design-selector .form-select:focus-visible {
+    outline: 3px solid var(--rds-design-focus);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+.o_web_studio_sidebar .rds-studio-design-selector:dir(rtl) .form-select {
+    padding: 9px 11px 9px 32px;
+    background-position: left 10px center;
+}
+.o_web_studio_sidebar .rds-studio-design-selector:dir(rtl) .rds-design-scope {
+    border-radius: 8px 0 0 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button {
+        transition: none;
+    }
+}
+@media (forced-colors: active) {
+    .o_web_studio_sidebar .rds-studio-design-selector .form-select {
+        appearance: auto;
+        -webkit-appearance: auto;
+        background-image: none;
+    }
+    .o_web_studio_sidebar .rds-studio-design-selector .form-select,
+    .o_web_studio_sidebar .rds-studio-design-selector .btn.rds-design-button {
+        -webkit-text-fill-color: currentColor;
+    }
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_order_form_rds_docucraft_branding" model="ir.ui.view">
+        <field name="name">purchase.order.form.rds.docucraft.branding</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="ranvals_document_studio.view_purchase_order_form_rds"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_rds_export']" position="attributes">
+                <attribute name="string">DocuCraft</attribute>
+                <attribute name="help">DocuCraft ile PDF, Word / DOCX veya PNG oluşturun.</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="server_action_purchase_rds_export" model="ir.actions.server">
+        <field name="name">DocuCraft</field>
+    </record>
+    <record id="action_report_rds_purchase_document" model="ir.actions.report">
+        <field name="name">DocuCraft – Satın Alma</field>
+    </record>
+</odoo>

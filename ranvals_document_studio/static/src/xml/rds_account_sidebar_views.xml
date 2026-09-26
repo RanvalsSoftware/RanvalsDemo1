@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.RdsAccountMoveFormView"
+       t-inherit="web.FormView"
+       t-inherit-mode="primary">
+        <xpath expr="./div[@t-ref='root']" position="attributes">
+            <attribute name="class">o_rds_sidebar_view o_rds_account_move_sidebar_view</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_form_view_container')]" position="before">
+            <RdsSidebar t-if="!env.inDialog" activeKey="rdsActiveMenuKey"/>
+        </xpath>
+    </t>
+</templates>

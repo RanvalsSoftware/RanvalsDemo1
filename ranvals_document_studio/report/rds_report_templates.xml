@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="rds_external_layout">
+        <div class="header" style="height:0;min-height:0;overflow:hidden;"/>
+        <div class="article rds-article"
+             t-att-data-oe-model="doc and doc._name"
+             t-att-data-oe-id="doc and doc.id"
+             t-att-data-oe-lang="doc and doc.env.context.get('lang')">
+            <t t-out="0"/>
+        </div>
+        <div class="footer rds-pdf-footer" style="font-family:Arial,sans-serif;font-size:8px;color:#7b8794;text-align:right;border-top:1px solid #e5e7eb;padding-top:3px;">
+            <span t-if="ctx.get('show_footer') and ctx.get('footer_text')" t-out="ctx.get('footer_text')" style="float:left;"/>
+            <span t-if="report_type == 'pdf'">
+                <span class="page"/> / <span class="topage"/>
+            </span>
+        </div>
+    </template>
+
+    <template id="report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <!--
+                    Report providers already put the selected language on the
+                    document recordset.  Reading it from the record context
+                    also keeps this root renderable in Odoo Studio, where the
+                    auxiliary wizard data mapping is not guaranteed to exist.
+                -->
+                <t t-set="o" t-value="doc"/>
+                <t t-set="rds_lang" t-value="doc.env.context.get('lang') or doc.partner_id.lang or doc.env.user.lang"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <t t-call="ranvals_document_studio.rds_layout_router"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="rds_base_styles">
+        <style>
+            .rds-page {
+                width: 100%;
+                /* A4 height minus the paperformat's 7mm top and 10mm bottom margins. */
+                min-height: 280mm;
+                box-sizing: border-box;
+                font-size: 10px;
+                line-height: 1.42;
+                color: #27313a;
+                padding: 2mm 1mm 4mm 1mm;
+            }
+            .rds-page * { box-sizing: border-box; }
+            .rds-page table { width: 100%; border-collapse: collapse; }
+            .rds-page td, .rds-page th { vertical-align: top; }
+            .rds-logo { display:block; width:auto; max-width:100%; object-fit:contain; }
+            .rds-brand-name { font-size:25px; font-weight:800; letter-spacing:.5px; line-height:1.05; }
+            .rds-title { font-size:28px; font-weight:700; line-height:1.08; letter-spacing:.6px; margin:0; }
+            .rds-number { font-size:12px; margin-top:9px; }
+            .rds-section-title { font-size:12px; font-weight:800; margin-bottom:7px; }
+            .rds-info-lines { font-size:9.5px; line-height:1.52; }
+            .rds-info-lines div { margin-bottom:1px; }
+            .rds-contact-line { margin-top:4px; }
+            .rds-meta-wrap { margin:7mm 0 6mm 0; border:1px solid #dce2e7; border-radius:6px; overflow:hidden; page-break-inside:avoid; }
+            .rds-meta-table { table-layout:fixed; }
+            .rds-meta-table td { text-align:center; padding:9px 5px; border-right:1px solid #dce2e7; }
+            .rds-meta-table td:last-child { border-right:none; }
+            .rds-meta-icon { font-size:14px; margin-bottom:4px; }
+            .rds-meta-label { font-size:7.8px; font-weight:800; text-transform:uppercase; line-height:1.2; }
+            .rds-meta-value { font-size:9px; margin-top:4px; line-height:1.25; }
+            .rds-lines { table-layout:fixed; border:1px solid #dde3e8; margin-top:2mm; }
+            .rds-lines thead { display:table-header-group; }
+            .rds-lines th { color:#fff; font-size:8px; text-transform:uppercase; padding:8px 6px; border:0; vertical-align:middle; }
+            .rds-lines td { font-size:9px; padding:8px 6px; border-bottom:1px solid #e4e8ec; vertical-align:middle; }
+            .rds-lines tbody tr:nth-child(even) td { background:#fbfcfd; }
+            .rds-lines .rds-section-row td { font-weight:800; }
+            .rds-lines .rds-note-row td { color:#687481; font-style:italic; background:#fff !important; }
+            .rds-totals-wrap { width:44%; margin-left:56%; margin-top:5mm; page-break-inside:avoid; }
+            .rds-totals td { padding:6px 9px; border-bottom:1px solid #e2e6ea; font-size:9.5px; }
+            .rds-totals .rds-total-final td { color:#fff; font-size:11.5px; font-weight:800; padding:9px; border:0; }
+            .rds-lower { margin-top:5mm; table-layout:fixed; page-break-inside:avoid; }
+            .rds-lower &gt; tbody &gt; tr &gt; td { width:50%; padding:0 5px; }
+            .rds-lower &gt; tbody &gt; tr &gt; td:first-child { padding-left:0; }
+            .rds-lower &gt; tbody &gt; tr &gt; td:last-child { padding-right:0; }
+            .rds-box { border:1px solid #dce2e7; border-radius:6px; padding:10px 11px; min-height:80px; }
+            .rds-box-title { font-size:9.5px; font-weight:800; text-transform:uppercase; margin-bottom:6px; }
+            .rds-note-list { margin:0; padding-left:15px; }
+            .rds-note-list li { margin:2px 0; font-size:8.5px; line-height:1.35; }
+            .rds-bank-table td { font-size:8.5px; padding:3px 4px; border-bottom:1px solid #edf0f2; }
+            .rds-bank-table td:first-child { width:31%; font-weight:700; }
+            .rds-card { border:1px solid #dce2e7; border-radius:7px; padding:11px 12px; min-height:115px; }
+            .rds-muted { color:#687481; }
+            .rds-row-separator { border-right:1px solid #dce2e7; }
+            .rds-banner { color:#fff; padding:14px 17px; border-radius:12px 12px 0 0; overflow:hidden; }
+            .rds-banner-table { table-layout:fixed; }
+            .rds-banner-table td:first-child { width:55%; }
+            .rds-banner-table td:last-child { width:45%; text-align:right; }
+            .rds-two-columns { table-layout:fixed; margin-top:5mm; }
+            .rds-two-columns &gt; tbody &gt; tr &gt; td { width:50%; padding:0 6px; }
+            .rds-two-columns &gt; tbody &gt; tr &gt; td:first-child { padding-left:0; }
+            .rds-two-columns &gt; tbody &gt; tr &gt; td:last-child { padding-right:0; }
+            .rds-three-columns { table-layout:fixed; margin-top:5mm; }
+            .rds-three-columns &gt; tbody &gt; tr &gt; td { padding:0 12px; }
+            .rds-three-columns &gt; tbody &gt; tr &gt; td:first-child { padding-left:0; }
+            .rds-three-columns &gt; tbody &gt; tr &gt; td:last-child { padding-right:0; }
+            .rds-document-chip { display:inline-block; padding:4px 9px; border-radius:14px; font-size:8px; font-weight:800; }
+            .rds-page-rtl { direction:rtl; }
+            .rds-page-rtl .rds-totals-wrap { margin-right:56%; margin-left:0; }
+        </style>
+    </template>
+
+    <template id="rds_logo">
+        <t t-if="ctx.get('company') and ctx['company'].logo">
+            <img class="rds-logo"
+                 t-att-src="image_data_uri(ctx['company'].logo)"
+                 t-att-style="'max-height:%smm;' % rds_template.logo_height_mm"
+                 alt="Logo"/>
+        </t>
+        <t t-else="">
+            <div class="rds-brand-name"
+                 t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])"
+                 t-out="ctx['company_info']['name']"/>
+        </t>
+    </template>
+
+    <template id="rds_info_block">
+        <t t-if="(block_title != ctx['labels']['company_info'] or ctx.get('show_company')) and (block_title != ctx['labels']['partner_info'] or ctx.get('show_partner'))">
+        <div class="rds-section-title"
+             t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])">
+            <span t-if="block_icon" t-attf-class="fa {{ block_icon }}" style="margin-right:5px;"/>
+            <t t-out="block_title"/>
+        </div>
+        <div class="rds-info-lines" t-att-style="'font-family:%s;' % ctx['theme']['body_font']">
+            <div style="font-weight:700;" t-out="block_info.get('name')"/>
+            <t t-foreach="block_info.get('lines', [])" t-as="line">
+                <div t-out="line"/>
+            </t>
+            <div t-if="block_info.get('phone')" class="rds-contact-line">
+                <span class="fa fa-phone" style="width:15px;"/> <span t-out="block_info['phone']"/>
+            </div>
+            <div t-if="block_info.get('email')" class="rds-contact-line">
+                <span class="fa fa-envelope-o" style="width:15px;"/> <span t-out="block_info['email']"/>
+            </div>
+            <div t-if="block_info.get('website')" class="rds-contact-line">
+                <span class="fa fa-globe" style="width:15px;"/> <span t-out="block_info['website']"/>
+            </div>
+            <div t-if="block_info.get('vat')" class="rds-contact-line">
+                <span class="fa fa-building-o" style="width:15px;"/> <span t-out="ctx['tax_label']"/>: <span t-out="block_info['vat']"/>
+            </div>
+        </div>
+        </t>
+    </template>
+
+    <template id="rds_metadata_strip">
+        <div t-if="ctx.get('show_metadata') and ctx.get('metadata')" class="rds-meta-wrap" t-att-style="'background:%s;' % ctx['theme']['secondary']">
+            <table class="rds-meta-table">
+                <tr>
+                    <t t-foreach="ctx['metadata']" t-as="item">
+                        <td>
+                            <div class="rds-meta-icon" t-att-style="'color:%s;' % ctx['theme']['primary']">
+                                <span t-attf-class="fa {{ item.get('icon') or 'fa-circle-o' }}"/>
+                            </div>
+                            <div class="rds-meta-label" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['body_font'])" t-out="item['label']"/>
+                            <div class="rds-meta-value" t-att-style="'font-family:%s;' % ctx['theme']['body_font']" t-out="item['value']"/>
+                        </td>
+                    </t>
+                </tr>
+            </table>
+        </div>
+    </template>
+
+    <template id="rds_line_table">
+        <table class="rds-lines" t-att-style="'font-family:%s;' % ctx['theme']['body_font']">
+            <thead>
+                <tr t-att-style="'background:%s;' % ctx['theme']['primary']">
+                    <t t-foreach="ctx['columns']" t-as="column">
+                        <th t-att-style="'width:' + str(column.get('width', 16)) + '%;text-align:' + column.get('align', 'left') + ';background:' + ctx['theme']['primary'] + ';'" t-out="column['label']"/>
+                    </t>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="ctx['lines']" t-as="line">
+                    <tr t-if="line.get('is_section')" class="rds-section-row">
+                        <td t-att-colspan="len(ctx['columns'])" t-att-style="'background:%s;color:%s;' % (ctx['theme']['secondary'], ctx['theme']['primary'])" t-out="line.get('description')"/>
+                    </tr>
+                    <tr t-elif="line.get('is_note')" class="rds-note-row">
+                        <td t-att-colspan="len(ctx['columns'])" t-out="line.get('description')"/>
+                    </tr>
+                    <tr t-else="">
+                        <t t-foreach="line.get('values', [])" t-as="value">
+                            <td t-att-style="'text-align:%s;%s%s' % (value.get('align', 'left'), 'font-weight:700;' if value.get('bold') else '', 'color:%s;' % ctx['theme']['accent'] if value.get('highlight') else '')" t-out="value.get('text')"/>
+                        </t>
+                    </tr>
+                </t>
+            </tbody>
+        </table>
+    </template>
+
+    <template id="rds_totals_notes">
+        <div t-if="ctx.get('totals')" class="rds-totals-wrap">
+            <table class="rds-totals" t-att-style="'font-family:%s;' % ctx['theme']['body_font']">
+                <t t-foreach="ctx['totals']" t-as="item">
+                    <tr t-att-class="'rds-total-final' if item.get('is_total') else ''" t-att-style="'background:%s;' % ctx['theme']['primary'] if item.get('is_total') else ''">
+                        <td t-out="item['label']"/>
+                        <td style="text-align:right;font-weight:700;" t-out="item['value']"/>
+                    </tr>
+                </t>
+            </table>
+        </div>
+        <table t-if="(ctx.get('show_notes') and ctx.get('notes')) or (ctx.get('show_bank') and ctx.get('bank'))" class="rds-lower">
+            <tr>
+                <td>
+                    <div t-if="ctx.get('show_notes') and ctx.get('notes')" class="rds-box" t-att-style="'background:%s;' % ctx['theme']['secondary']">
+                        <div class="rds-box-title" t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['labels']['notes']"/>
+                        <ul class="rds-note-list">
+                            <t t-foreach="ctx['notes']" t-as="note">
+                                <li t-out="note"/>
+                            </t>
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    <div t-if="ctx.get('show_bank') and ctx.get('bank')" class="rds-box">
+                        <div class="rds-box-title" t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['labels']['bank_info']"/>
+                        <table class="rds-bank-table">
+                            <tr t-if="ctx['bank'].get('bank_name')"><td t-out="ctx['bank_labels']['bank']"/><td t-out="ctx['bank']['bank_name']"/></tr>
+                            <tr t-if="ctx['bank'].get('branch')"><td t-out="ctx['bank_labels']['branch']"/><td t-out="ctx['bank']['branch']"/></tr>
+                            <tr t-if="ctx['bank'].get('account_name')"><td t-out="ctx['bank_labels']['account_name']"/><td t-out="ctx['bank']['account_name']"/></tr>
+                            <tr t-if="ctx['bank'].get('iban')"><td t-out="ctx['bank_labels']['iban']"/><td style="font-weight:800;" t-out="ctx['bank']['iban']"/></tr>
+                            <tr t-if="ctx['bank'].get('swift')"><td t-out="ctx['bank_labels']['swift']"/><td t-out="ctx['bank']['swift']"/></tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </template>
+
+    <template id="rds_common_body">
+        <t t-call="ranvals_document_studio.rds_metadata_strip"/>
+        <t t-call="ranvals_document_studio.rds_line_table"/>
+        <t t-call="ranvals_document_studio.rds_totals_notes"/>
+    </template>
+
+    <!-- 1. PREMIUM BEAUTY -->
+    <template id="rds_layout_beauty">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td style="width:50%;padding:6px 7px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td t-att-style="'width:50%;padding:12px 7px;text-align:right;font-size:14px;font-style:italic;color:' + ctx['theme']['primary'] + ';font-family:' + ctx['theme']['heading_font'] + ';'" t-out="ctx.get('tagline')"/>
+                </tr>
+            </table>
+            <div t-att-style="'border-top:1.5px solid %s;margin:4mm 0 6mm 0;' % ctx['theme']['primary']"/>
+            <table class="rds-three-columns">
+                <tr>
+                    <td style="width:27%;border-right:1px solid #d8cdca;">
+                        <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                        <div t-att-style="'width:38px;border-top:3px solid %s;margin:9px 0;' % ctx['theme']['accent']"/>
+                        <div class="rds-number">No: <strong t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['number']"/></div>
+                    </td>
+                    <td style="width:36.5%;border-right:1px solid #d8cdca;">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                        <t t-set="block_info" t-value="ctx['company_info']"/>
+                        <t t-set="block_icon" t-value="'fa-building-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td style="width:36.5%;">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                        <t t-set="block_info" t-value="ctx['partner_info']"/>
+                        <t t-set="block_icon" t-value="'fa-user-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 2. CONSTRUCTION -->
+    <template id="rds_layout_construction">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <div class="rds-banner" t-att-style="'background:%s;border-bottom:4px solid %s;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
+                <table class="rds-banner-table">
+                    <tr>
+                        <td><t t-call="ranvals_document_studio.rds_logo"/></td>
+                        <td>
+                            <div t-if="ctx.get('show_company')" style="font-size:9px;line-height:1.5;">
+                                <div t-out="ctx['company_info']['phone']"/>
+                                <div t-out="ctx['company_info']['email']"/>
+                                <div t-out="ctx['company_info']['website']"/>
+                                <div t-if="ctx['company_info']['vat']"><span t-out="ctx['tax_label']"/>: <span t-out="ctx['company_info']['vat']"/></div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="margin:6mm 4px 3mm 4px;">
+                <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                <div class="rds-number"><strong t-att-style="'color:%s;' % ctx['theme']['accent']" t-out="ctx['number']"/></div>
+            </div>
+            <table class="rds-two-columns">
+                <tr>
+                    <td>
+                        <div class="rds-card">
+                            <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                            <t t-set="block_info" t-value="ctx['partner_info']"/>
+                            <t t-set="block_icon" t-value="'fa-map-marker'"/>
+                            <t t-call="ranvals_document_studio.rds_info_block"/>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="rds-card">
+                            <div class="rds-section-title" t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['labels']['document_info']"/>
+                            <t t-if="ctx.get('show_metadata')" t-foreach="ctx['metadata'][:4]" t-as="item">
+                                <div style="padding:4px 0;border-bottom:1px solid #e7eaed;">
+                                    <span class="rds-muted" t-out="item['label']"/> <span style="float:right;font-weight:700;" t-out="item['value']"/>
+                                </div>
+                            </t>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 3. TECHNOLOGY -->
+    <template id="rds_layout_technology">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;border-bottom:2px solid #dfe7ee;">
+                <tr>
+                    <td style="width:55%;padding:6px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td t-att-style="'width:45%;padding:12px 6px;text-align:right;font-size:11px;color:' + ctx['theme']['primary'] + ';'" t-out="ctx.get('tagline')"/>
+                </tr>
+            </table>
+            <div style="margin:7mm 5px 4mm 5px;">
+                <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                <div class="rds-number"># <strong t-out="ctx['number']"/></div>
+            </div>
+            <table class="rds-two-columns">
+                <tr>
+                    <td class="rds-row-separator">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                        <t t-set="block_info" t-value="ctx['company_info']"/>
+                        <t t-set="block_icon" t-value="'fa-building'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td>
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                        <t t-set="block_info" t-value="ctx['partner_info']"/>
+                        <t t-set="block_icon" t-value="'fa-user'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 4. INDUSTRIAL -->
+    <template id="rds_layout_industrial">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <div class="rds-banner" t-att-style="'background:%s;border-bottom:5px solid %s;border-radius:0;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
+                <table class="rds-banner-table">
+                    <tr>
+                        <td><t t-call="ranvals_document_studio.rds_logo"/></td>
+                        <td>
+                            <div style="font-size:24px;font-weight:900;" t-out="ctx['title']"/>
+                            <div class="rds-document-chip" t-att-style="'background:#fff;color:%s;margin-top:7px;' % ctx['theme']['accent']">No: <span t-out="ctx['number']"/></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <table class="rds-three-columns">
+                <tr>
+                    <td style="width:34%;border-right:1px solid #dce2e7;">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                        <t t-set="block_info" t-value="ctx['company_info']"/>
+                        <t t-set="block_icon" t-value="'fa-industry'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td style="width:33%;border-right:1px solid #dce2e7;">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                        <t t-set="block_info" t-value="ctx['partner_info']"/>
+                        <t t-set="block_icon" t-value="'fa-users'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td style="width:33%;">
+                        <div class="rds-section-title" t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['labels']['document_info']"/>
+                        <t t-if="ctx.get('show_metadata')" t-foreach="ctx['metadata'][:5]" t-as="item">
+                            <div style="padding:3px 0;font-size:8.8px;"><span class="rds-muted" t-out="item['label']"/>: <strong style="float:right;" t-out="item['value']"/></div>
+                        </t>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 5. ECO -->
+    <template id="rds_layout_eco">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;border:1px solid #e1e6dc;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td style="width:55%;padding:7px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td t-att-style="'width:45%;padding:12px;text-align:right;font-size:13px;font-style:italic;color:' + ctx['theme']['primary'] + ';font-family:' + ctx['theme']['heading_font'] + ';'" t-out="ctx.get('tagline')"/>
+                </tr>
+            </table>
+            <div t-att-style="'border-top:1.5px solid %s;margin:3mm 0 6mm 0;' % ctx['theme']['primary']"/>
+            <table class="rds-three-columns">
+                <tr>
+                    <td style="width:28%;border-right:1px solid #cfd8ca;">
+                        <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                        <div class="rds-number"><strong t-out="ctx['number']"/></div>
+                    </td>
+                    <td style="width:36%;border-right:1px solid #cfd8ca;">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                        <t t-set="block_info" t-value="ctx['company_info']"/>
+                        <t t-set="block_icon" t-value="'fa-leaf'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                    <td style="width:36%;">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                        <t t-set="block_info" t-value="ctx['partner_info']"/>
+                        <t t-set="block_icon" t-value="'fa-user-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <!-- 6. FURNITURE -->
+    <template id="rds_layout_furniture">
+        <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+            <t t-call="ranvals_document_studio.rds_base_styles"/>
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td style="width:52%;padding:7px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                    <td t-att-style="'width:48%;padding:14px 7px;text-align:right;font-size:13px;font-style:italic;color:' + ctx['theme']['accent'] + ';font-family:' + ctx['theme']['heading_font'] + ';'" t-out="ctx.get('tagline')"/>
+                </tr>
+            </table>
+            <div style="margin:5mm 5px 4mm 5px;">
+                <div class="rds-title" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['heading_font'], ctx['theme']['text'])" t-out="ctx['title']"/>
+                <div t-att-style="'width:38px;border-top:3px solid %s;margin:8px 0;' % ctx['theme']['accent']"/>
+                <div class="rds-number">No: <strong t-att-style="'color:%s;' % ctx['theme']['accent']" t-out="ctx['number']"/></div>
+            </div>
+            <table class="rds-two-columns">
+                <tr>
+                    <td><div class="rds-card">
+                        <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                        <t t-set="block_info" t-value="ctx['company_info']"/>
+                        <t t-set="block_icon" t-value="'fa-building-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </div></td>
+                    <td><div class="rds-card">
+                        <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                        <t t-set="block_info" t-value="ctx['partner_info']"/>
+                        <t t-set="block_icon" t-value="'fa-user-o'"/>
+                        <t t-call="ranvals_document_studio.rds_info_block"/>
+                    </div></td>
+                </tr>
+            </table>
+            <t t-call="ranvals_document_studio.rds_common_body"/>
+        </div>
+    </template>
+
+    <template id="rds_layout_router">
+        <t t-if="rds_template.layout_style == 'beauty'" t-call="ranvals_document_studio.rds_layout_beauty"/>
+        <t t-elif="rds_template.layout_style == 'construction'" t-call="ranvals_document_studio.rds_layout_construction"/>
+        <t t-elif="rds_template.layout_style == 'technology'" t-call="ranvals_document_studio.rds_layout_technology"/>
+        <t t-elif="rds_template.layout_style == 'industrial'" t-call="ranvals_document_studio.rds_layout_industrial"/>
+        <t t-elif="rds_template.layout_style == 'eco'" t-call="ranvals_document_studio.rds_layout_eco"/>
+        <t t-else="" t-call="ranvals_document_studio.rds_layout_furniture"/>
+    </template>
+
+</odoo>

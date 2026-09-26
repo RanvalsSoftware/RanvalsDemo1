@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rds_export_wizard_form" model="ir.ui.view">
+        <field name="name">rds.export.wizard.form</field>
+        <field name="model">rds.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="DocuCraft" class="rds-export-wizard">
+                <sheet class="rds-export-wizard__sheet">
+                    <group>
+                        <group>
+                            <field name="res_model"/>
+                            <field name="record_count"/>
+                            <field name="available_template_ids" invisible="1"/>
+                            <field name="template_id" options="{'no_create': True, 'no_open': False}"/>
+                            <field name="language_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="output_format" widget="radio"/>
+                            <field name="dpi" invisible="output_format not in ('png', 'zip')"/>
+                            <div class="alert alert-success" role="status" invisible="output_format != 'docx_editable'">
+                                Düzenlenebilir Word; başlıkları, satırları, tutarları, notları ve banka bilgilerini gerçek Word metni ve tabloları olarak oluşturur.
+                            </div>
+                            <div class="alert alert-info" role="status" invisible="output_format != 'docx'">
+                                PDF görünümündeki Word, tasarımı birebir korur; sayfalar yüksek çözünürlüklü görsel olduğu için metinler düzenlenemez.
+                            </div>
+                            <div class="alert alert-info" role="status" invisible="output_format != 'zip'">
+                                ZIP paketi seçilen her kayıt için PDF, düzenlenebilir Word, PDF görünümündeki Word ve yüksek çözünürlüklü PNG sayfalarını birlikte içerir.
+                            </div>
+                            <field name="attach_to_record"/>
+                            <field name="file_name_prefix" placeholder="İsteğe bağlı"/>
+                        </group>
+                    </group>
+                    <field name="template_preview_html" widget="html" nolabel="1"/>
+                    <field name="res_ids_json" invisible="1"/>
+                    <field name="file_data" invisible="1"/>
+                    <field name="file_name" invisible="1"/>
+                    <field name="file_mimetype" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_preview" type="object" string="PDF Önizle" class="btn-secondary" icon="fa-eye" invisible="output_format != 'pdf' or record_count != 1"/>
+                    <button name="action_export" type="object" string="Oluştur ve İndir" class="btn-primary" icon="fa-download"/>
+                    <button string="İptal" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rds_field_add_wizard_form" model="ir.ui.view">
+        <field name="name">rds.field.add.wizard.form</field>
+        <field name="model">rds.field.add.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Şablona Alan Ekle">
+                <group>
+                    <field name="template_id" options="{'no_create': True}"/>
+                    <field name="section"/>
+                    <field name="source_model_id" options="{'no_create': True}"/>
+                    <field name="field_id" options="{'no_create': True}" domain="[('model_id', '=', source_model_id)]"/>
+                    <field name="field_path" placeholder="Örn. partner_id.vat"/>
+                    <field name="label"/>
+                </group>
+                <group string="Görünüm">
+                    <field name="sequence"/>
+                    <field name="icon_class"/>
+                    <field name="value_type"/>
+                    <field name="alignment"/>
+                    <field name="width_percent"/>
+                    <field name="hide_if_empty"/>
+                    <field name="bold"/>
+                    <field name="highlight"/>
+                </group>
+                <footer>
+                    <button name="action_add" type="object" string="Alanı Ekle" class="btn-primary"/>
+                    <button string="İptal" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

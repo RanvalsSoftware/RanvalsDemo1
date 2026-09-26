@@ -1,0 +1,23 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rds_template_user,rds.template user,model_rds_template,base.group_user,1,0,0,0
+access_rds_template_manager,rds.template manager,model_rds_template,ranvals_document_studio.group_rds_manager,1,1,1,1
+access_rds_template_field_user,rds.template.field user,model_rds_template_field,base.group_user,1,0,0,0
+access_rds_template_field_manager,rds.template.field manager,model_rds_template_field,ranvals_document_studio.group_rds_manager,1,1,1,1
+access_rds_export_log_user,rds.export.log user,model_rds_export_log,base.group_user,1,0,0,0
+access_rds_export_log_manager,rds.export.log manager,model_rds_export_log,ranvals_document_studio.group_rds_manager,1,0,0,1
+access_rds_export_wizard_user,rds.export.wizard user,model_rds_export_wizard,base.group_user,1,1,1,1
+access_rds_field_add_wizard_manager,rds.field.add.wizard manager,model_rds_field_add_wizard,ranvals_document_studio.group_rds_manager,1,1,1,1
+access_rds_report_design_user,Report design read,model_rds_report_design,base.group_user,1,0,0,0
+access_rds_report_design_manager,Report design manager,model_rds_report_design,ranvals_document_studio.group_rds_manager,1,1,1,1
+access_rds_report_design_system,Report design system,model_rds_report_design,base.group_system,1,1,1,1
+access_rds_template_version_manager,rds.template.version manager,model_rds_template_version,ranvals_document_studio.group_rds_manager,1,0,0,0
+access_rds_template_rule_user,rds.template.rule user,model_rds_template_rule,base.group_user,1,0,0,0
+access_rds_template_rule_manager,rds.template.rule manager,model_rds_template_rule,ranvals_document_studio.group_rds_manager,1,1,1,1
+access_rds_system_health_system,rds.system.health system,model_rds_system_health,base.group_system,1,1,1,1
+access_rds_system_health_line_system,rds.system.health.line system,model_rds_system_health_line,base.group_system,1,1,1,1
+access_rds_retention_settings_system,rds.retention.settings system,model_rds_retention_settings,base.group_system,1,1,1,1
+access_rds_template_portability_manager,rds.template.portability manager,model_rds_template_portability_wizard,ranvals_document_studio.group_rds_manager,1,1,1,1
+access_rds_template_preview_user,rds.template.preview user,model_rds_template_preview_wizard,base.group_user,1,1,1,1
+access_rds_export_job_user,rds.export.job user,model_rds_export_job,base.group_user,1,0,0,0
+access_rds_export_job_manager,rds.export.job manager,model_rds_export_job,ranvals_document_studio.group_rds_manager,1,0,0,1
+access_rds_export_job_system,rds.export.job system,model_rds_export_job,base.group_system,1,1,1,1

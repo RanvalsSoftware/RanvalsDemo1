@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.RdsSidebar" owl="1">
+        <div t-if="props.enabled" t-att-class="hostClass" t-att-data-rds-sidebar-scope="resolvedActiveKey">
+            <button t-if="props.showMobileToggle"
+                    t-ref="opener"
+                    type="button"
+                    class="o_rds_sidebar__mobile-toggle"
+                    t-att-aria-controls="sidebarId"
+                    t-att-aria-expanded="isDrawerOpen ? 'true' : 'false'"
+                    aria-label="DocuCraft menüsünü aç"
+                    title="Menüyü aç"
+                    t-on-click="toggleDrawer">
+                <span aria-hidden="true" class="o_rds_sidebar__hamburger"><i/><i/><i/></span>
+            </button>
+            <button t-if="isDrawerOpen" type="button" class="o_rds_sidebar__backdrop" aria-label="DocuCraft menüsünü kapat" t-on-click="closeDrawer"/>
+            <aside t-ref="panel"
+                   t-att-id="sidebarId"
+                   class="o_rds_sidebar"
+                   t-att-aria-label="props.ariaLabel"
+                   t-att-role="state.isMobile &amp;&amp; isDrawerOpen ? 'dialog' : undefined"
+                   t-att-aria-modal="state.isMobile &amp;&amp; isDrawerOpen ? 'true' : undefined"
+                   t-att-aria-hidden="state.isMobile &amp;&amp; !isDrawerOpen ? 'true' : undefined"
+                   t-att-inert="state.isMobile &amp;&amp; !isDrawerOpen ? true : undefined">
+                <header class="o_rds_sidebar__header">
+                    <button type="button" class="o_rds_sidebar__brand" aria-label="DocuCraft ana bölümünü aç" title="DocuCraft" t-on-click="openHome">
+                        <span class="o_rds_sidebar__brand-icon">
+                            <img src="/ranvals_document_studio/static/description/docucraft_app_icon_v9_20260914.png" alt="" aria-hidden="true"/>
+                        </span>
+                        <span class="o_rds_sidebar__brand-label">DocuCraft</span>
+                    </button>
+                    <button type="button" class="o_rds_sidebar__close" aria-label="Menüyü kapat" title="Menüyü kapat" t-on-click="closeDrawer"><span aria-hidden="true">&#215;</span></button>
+                </header>
+                <nav class="o_rds_sidebar__nav" aria-label="Ana bölümler">
+                    <button t-foreach="navigationItems" t-as="item" t-key="item.key" type="button"
+                            t-att-class="navClass(item)"
+                            t-att-disabled="item.disabled ? true : undefined"
+                            t-att-aria-current="isActive(item) ? 'page' : undefined"
+                            t-att-title="item.label"
+                            t-att-data-rds-nav-key="item.key"
+                            t-on-click="() => this.activate(item)">
+                        <span class="o_rds_sidebar__item-icon"><img t-att-src="icon(item.icon)" alt="" aria-hidden="true"/></span>
+                        <span class="o_rds_sidebar__item-label" t-out="item.label"/>
+                    </button>
+                </nav>
+                <footer t-if="footerItems.length || (props.slots ? props.slots.footer : false)" class="o_rds_sidebar__footer">
+                    <nav t-if="footerItems.length" class="o_rds_sidebar__nav o_rds_sidebar__nav--auxiliary" aria-label="Yardımcı bölümler">
+                        <button t-foreach="footerItems" t-as="item" t-key="item.key" type="button"
+                                t-att-class="navClass(item)"
+                                t-att-disabled="item.disabled ? true : undefined"
+                                t-att-aria-current="isActive(item) ? 'page' : undefined"
+                                t-att-title="item.label"
+                                t-att-data-rds-nav-key="item.key"
+                                t-on-click="() => this.activate(item)">
+                            <span class="o_rds_sidebar__item-icon"><img t-att-src="icon(item.icon)" alt="" aria-hidden="true"/></span>
+                            <span class="o_rds_sidebar__item-label" t-out="item.label"/>
+                        </button>
+                    </nav>
+                    <t t-if="props.slots ? props.slots.footer : false" t-slot="footer"/>
+                </footer>
+                <button t-if="props.collapsible" type="button" class="o_rds_sidebar__collapse"
+                        t-att-aria-label="isCollapsed ? 'Menüyü genişlet' : 'Menüyü daralt'"
+                        t-att-title="isCollapsed ? 'Menüyü genişlet' : 'Menüyü daralt'"
+                        t-on-click="toggleCollapsed">
+                    <span aria-hidden="true" t-out="isCollapsed ? '&#8250;' : '&#8249;'"/>
+                </button>
+            </aside>
+        </div>
+    </t>
+</templates>

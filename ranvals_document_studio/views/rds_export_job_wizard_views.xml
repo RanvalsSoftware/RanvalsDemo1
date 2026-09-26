@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rds_export_wizard_background_form" model="ir.ui.view">
+        <field name="name">rds.export.wizard.background.form</field>
+        <field name="model">rds.export.wizard</field>
+        <field name="inherit_id" ref="view_rds_export_wizard_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='attach_to_record']" position="before">
+                <field name="processing_mode" widget="radio"/>
+                <div class="alert alert-info" role="status"
+                     invisible="processing_mode != 'auto'">
+                    Küçük belgeler hemen indirilir; büyük, çok kayıtlı veya tüm-format işlemleri otomatik olarak arka plana alınır.
+                </div>
+                <div class="alert alert-info" role="status"
+                     invisible="processing_mode != 'background'">
+                    Pencereyi açık tutmanız gerekmez. İş tamamlandığında bildirim alır ve Arka Plan İşlerim ekranından indirirsiniz.
+                </div>
+            </xpath>
+            <xpath expr="//footer/button[@name='action_export']" position="attributes">
+                <attribute name="invisible">processing_mode == 'background' or (processing_mode == 'auto' and (record_count &gt; 3 or output_format == 'zip'))</attribute>
+            </xpath>
+            <xpath expr="//footer/button[@name='action_export']" position="after">
+                <button name="action_export" type="object" string="Arka Plana Al"
+                        class="btn-primary" icon="fa-clock-o"
+                        invisible="processing_mode == 'immediate' or (processing_mode == 'auto' and record_count &lt;= 3 and output_format != 'zip')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

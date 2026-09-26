@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="template_beauty_premium" model="rds.template">
+        <field name="name">Premium Bordo – Güzellik ve Sağlık</field>
+        <field name="code">FREE_BEAUTY_PREMIUM</field>
+        <field name="sequence">10</field>
+        <field name="layout_style">beauty</field>
+        <field name="primary_color">#7A1020</field>
+        <field name="secondary_color">#FFF9F5</field>
+        <field name="accent_color">#B97865</field>
+        <field name="text_color">#332B2B</field>
+        <field name="heading_font">serif</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Lüks ve Bütünsel Hizmet</field>
+        <field name="footer_text">Bizi tercih ettiğiniz için teşekkür ederiz.</field>
+        <field name="preview_path">/ranvals_document_studio/static/description/templates/beauty.jpg</field>
+    </record>
+
+    <record id="template_construction_navy" model="rds.template">
+        <field name="name">Kurumsal Lacivert – İnşaat ve Mühendislik</field>
+        <field name="code">FREE_CONSTRUCTION_NAVY</field>
+        <field name="sequence">20</field>
+        <field name="layout_style">construction</field>
+        <field name="primary_color">#0B2A50</field>
+        <field name="secondary_color">#F5F7F9</field>
+        <field name="accent_color">#F36B21</field>
+        <field name="text_color">#24313D</field>
+        <field name="heading_font">technical</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">İnşaat • Mimarlık • Mühendislik</field>
+        <field name="footer_text">Güvenli yapılar, kalıcı çözümler.</field>
+        <field name="preview_path">/ranvals_document_studio/static/description/templates/construction.jpg</field>
+    </record>
+
+    <record id="template_technology_blue" model="rds.template">
+        <field name="name">Modern Mavi – Teknoloji ve Yazılım</field>
+        <field name="code">FREE_TECHNOLOGY_BLUE</field>
+        <field name="sequence">30</field>
+        <field name="layout_style">technology</field>
+        <field name="primary_color">#155BD7</field>
+        <field name="secondary_color">#F4F8FF</field>
+        <field name="accent_color">#10B9E8</field>
+        <field name="text_color">#17263B</field>
+        <field name="heading_font">sans</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Modern İşletmeler İçin Akıllı Belgeler</field>
+        <field name="footer_text">Dijital iş süreçleriniz için teşekkür ederiz.</field>
+        <field name="is_default" eval="True"/>
+        <field name="preview_path">/ranvals_document_studio/static/description/templates/technology.jpg</field>
+    </record>
+
+    <record id="template_industrial_red" model="rds.template">
+        <field name="name">Endüstriyel – Üretim ve Makine</field>
+        <field name="code">FREE_INDUSTRIAL_RED</field>
+        <field name="sequence">40</field>
+        <field name="layout_style">industrial</field>
+        <field name="primary_color">#172B46</field>
+        <field name="secondary_color">#F3F5F7</field>
+        <field name="accent_color">#D92832</field>
+        <field name="text_color">#202A34</field>
+        <field name="heading_font">technical</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Güçlü Çözümler, Sağlam Yarınlar</field>
+        <field name="footer_text">Teknik çözüm ortağınız.</field>
+        <field name="preview_path">/ranvals_document_studio/static/description/templates/industrial.jpg</field>
+    </record>
+
+    <record id="template_eco_green" model="rds.template">
+        <field name="name">Doğal Yeşil – Mimarlık ve Sürdürülebilirlik</field>
+        <field name="code">FREE_ECO_GREEN</field>
+        <field name="sequence">50</field>
+        <field name="layout_style">eco</field>
+        <field name="primary_color">#245A34</field>
+        <field name="secondary_color">#FBFAF3</field>
+        <field name="accent_color">#7E9E63</field>
+        <field name="text_color">#26372B</field>
+        <field name="heading_font">serif</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Sürdürülebilir Mekânlar, Kalıcı Değerler</field>
+        <field name="footer_text">Doğaya saygılı, insan odaklı, geleceğe değer.</field>
+        <field name="preview_path">/ranvals_document_studio/static/description/templates/eco.jpg</field>
+    </record>
+
+    <record id="template_furniture_terracotta" model="rds.template">
+        <field name="name">Terakota – Mobilya ve İç Mimarlık</field>
+        <field name="code">FREE_FURNITURE_TERRACOTTA</field>
+        <field name="sequence">60</field>
+        <field name="layout_style">furniture</field>
+        <field name="primary_color">#31363A</field>
+        <field name="secondary_color">#FFF9F3</field>
+        <field name="accent_color">#BA4D2D</field>
+        <field name="text_color">#292B2D</field>
+        <field name="heading_font">editorial</field>
+        <field name="body_font">sans</field>
+        <field name="tagline">Mekâna Karakter Katan Tasarımlar</field>
+        <field name="footer_text">Teşekkür ederiz.</field>
+        <field name="preview_path">/ranvals_document_studio/static/description/templates/furniture.jpg</field>
+    </record>
+</odoo>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.RdsColorPicker" owl="1">
+        <div t-att-class="{'o_rds_color_picker': true, 'o_rds_color_picker--readonly': props.readonly}">
+            <span class="o_rds_color_picker__swatch" t-att-title="value">
+                <input t-if="!props.readonly"
+                       class="o_rds_color_picker__native"
+                       type="color"
+                       t-att-value="value"
+                       t-on-change="onColorChange"/>
+                <span t-else="" class="o_rds_color_picker__readonly_swatch" t-att-style="'background:' + value + ';'"/>
+            </span>
+            <input t-if="!props.readonly"
+                   class="form-control o_rds_color_picker__text"
+                   type="text"
+                   maxlength="7"
+                   spellcheck="false"
+                   t-att-value="value"
+                   t-on-change="onTextChange"
+                   aria-label="HEX renk kodu"/>
+            <span t-else="" class="o_rds_color_picker__code" t-out="value"/>
+        </div>
+    </t>
+
+    <t t-name="ranvals_document_studio.RdsFontPicker" owl="1">
+        <div t-att-class="{'o_rds_font_picker': true, 'o_rds_font_picker--readonly': props.readonly}">
+            <select t-if="!props.readonly"
+                    class="form-select o_rds_font_picker__select"
+                    t-att-value="value"
+                    t-on-change="onFontChange"
+                    aria-label="Yazı tipi seçimi">
+                <option t-foreach="options" t-as="option" t-key="option[0]" t-att-value="option[0]" t-att-selected="option[0] === value">
+                    <t t-out="option[1]"/>
+                </option>
+            </select>
+            <div class="o_rds_font_picker__sample" t-att-style="sampleStyle">
+                <span class="o_rds_font_picker__sample_label">Aa</span>
+                <span class="o_rds_font_picker__sample_text" t-out="currentLabel"/>
+            </div>
+        </div>
+    </t>
+</templates>

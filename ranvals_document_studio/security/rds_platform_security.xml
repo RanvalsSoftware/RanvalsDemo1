@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_rds_template_version_company" model="ir.rule">
+        <field name="name">Şablon sürümleri: izinli şirketler</field>
+        <field name="model_id" ref="model_rds_template_version"/>
+        <field name="domain_force">['&amp;', '|', ('company_id', '=', False), ('company_id', 'in', company_ids), '|', ('template_id.company_id', '=', False), ('template_id.company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('ranvals_document_studio.group_rds_manager'))]"/>
+    </record>
+
+    <record id="rule_rds_template_rule_company" model="ir.rule">
+        <field name="name">Şablon kuralları: izinli şirketler</field>
+        <field name="model_id" ref="model_rds_template_rule"/>
+        <field name="domain_force">['&amp;', '|', ('company_id', '=', False), ('company_id', 'in', company_ids), '|', ('template_id.company_id', '=', False), ('template_id.company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_rds_template_portability_owner" model="ir.rule">
+        <field name="name">Şablon taşıma: yalnız oluşturan kullanıcı</field>
+        <field name="model_id" ref="model_rds_template_portability_wizard"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ranvals_document_studio.group_rds_manager'))]"/>
+    </record>
+
+    <record id="rule_rds_template_preview_owner" model="ir.rule">
+        <field name="name">Gerçek kayıt önizlemesi: yalnız oluşturan kullanıcı</field>
+        <field name="model_id" ref="model_rds_template_preview_wizard"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

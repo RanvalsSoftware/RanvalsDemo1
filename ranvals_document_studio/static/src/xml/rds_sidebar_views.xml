@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.RdsListView"
+       t-inherit="web.ListView"
+       t-inherit-mode="primary">
+        <xpath expr="./div[@t-ref='root']" position="attributes">
+            <attribute name="class">o_rds_sidebar_view o_rds_sidebar_list_view</attribute>
+        </xpath>
+        <xpath expr="//Layout" position="before">
+            <RdsSidebar t-if="!env.inDialog" activeKey="rdsActiveMenuKey"/>
+            <section t-if="!env.inDialog and rdsListHero" class="o_rds_view_hero">
+                <span class="o_rds_view_hero__icon">
+                    <img t-att-src="rdsIcon(rdsListHero.icon)" alt="" aria-hidden="true"/>
+                </span>
+                <span>
+                    <h1 t-out="rdsListHero.title"/>
+                    <p t-out="rdsListHero.subtitle"/>
+                </span>
+            </section>
+        </xpath>
+    </t>
+
+    <t t-name="ranvals_document_studio.RdsFormView"
+       t-inherit="web.FormView"
+       t-inherit-mode="primary">
+        <xpath expr="./div[@t-ref='root']" position="attributes">
+            <attribute name="class">o_rds_sidebar_view o_rds_sidebar_form_view</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('o_form_view_container')]" position="before">
+            <RdsSidebar t-if="!env.inDialog" activeKey="rdsActiveMenuKey"/>
+        </xpath>
+    </t>
+</templates>

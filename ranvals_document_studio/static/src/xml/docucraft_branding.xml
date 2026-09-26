@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.DocuCraftSidebarBranding"
+       t-inherit="ranvals_document_studio.RdsSidebar"
+       t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('o_rds_sidebar__mobile-toggle')]" position="attributes">
+            <attribute name="aria-label">DocuCraft menüsünü aç</attribute>
+        </xpath>
+        <xpath expr="//button[hasclass('o_rds_sidebar__backdrop')]" position="attributes">
+            <attribute name="aria-label">DocuCraft menüsünü kapat</attribute>
+        </xpath>
+        <xpath expr="//aside[hasclass('o_rds_sidebar')]" position="attributes">
+            <attribute name="t-att-aria-label">'DocuCraft – PDF, Word &amp; Document Designer for Odoo'</attribute>
+        </xpath>
+        <xpath expr="//button[hasclass('o_rds_sidebar__brand')]" position="attributes">
+            <attribute name="aria-label">DocuCraft ana bölümünü aç</attribute>
+            <attribute name="title">DocuCraft – PDF, Word &amp; Document Designer for Odoo</attribute>
+        </xpath>
+        <xpath expr="//span[hasclass('o_rds_sidebar__brand-label')]" position="replace">
+            <span class="o_rds_sidebar__brand-label">DocuCraft</span>
+        </xpath>
+    </t>
+
+    <t t-name="ranvals_document_studio.DocuCraftConnectorsBranding"
+       t-inherit="ranvals_document_studio.ConnectorsDashboard"
+       t-inherit-mode="extension">
+        <xpath expr="//section[hasclass('rds-connector-grid')]" position="attributes">
+            <attribute name="aria-label">DocuCraft bağlayıcıları</attribute>
+        </xpath>
+    </t>
+</templates>

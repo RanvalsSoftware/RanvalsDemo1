@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rds_template_form_platform" model="ir.ui.view">
+        <field name="name">rds.template.form.platform</field>
+        <field name="model">rds.template</field>
+        <field name="inherit_id" ref="ranvals_document_studio.view_rds_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='active']" position="before">
+                <button name="action_open_real_record_preview" type="object" string="Gerçek Kayıtla Test Et" icon="fa-eye"/>
+                <button name="action_open_portability" type="object" string="JSON Dışa Aktar" icon="fa-exchange" groups="ranvals_document_studio.group_rds_manager"/>
+            </xpath>
+            <xpath expr="//sheet/*[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_versions" type="object" class="oe_stat_button" icon="fa-history" groups="ranvals_document_studio.group_rds_manager">
+                        <field name="version_count" widget="statinfo" string="Sürüm"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='fields']//list/field[@name='field_path']" position="after">
+                <field name="technical_risk" widget="badge"
+                       decoration-success="technical_risk == 'safe'"
+                       decoration-info="technical_risk == 'related'"
+                       decoration-warning="technical_risk == 'costly'"
+                       decoration-danger="technical_risk == 'restricted'"/>
+                <field name="technical_risk_help" optional="hide"/>
+            </xpath>
+            <xpath expr="//notebook/page[@name='fields']" position="after">
+                <page string="Otomatik Seçim" name="conditional_rules" groups="ranvals_document_studio.group_rds_manager">
+                    <div class="alert alert-info" role="alert">
+                        Kurallar yüksek öncelikten düşüğe değerlendirilir. Eşleşme yoksa normal varsayılan şablon kullanılır; Python kodu veya serbest domain çalıştırılmaz.
+                    </div>
+                    <field name="rule_ids" nolabel="1">
+                        <list editable="bottom" decoration-muted="not active">
+                            <field name="sequence" widget="handle"/>
+                            <field name="active"/>
+                            <field name="priority"/>
+                            <field name="name"/>
+                            <field name="model_id"/>
+                            <field name="company_id" optional="show" groups="base.group_multi_company"/>
+                            <field name="partner_id" optional="hide"/>
+                            <field name="country_id" optional="hide"/>
+                            <field name="currency_id" optional="show"/>
+                            <field name="min_total" optional="show"/>
+                            <field name="max_total" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+                <page string="Sürüm Geçmişi" name="versions" groups="ranvals_document_studio.group_rds_manager">
+                    <field name="version_ids" nolabel="1">
+                        <list create="false" edit="false" delete="false">
+                            <field name="create_date"/>
+                            <field name="version_user_id"/>
+                            <field name="note"/>
+                            <field name="diff_summary"/>
+                            <button name="action_restore" type="object" string="Geri Yükle" icon="fa-undo" confirm="Bu sürüm güvenli bir yeni sürüm olarak geri yüklenecek. Devam edilsin mi?"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_rds_template_version_list" model="ir.ui.view">
+        <field name="name">rds.template.version.list</field>
+        <field name="model">rds.template.version</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="create_date"/>
+                <field name="template_id"/>
+                <field name="version_user_id"/>
+                <field name="note"/>
+                <field name="diff_summary"/>
+                <button name="action_restore" type="object" string="Geri Yükle" icon="fa-undo" confirm="Bu sürüm geri yüklensin mi?"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rds_template_version_form" model="ir.ui.view">
+        <field name="name">rds.template.version.form</field>
+        <field name="model">rds.template.version</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_restore" type="object" string="Bu Sürümü Geri Yükle" class="btn-primary" icon="fa-undo" confirm="Bu sürüm geri yüklensin mi?"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group><field name="template_id"/><field name="company_id"/><field name="version_user_id"/></group>
+                        <group><field name="create_date"/><field name="note"/><field name="diff_summary"/></group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rds_template_rule_list" model="ir.ui.view">
+        <field name="name">rds.template.rule.list</field>
+        <field name="model">rds.template.rule</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="priority"/>
+                <field name="name"/>
+                <field name="template_id"/>
+                <field name="model_id"/>
+                <field name="company_id" optional="show"/>
+                <field name="partner_id" optional="hide"/>
+                <field name="country_id" optional="hide"/>
+                <field name="currency_id" optional="show"/>
+                <field name="min_total" optional="show"/>
+                <field name="max_total" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rds_template_rule_form" model="ir.ui.view">
+        <field name="name">rds.template.rule.form</field>
+        <field name="model">rds.template.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group><field name="active"/><field name="priority"/><field name="sequence"/><field name="template_id"/></group>
+                        <group><field name="model_id"/><field name="company_id" groups="base.group_multi_company"/></group>
+                    </group>
+                    <separator string="Tümü sağlanması gereken güvenli koşullar"/>
+                    <group>
+                        <group><field name="partner_id"/><field name="country_id"/></group>
+                        <group><field name="currency_id"/><field name="min_total"/><field name="max_total"/></group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rds_template_rule" model="ir.actions.act_window">
+        <field name="name">Otomatik Şablon Kuralları</field>
+        <field name="res_model">rds.template.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_rds_system_health_form" model="ir.ui.view">
+        <field name="name">rds.system.health.form</field>
+        <field name="model">rds.system.health</field>
+        <field name="arch" type="xml">
+            <form delete="false">
+                <header><button name="action_refresh" type="object" string="Kontrolleri Yenile" icon="fa-refresh" class="btn-primary"/></header>
+                <sheet>
+                    <div class="oe_title"><h1>Sistem Sağlığı</h1><p class="text-muted">Son kontrol: <field name="checked_at" readonly="1"/></p></div>
+                    <group><field name="ok_count"/><field name="warning_count"/><field name="error_count"/></group>
+                    <field name="line_ids" nolabel="1">
+                        <list create="false" edit="false" delete="false">
+                            <field name="category"/>
+                            <field name="name"/>
+                            <field name="status" widget="badge" decoration-success="status == 'ok'" decoration-warning="status == 'warning'" decoration-danger="status == 'error'"/>
+                            <field name="detail"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rds_system_health" model="ir.actions.act_window">
+        <field name="name">Sistem Sağlığı</field>
+        <field name="res_model">rds.system.health</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="view_rds_retention_settings_form" model="ir.ui.view">
+        <field name="name">rds.retention.settings.form</field>
+        <field name="model">rds.retention.settings</field>
+        <field name="arch" type="xml">
+            <form delete="false">
+                <sheet>
+                    <div class="oe_title"><h1>Dışa Aktarım Saklama Politikası</h1></div>
+                    <div class="alert alert-info" role="alert">Denetim kayıtları silinmez. Yalnız eski dosya içeriği, tamamlanmış/başarısız/iptal edilmiş arka plan işlerinin çıktıları ve seçenek açıksa DocuCraft'ın oluşturduğu doğrulanmış belge ekleri temizlenir. Kuyruktaki ve çalışan işlere dokunulmaz.</div>
+                    <group>
+                        <field name="retention_days" string="Dosyaları saklama süresi (gün)"/>
+                        <field name="delete_owned_attachments" string="Süre dolunca belgeye eklenen DocuCraft dosyalarını da sil"/>
+                    </group>
+                    <footer>
+                        <button name="action_save" type="object" string="Kaydet" class="btn-primary"/>
+                        <button name="action_purge_now" type="object" string="Şimdi Güvenle Temizle" class="btn-secondary" confirm="Süresi dolmuş dosya içerikleri temizlenecek; denetim kayıtları korunacak. Devam edilsin mi?"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rds_retention_settings" model="ir.actions.act_window">
+        <field name="name">Saklama Politikası</field>
+        <field name="res_model">rds.retention.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="view_rds_template_portability_form" model="ir.ui.view">
+        <field name="name">rds.template.portability.wizard.form</field>
+        <field name="model">rds.template.portability.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Şablon Taşıma">
+                <sheet>
+                    <field name="mode" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                    <group invisible="mode != 'export'"><field name="template_id"/></group>
+                    <group invisible="mode != 'import'">
+                        <field name="upload_data" filename="upload_name" string="DocuCraft JSON Dosyası"/>
+                        <field name="upload_name" invisible="1"/>
+                    </group>
+                    <field name="preview_summary" nolabel="1" readonly="1" invisible="not preview_summary"/>
+                    <field name="export_data" invisible="1"/>
+                    <field name="export_name" invisible="1"/>
+                </sheet>
+                <footer>
+                    <button name="action_prepare_export" type="object" string="JSON İndir" class="btn-primary" invisible="mode != 'export'"/>
+                    <button name="action_preview_import" type="object" string="Dosyayı Doğrula" class="btn-primary" invisible="mode != 'import' or state == 'ready'"/>
+                    <button name="action_create_copy" type="object" string="Pasif Kopyayı Oluştur" class="btn-primary" invisible="mode != 'import' or state != 'ready'"/>
+                    <button string="Kapat" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rds_template_import" model="ir.actions.act_window">
+        <field name="name">Şablon İçe Aktar</field>
+        <field name="res_model">rds.template.portability.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_mode': 'import'}</field>
+    </record>
+
+    <record id="view_rds_template_preview_form" model="ir.ui.view">
+        <field name="name">rds.template.preview.wizard.form</field>
+        <field name="model">rds.template.preview.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Gerçek Kayıtla Test Et">
+                <sheet>
+                    <div class="alert alert-info" role="alert">Seçilen gerçek kayıt mevcut kullanıcı yetkileri ve şirket sınırlarıyla PDF olarak hazırlanır; geçmiş kaydı veya belge eki oluşturulmaz.</div>
+                    <group>
+                        <field name="template_id"/>
+                        <field name="target_model"/>
+                        <field name="sale_order_id" invisible="target_model != 'sale.order'" required="target_model == 'sale.order'"/>
+                        <field name="account_move_id" domain="[('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])]" invisible="target_model != 'account.move'" required="target_model == 'account.move'"/>
+                        <field name="purchase_order_id" invisible="target_model != 'purchase.order'" required="target_model == 'purchase.order'"/>
+                        <field name="language_id"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_preview" type="object" string="PDF Önizlemeyi Aç" class="btn-primary" icon="fa-eye"/>
+                    <button string="Kapat" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rds_export_log_form_retention" model="ir.ui.view">
+        <field name="name">rds.export.log.form.retention</field>
+        <field name="model">rds.export.log</field>
+        <field name="inherit_id" ref="ranvals_document_studio.view_rds_export_log_form"/>
+        <field name="arch" type="xml">
+            <field name="attachment_id" position="after"><field name="payload_purged_at" optional="show"/></field>
+        </field>
+    </record>
+</odoo>

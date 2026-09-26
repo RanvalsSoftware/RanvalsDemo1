@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="access_report_language_user" model="ir.model.access">
+        <field name="name">rds.report.language.user</field><field name="model_id" ref="model_rds_report_language"/>
+        <field name="group_id" ref="base.group_user"/><field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="access_report_language_manager" model="ir.model.access">
+        <field name="name">rds.report.language.manager</field><field name="model_id" ref="model_rds_report_language"/>
+        <field name="group_id" ref="ranvals_document_studio.group_rds_manager"/><field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/><field name="perm_create" eval="True"/><field name="perm_unlink" eval="True"/>
+    </record>
+    <record id="access_report_language_system" model="ir.model.access">
+        <field name="name">rds.report.language.system</field><field name="model_id" ref="model_rds_report_language"/>
+        <field name="group_id" ref="base.group_system"/><field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/><field name="perm_create" eval="True"/><field name="perm_unlink" eval="True"/>
+    </record>
+    <record id="rule_report_language_company" model="ir.rule">
+        <field name="name">Document Studio report language company isolation</field><field name="model_id" ref="model_rds_report_language"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

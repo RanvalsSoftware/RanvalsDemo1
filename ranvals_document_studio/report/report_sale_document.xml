@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        The generic report is used by the Document Studio wizard.  The themed
+        reports below are bound directly to sale.order so they appear in the
+        Print menu and in Odoo Studio's Sales reports list.
+    -->
+    <template id="report_sale_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <t t-call="ranvals_document_studio.rds_sale_layout_router"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!--
+        Odoo's native header Print button and quotation emails render
+        sale.report_saleorder_document.  Keep that native action/report name
+        intact (important for portal and sale EDI), but replace its body with
+        the default Document Studio design while this connector is installed.
+        If no usable template exists, the original Odoo body remains active.
+
+        The primary copies below isolate Studio edits to Sales.  Editing a
+        sales document must not alter invoice or purchase layouts that share
+        the core design engine.
+    -->
+    <template id="rds_sale_layout_beauty"
+              inherit_id="ranvals_document_studio.rds_layout_beauty"
+              primary="True"/>
+    <template id="rds_sale_layout_construction"
+              inherit_id="ranvals_document_studio.rds_layout_construction"
+              primary="True"/>
+    <template id="rds_sale_layout_technology"
+              inherit_id="ranvals_document_studio.rds_layout_technology"
+              primary="True"/>
+    <template id="rds_sale_layout_industrial"
+              inherit_id="ranvals_document_studio.rds_layout_industrial"
+              primary="True"/>
+    <template id="rds_sale_layout_eco"
+              inherit_id="ranvals_document_studio.rds_layout_eco"
+              primary="True"/>
+    <template id="rds_sale_layout_furniture"
+              inherit_id="ranvals_document_studio.rds_layout_furniture"
+              primary="True"/>
+
+    <template id="rds_sale_layout_router">
+        <t t-if="rds_template.layout_style == 'beauty'" t-call="ranvals_document_studio.rds_sale_layout_beauty"/>
+        <t t-elif="rds_template.layout_style == 'construction'" t-call="ranvals_document_studio.rds_sale_layout_construction"/>
+        <t t-elif="rds_template.layout_style == 'technology'" t-call="ranvals_document_studio.rds_sale_layout_technology"/>
+        <t t-elif="rds_template.layout_style == 'industrial'" t-call="ranvals_document_studio.rds_sale_layout_industrial"/>
+        <t t-elif="rds_template.layout_style == 'eco'" t-call="ranvals_document_studio.rds_sale_layout_eco"/>
+        <t t-else="" t-call="ranvals_document_studio.rds_sale_layout_furniture"/>
+    </template>
+
+    <template id="report_saleorder_document_rds_bridge"
+              inherit_id="sale.report_saleorder_document"
+              priority="90">
+        <xpath expr="//t[@t-call='web.external_layout']" position="before">
+            <t t-set="rds_template" t-value="doc._rds_standard_report_template()"/>
+            <t t-if="rds_template">
+                <t t-set="rds_lang" t-value="doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div class="oe_structure"/>
+                    <t t-call="ranvals_document_studio.rds_sale_layout_router"/>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </xpath>
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-if">not rds_template</attribute>
+        </xpath>
+    </template>
+
+    <!--
+        Independent QWeb roots for Studio.  Each action has a real report
+        document root and a separate layout call, so Odoo Studio can create an
+        inherited view for one design without changing the standard sale report
+        or the other Document Studio designs.  We deliberately use the private
+        rds_external_layout instead of web.external_layout_standard: the latter
+        is the global company layout and would alter invoices and purchases too.
+    -->
+    <template id="report_sale_beauty_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+                        <t t-call="ranvals_document_studio.rds_base_styles"/>
+                        <table style="table-layout:fixed;">
+                            <tr>
+                                <td style="width:50%;padding:6px 7px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                                <td t-att-style="'width:50%;padding:12px 7px;text-align:right;font-size:14px;font-style:italic;color:' + ctx['theme']['primary'] + ';font-family:' + ctx['theme']['heading_font'] + ';'" t-out="ctx.get('tagline')"/>
+                            </tr>
+                        </table>
+                        <div t-att-style="'border-top:1.5px solid %s;margin:4mm 0 6mm 0;' % ctx['theme']['primary']"/>
+                        <table class="rds-three-columns">
+                            <tr>
+                                <td style="width:27%;border-right:1px solid #d8cdca;">
+                                    <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                                    <div t-att-style="'width:38px;border-top:3px solid %s;margin:9px 0;' % ctx['theme']['accent']"/>
+                                    <div class="rds-number">No: <strong t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['number']"/></div>
+                                </td>
+                                <td style="width:36.5%;border-right:1px solid #d8cdca;">
+                                    <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                                    <t t-set="block_info" t-value="ctx['company_info']"/>
+                                    <t t-set="block_icon" t-value="'fa-building-o'"/>
+                                    <t t-call="ranvals_document_studio.rds_info_block"/>
+                                </td>
+                                <td style="width:36.5%;">
+                                    <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                    <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                    <t t-set="block_icon" t-value="'fa-user-o'"/>
+                                    <t t-call="ranvals_document_studio.rds_info_block"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <t t-call="ranvals_document_studio.rds_common_body"/>
+                    </div>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sale_construction_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+                        <t t-call="ranvals_document_studio.rds_base_styles"/>
+                        <div class="rds-banner" t-att-style="'background:%s;border-bottom:4px solid %s;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
+                            <table class="rds-banner-table"><tr>
+                                <td><t t-call="ranvals_document_studio.rds_logo"/></td>
+                                <td><div t-if="ctx.get('show_company')" style="font-size:9px;line-height:1.5;">
+                                    <div t-out="ctx['company_info']['phone']"/>
+                                    <div t-out="ctx['company_info']['email']"/>
+                                    <div t-out="ctx['company_info']['website']"/>
+                                    <div t-if="ctx['company_info']['vat']"><span t-out="ctx['tax_label']"/>: <span t-out="ctx['company_info']['vat']"/></div>
+                                </div></td>
+                            </tr></table>
+                        </div>
+                        <div style="margin:6mm 4px 3mm 4px;">
+                            <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                            <div class="rds-number"><strong t-att-style="'color:%s;' % ctx['theme']['accent']" t-out="ctx['number']"/></div>
+                        </div>
+                        <table class="rds-two-columns"><tr>
+                            <td><div class="rds-card">
+                                <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                <t t-set="block_icon" t-value="'fa-map-marker'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </div></td>
+                            <td><div class="rds-card">
+                                <div class="rds-section-title" t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['labels']['document_info']"/>
+                                <t t-if="ctx.get('show_metadata')" t-foreach="ctx['metadata'][:4]" t-as="item">
+                                    <div style="padding:4px 0;border-bottom:1px solid #e7eaed;">
+                                        <span class="rds-muted" t-out="item['label']"/> <span style="float:right;font-weight:700;" t-out="item['value']"/>
+                                    </div>
+                                </t>
+                            </div></td>
+                        </tr></table>
+                        <t t-call="ranvals_document_studio.rds_common_body"/>
+                    </div>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sale_technology_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+                        <t t-call="ranvals_document_studio.rds_base_styles"/>
+                        <table style="table-layout:fixed;border-bottom:2px solid #dfe7ee;"><tr>
+                            <td style="width:55%;padding:6px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                            <td t-att-style="'width:45%;padding:12px 6px;text-align:right;font-size:11px;color:' + ctx['theme']['primary'] + ';'" t-out="ctx.get('tagline')"/>
+                        </tr></table>
+                        <div style="margin:7mm 5px 4mm 5px;">
+                            <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                            <div class="rds-number"># <strong t-out="ctx['number']"/></div>
+                        </div>
+                        <table class="rds-two-columns"><tr>
+                            <td class="rds-row-separator">
+                                <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                                <t t-set="block_info" t-value="ctx['company_info']"/>
+                                <t t-set="block_icon" t-value="'fa-building'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </td>
+                            <td>
+                                <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                <t t-set="block_icon" t-value="'fa-user'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </td>
+                        </tr></table>
+                        <t t-call="ranvals_document_studio.rds_common_body"/>
+                    </div>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sale_industrial_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['text'])">
+                        <t t-call="ranvals_document_studio.rds_base_styles"/>
+                        <div class="rds-banner" t-att-style="'background:%s;border-bottom:5px solid %s;border-radius:0;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
+                            <table class="rds-banner-table"><tr>
+                                <td><t t-call="ranvals_document_studio.rds_logo"/></td>
+                                <td>
+                                    <div style="font-size:24px;font-weight:900;" t-out="ctx['title']"/>
+                                    <div class="rds-document-chip" t-att-style="'background:#fff;color:%s;margin-top:7px;' % ctx['theme']['accent']">No: <span t-out="ctx['number']"/></div>
+                                </td>
+                            </tr></table>
+                        </div>
+                        <table class="rds-three-columns"><tr>
+                            <td style="width:34%;border-right:1px solid #dce2e7;">
+                                <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                                <t t-set="block_info" t-value="ctx['company_info']"/>
+                                <t t-set="block_icon" t-value="'fa-industry'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </td>
+                            <td style="width:33%;border-right:1px solid #dce2e7;">
+                                <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                <t t-set="block_icon" t-value="'fa-users'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </td>
+                            <td style="width:33%;">
+                                <div class="rds-section-title" t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['labels']['document_info']"/>
+                                <t t-if="ctx.get('show_metadata')" t-foreach="ctx['metadata'][:5]" t-as="item">
+                                    <div style="padding:3px 0;font-size:8.8px;"><span class="rds-muted" t-out="item['label']"/>: <strong style="float:right;" t-out="item['value']"/></div>
+                                </t>
+                            </td>
+                        </tr></table>
+                        <t t-call="ranvals_document_studio.rds_common_body"/>
+                    </div>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sale_eco_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;border:1px solid #e1e6dc;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+                        <t t-call="ranvals_document_studio.rds_base_styles"/>
+                        <table style="table-layout:fixed;"><tr>
+                            <td style="width:55%;padding:7px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                            <td t-att-style="'width:45%;padding:12px;text-align:right;font-size:13px;font-style:italic;color:' + ctx['theme']['primary'] + ';font-family:' + ctx['theme']['heading_font'] + ';'" t-out="ctx.get('tagline')"/>
+                        </tr></table>
+                        <div t-att-style="'border-top:1.5px solid %s;margin:3mm 0 6mm 0;' % ctx['theme']['primary']"/>
+                        <table class="rds-three-columns"><tr>
+                            <td style="width:28%;border-right:1px solid #cfd8ca;">
+                                <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                                <div class="rds-number"><strong t-out="ctx['number']"/></div>
+                            </td>
+                            <td style="width:36%;border-right:1px solid #cfd8ca;">
+                                <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                                <t t-set="block_info" t-value="ctx['company_info']"/>
+                                <t t-set="block_icon" t-value="'fa-leaf'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </td>
+                            <td style="width:36%;">
+                                <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                <t t-set="block_icon" t-value="'fa-user-o'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </td>
+                        </tr></table>
+                        <t t-call="ranvals_document_studio.rds_common_body"/>
+                    </div>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sale_furniture_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <div t-attf-class="page rds-page {{ 'rds-page-rtl' if ctx.get('direction') == 'rtl' else '' }}" t-att-dir="ctx.get('direction')" t-att-style="'font-family:%s;background:%s;color:%s;' % (ctx['theme']['body_font'], ctx['theme']['secondary'], ctx['theme']['text'])">
+                        <t t-call="ranvals_document_studio.rds_base_styles"/>
+                        <table style="table-layout:fixed;"><tr>
+                            <td style="width:52%;padding:7px;"><t t-call="ranvals_document_studio.rds_logo"/></td>
+                            <td t-att-style="'width:48%;padding:14px 7px;text-align:right;font-size:13px;font-style:italic;color:' + ctx['theme']['accent'] + ';font-family:' + ctx['theme']['heading_font'] + ';'" t-out="ctx.get('tagline')"/>
+                        </tr></table>
+                        <div style="margin:5mm 5px 4mm 5px;">
+                            <div class="rds-title" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['heading_font'], ctx['theme']['text'])" t-out="ctx['title']"/>
+                            <div t-att-style="'width:38px;border-top:3px solid %s;margin:8px 0;' % ctx['theme']['accent']"/>
+                            <div class="rds-number">No: <strong t-att-style="'color:%s;' % ctx['theme']['accent']" t-out="ctx['number']"/></div>
+                        </div>
+                        <table class="rds-two-columns"><tr>
+                            <td><div class="rds-card">
+                                <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
+                                <t t-set="block_info" t-value="ctx['company_info']"/>
+                                <t t-set="block_icon" t-value="'fa-building-o'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </div></td>
+                            <td><div class="rds-card">
+                                <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
+                                <t t-set="block_info" t-value="ctx['partner_info']"/>
+                                <t t-set="block_icon" t-value="'fa-user-o'"/>
+                                <t t-call="ranvals_document_studio.rds_info_block"/>
+                            </div></td>
+                        </tr></table>
+                        <t t-call="ranvals_document_studio.rds_common_body"/>
+                    </div>
+                    <div class="oe_structure"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_rds_sale_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Varsayılan Tasarım</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_document</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document')</field>
+    </record>
+
+    <record id="action_report_rds_sale_beauty_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Premium Bordo / Güzellik ve Sağlık</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_beauty_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_beauty_document</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Premium_Bordo'</field>
+    </record>
+
+    <record id="action_report_rds_sale_construction_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Kurumsal Lacivert / İnşaat ve Mühendislik</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_construction_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_construction_document</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Kurumsal_Lacivert'</field>
+    </record>
+
+    <record id="action_report_rds_sale_technology_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Modern Mavi / Teknoloji ve Yazılım</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_technology_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_technology_document</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Modern_Mavi'</field>
+    </record>
+
+    <record id="action_report_rds_sale_industrial_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Endüstriyel / Üretim ve Makine</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_industrial_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_industrial_document</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Endustriyel'</field>
+    </record>
+
+    <record id="action_report_rds_sale_eco_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Doğal Yeşil / Mimarlık ve Sürdürülebilirlik</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_eco_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_eco_document</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Dogal_Yesil'</field>
+    </record>
+
+    <record id="action_report_rds_sale_furniture_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Terakota / Mobilya ve İç Mimarlık</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_sale_furniture_document</field>
+        <field name="report_file">ranvals_document_studio.report_sale_furniture_document</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or 'Sale_Document') + '_Terakota'</field>
+    </record>
+</odoo>

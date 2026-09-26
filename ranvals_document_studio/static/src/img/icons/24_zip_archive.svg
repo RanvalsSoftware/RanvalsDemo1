@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="ZIP">
+  <defs>
+    <linearGradient id="zipGradient" x1="40" y1="28" x2="214" y2="228" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#24C69A"/>
+      <stop offset="1" stop-color="#07866B"/>
+    </linearGradient>
+  </defs>
+  <path d="M62 24h91l45 45v153c0 8-6 14-14 14H62c-8 0-14-6-14-14V38c0-8 6-14 14-14Z" fill="url(#zipGradient)"/>
+  <path d="M153 24v40c0 8 6 14 14 14h31" fill="#64DDBB" opacity=".9"/>
+  <path d="M108 24h24v18h-24zm0 22h24v18h-24zm0 22h24v18h-24zm0 22h24v18h-24z" fill="#EFFFFA"/>
+  <rect x="102" y="108" width="36" height="51" rx="8" fill="#EFFFFA"/>
+  <path d="M112 123h16v21h-16z" fill="#07866B"/>
+  <text x="123" y="202" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="800">ZIP</text>
+</svg>

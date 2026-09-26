@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.PdfPreviewDialog" owl="1">
+        <Dialog title="props.title"
+                size="'xl'"
+                footer="false"
+                withBodyPadding="false"
+                contentClass="'o_rds_pdf_preview_dialog'">
+            <iframe class="o_rds_pdf_preview_dialog__frame"
+                    t-att-src="props.url"
+                    title="PDF Önizleme"/>
+        </Dialog>
+    </t>
+</templates>

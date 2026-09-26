@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rds_export_log_list" model="ir.ui.view">
+        <field name="name">rds.export.log.list</field>
+        <field name="model">rds.export.log</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false"
+                  js_class="rds_sidebar_list"
+                  class="rds-export-log-list">
+                <field name="create_date"/>
+                <field name="user_id"/>
+                <field name="record_name"/>
+                <field name="template_id"/>
+                <field name="output_format"/>
+                <field name="file_name"/>
+                <field name="file_size_display" string="Boyut"/>
+                <field name="has_stored_file" column_invisible="True"/>
+                <field name="attached_to_record" string="Kayda Ekli" optional="show"/>
+                <field name="attachment_id"/>
+                <button name="action_download"
+                        type="object"
+                        string="İndir"
+                        icon="fa-download"
+                        invisible="not has_stored_file"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rds_export_log_search" model="ir.ui.view">
+        <field name="name">rds.export.log.search</field>
+        <field name="model">rds.export.log</field>
+        <field name="arch" type="xml">
+            <search string="Dışa Aktarım Geçmişinde Ara">
+                <field name="file_name"/>
+                <field name="record_name"/>
+                <field name="template_id"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter name="rds_format_pdf" string="PDF" domain="[('output_format', '=', 'pdf')]"/>
+                <filter name="rds_format_docx" string="Word (PDF Görünümü)" domain="[('output_format', '=', 'docx')]"/>
+                <filter name="rds_format_docx_editable" string="Word (Düzenlenebilir)" domain="[('output_format', '=', 'docx_editable')]"/>
+                <filter name="rds_format_png" string="PNG" domain="[('output_format', '=', 'png')]"/>
+                <filter name="rds_format_zip" string="ZIP" domain="[('output_format', '=', 'zip')]"/>
+                <group>
+                    <filter name="rds_group_format" string="Format" context="{'group_by': 'output_format'}"/>
+                    <filter name="rds_group_user" string="Kullanıcı" context="{'group_by': 'user_id'}"/>
+                    <filter name="rds_group_template" string="Şablon" context="{'group_by': 'template_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_rds_export_log_form" model="ir.ui.view">
+        <field name="name">rds.export.log.form</field>
+        <field name="model">rds.export.log</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" delete="false"
+                  js_class="rds_sidebar_form"
+                  class="rds-export-log-form">
+                <header>
+                    <button name="action_download"
+                            type="object"
+                            string="İndir"
+                            icon="fa-download"
+                            class="btn-primary"
+                            invisible="not has_stored_file"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="create_date"/>
+                            <field name="user_id"/>
+                            <field name="company_id"/>
+                            <field name="template_id"/>
+                        </group>
+                        <group>
+                            <field name="record_name"/>
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                            <field name="output_format"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="file_name"/>
+                        <field name="file_size_display"/>
+                        <field name="file_mimetype"/>
+                        <field name="has_stored_file"/>
+                        <field name="attached_to_record"/>
+                        <field name="attachment_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rds_export_log" model="ir.actions.act_window">
+        <field name="name">Dışa Aktarım Geçmişi</field>
+        <field name="res_model">rds.export.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_rds_export_log_search"/>
+        <field name="context">{'rds_sidebar_menu': 'ranvals_document_studio.menu_rds_logs'}</field>
+    </record>
+
+    <record id="action_rds_export_log_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_rds_export_log_list"/>
+        <field name="act_window_id" ref="action_rds_export_log"/>
+    </record>
+
+    <record id="action_rds_export_log_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rds_export_log_form"/>
+        <field name="act_window_id" ref="action_rds_export_log"/>
+    </record>
+</odoo>

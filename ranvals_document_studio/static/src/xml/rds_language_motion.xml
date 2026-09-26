@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.LanguageButton">
+        <button type="button" class="rds-language-button" t-att-disabled="state.busy" t-on-click="open"
+                title="Dil ayarları" aria-label="Arayüz dilini değiştir">
+            <i class="fa fa-globe" aria-hidden="true"/>
+            <span class="rds-language-button__label">Dil / Language</span>
+            <span class="rds-language-button__code" t-esc="code"/>
+        </button>
+    </t>
+    <t t-name="ranvals_document_studio.SidebarLanguage" t-inherit="ranvals_document_studio.RdsSidebar" t-inherit-mode="extension">
+        <xpath expr="//aside/footer" position="before"><div class="rds-sidebar-language"><RdsLanguageButton/></div></xpath>
+        <xpath expr="//button[@t-on-click='toggleCollapsed']" position="attributes">
+            <attribute name="t-att-title">rdsCollapseTitle</attribute>
+            <attribute name="t-att-aria-label">rdsCollapseTitle</attribute>
+        </xpath>
+    </t>
+</templates>

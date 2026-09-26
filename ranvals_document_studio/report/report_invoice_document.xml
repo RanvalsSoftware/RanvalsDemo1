@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rds_lang" t-value="doc.env.context.get('rds_requested_lang') or doc.partner_id.lang or doc.env.context.get('lang') or doc.env.user.lang"/>
+                <t t-set="doc" t-value="doc.with_context(lang=rds_lang)"/>
+                <t t-set="o" t-value="doc"/>
+                <t t-set="company" t-value="doc.company_id"/>
+                <t t-set="ctx" t-value="doc._rds_document_context(rds_template, rds_lang)"/>
+                <t t-call="ranvals_document_studio.rds_external_layout">
+                    <t t-call="ranvals_document_studio.rds_layout_router"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_rds_invoice_document" model="ir.actions.report">
+        <field name="name">Belge Studio – Fatura</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_document_studio.report_invoice_document</field>
+        <field name="report_file">ranvals_document_studio.report_invoice_document</field>
+        <field name="paperformat_id" ref="ranvals_document_studio.paperformat_rds_a4"/>
+        <field name="print_report_name">(object.name or object.ref or 'Invoice')</field>
+    </record>
+</odoo>

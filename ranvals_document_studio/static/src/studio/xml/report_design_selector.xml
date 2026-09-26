@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="ranvals_document_studio.SidebarExtension"
+       t-inherit="web_studio.ReportEditorWysiwyg.Sidebar" t-inherit-mode="extension">
+        <xpath expr="//Record" position="after">
+            <RdsReportDesignSelector reportModel="reportEditorModel" save.bind="save"/>
+        </xpath>
+    </t>
+    <t t-name="ranvals_document_studio.ReportDesignSelector">
+        <section t-if="visible" class="rds-studio-design-selector" aria-label="PDF Tasarımı" t-att-aria-busy="state.busy or !state.ready">
+            <div class="rds-design-heading">
+                <span class="rds-design-brand-icon"><i class="fa fa-file-pdf-o" aria-hidden="true"/></span>
+                <div class="rds-design-brand">
+                    <span class="rds-design-eyebrow">DOCUCRAFT</span>
+                    <strong>PDF Tasarımı</strong>
+                </div>
+                <span t-if="state.ready and state.supported" class="rds-design-count"><t t-esc="state.templates.length"/> şablon</span>
+            </div>
+            <p class="rds-design-hint">Şablonu seçin, bu rapora uygulayın.</p>
+            <div t-if="!state.ready" class="rds-design-message" role="status"><i class="fa fa-spinner fa-spin me-1" aria-hidden="true"/> Tasarımlar yükleniyor…</div>
+            <div t-elif="state.error" class="rds-design-message rds-design-warning" role="alert"><t t-esc="state.error"/><button type="button" class="btn rds-design-button rds-design-button--retry" t-on-click="load">Tekrar dene</button></div>
+            <t t-elif="state.supported">
+                <label class="rds-design-label">Belge şablonu
+                    <select class="form-select" t-model="state.templateId" aria-label="DocuCraft şablonu" t-att-title="selectedName" t-att-disabled="state.busy or !state.canManage or (!hasTemplates and !state.savedId)">
+                        <option value="">Mevcut / varsayılan tasarım</option>
+                        <option t-foreach="state.templates" t-as="item" t-key="item.id" t-att-value="item.id"><t t-esc="item.name"/></option>
+                    </select>
+                </label>
+                <div class="rds-design-scope"><span>Seçili tasarım</span><strong t-esc="selectedName"/><div class="rds-design-company"><i class="fa fa-building-o" aria-hidden="true"/><span>Şirket: <t t-esc="state.company"/></span></div></div>
+                <div t-if="!hasTemplates" class="rds-design-message rds-design-warning" role="status">Bu şirket ve belge modeli için etkin şablon bulunamadı. DocuCraft → Şablonlar bölümünü kontrol edin.</div>
+                <button type="button" class="btn btn-primary rds-design-button rds-design-button--apply" t-on-click="apply" t-att-disabled="!canApply"><i t-if="state.busy" class="fa fa-spinner fa-spin" aria-hidden="true"/><i t-else="" class="fa fa-check" aria-hidden="true"/> Uygula ve Önizle</button>
+                <p t-if="changed" class="rds-design-pending" role="status">Seçim henüz uygulanmadı.</p>
+                <p class="rds-design-note"><i class="fa fa-info-circle" aria-hidden="true"/><span>Yalnız bu rapor ve şirket için kaydedilir. Diğer raporlar değişmez.</span></p>
+                <p t-if="!state.canManage" class="rds-design-message">Tasarımı kaydetmek için DocuCraft yöneticisi yetkisi gerekir.</p>
+                <div class="rds-design-download"><div class="rds-design-download-title">İndirme biçimi</div><div class="rds-design-download-controls"><select class="form-select rds-design-format" t-model="state.format" t-att-disabled="state.busy" aria-label="İndirme biçimi"><option value="pdf">PDF</option><option value="docx_editable">Word / DOCX (düzenlenebilir – önerilen)</option><option value="docx">Word / DOCX (PDF görünümü)</option><option value="png">PNG</option><option value="zip">ZIP – Tüm Formatlar</option></select><button type="button" class="btn rds-design-button rds-design-button--download" t-on-click="exportFile" t-att-disabled="!canDownload"><i class="fa fa-download" aria-hidden="true"/> İndir</button></div></div>
+                <p t-if="state.format === 'docx_editable'" class="rds-design-hint">Metinleri ve tabloları Word içinde düzenleyebileceğiniz doğal DOCX oluşturur.</p>
+                <p t-if="state.format === 'docx'" class="rds-design-hint">Word, seçilen QWeb PDF tasarımını 300 DPI kalitede birebir taşır.</p>
+                <p t-if="state.format === 'zip'" class="rds-design-hint">ZIP paketi PDF, düzenlenebilir Word, PDF görünümündeki Word ve PNG sayfalarını birlikte içerir.</p>
+                <p t-if="!hasRecord" class="rds-design-message rds-design-warning">Önizleme ve indirme için sağ üstten gerçek bir belge kaydı seçin.</p>
+            </t>
+            <p t-else="" class="rds-design-message">Bu rapor türünde tasarım seçimi kullanılamıyor.</p>
+            <div class="rds-design-version">DocuCraft · Tasarım Seçici</div>
+        </section>
+    </t>
+</templates>

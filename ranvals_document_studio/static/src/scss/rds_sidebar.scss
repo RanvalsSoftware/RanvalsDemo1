@@ -1,0 +1,449 @@
+/*
+ * Belge Studio action shell contract
+ * -----------------------------------
+ * Mount RdsSidebar as the first child of `.o_rds_sidebar_layout` and put the
+ * action body in `.o_rds_sidebar_layout__content`.  No generic Odoo list/form
+ * selector is changed, so unrelated backend actions keep their native layout.
+ */
+body.o_rds_sidebar_active .o_menu_sections {
+    display: none !important;
+}
+
+/*
+ * Odoo's action manager gives every direct `.o_action` a column flex-flow.
+ * Dashboard client actions also carry `.o_action`, so use an equally scoped
+ * action-manager selector to turn only the Belge Studio shell back into the
+ * intended horizontal rail + content layout.
+ */
+.o_web_client > .o_action_manager > .o_action.o_rds_sidebar_layout {
+    flex-flow: row nowrap;
+    overflow: hidden;
+}
+
+.o_rds_sidebar_layout {
+    --rds-sidebar-width: 188px;
+    --rds-sidebar-rail-width: 72px;
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: #fbfcfe;
+
+    &__content {
+        flex: 1 1 auto;
+        min-width: 0;
+        min-height: 0;
+        overflow: auto;
+    }
+}
+
+/* Compatibility shell for scoped list/form controllers using RdsSidebar. */
+.o_rds_sidebar_view {
+    position: relative;
+    display: flex !important;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: #fbfcfe;
+
+    > :not(.o_rds_sidebar_host) {
+        flex: 1 1 auto;
+        min-width: 0;
+        min-height: 0;
+    }
+}
+
+.o_rds_sidebar_host {
+    --rds-sidebar-navy: #17223b;
+    --rds-sidebar-navy-deep: #101a31;
+    --rds-sidebar-text: #f7f8fc;
+    --rds-sidebar-muted: #b7c0d2;
+    --rds-sidebar-active: rgba(109, 31, 116, 0.68);
+    --rds-sidebar-focus: #86b7fe;
+    position: relative;
+    z-index: 30;
+    flex: 0 0 var(--rds-sidebar-width, 188px);
+    width: var(--rds-sidebar-width, 188px);
+    min-width: 0;
+    min-height: 100%;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    button {
+        font: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+        outline: 3px solid var(--rds-sidebar-focus);
+        outline-offset: 2px;
+    }
+
+    &.is-collapsed {
+        flex-basis: var(--rds-sidebar-rail-width, 72px);
+        width: var(--rds-sidebar-rail-width, 72px);
+
+        .o_rds_sidebar {
+            width: var(--rds-sidebar-rail-width, 72px);
+        }
+
+        .o_rds_sidebar__brand-label,
+        .o_rds_sidebar__item-label,
+        .o_rds_sidebar__footer > :not(.o_rds_sidebar__nav) {
+            display: none;
+        }
+
+        .o_rds_sidebar__header,
+        .o_rds_sidebar__nav {
+            padding-inline: 10px;
+        }
+
+        .o_rds_sidebar__brand,
+        .o_rds_sidebar__item {
+            justify-content: center;
+        }
+    }
+}
+
+.o_rds_sidebar {
+    position: sticky;
+    inset-block-start: 0;
+    display: flex;
+    flex-direction: column;
+    width: var(--rds-sidebar-width, 188px);
+    height: 100%;
+    min-height: 520px;
+    overflow: hidden;
+    color: var(--rds-sidebar-text);
+    background:
+        radial-gradient(circle at 20% 8%, rgba(109, 31, 116, 0.22), transparent 34%),
+        linear-gradient(180deg, var(--rds-sidebar-navy) 0%, var(--rds-sidebar-navy-deep) 100%);
+    box-shadow: 8px 0 24px rgba(15, 23, 42, 0.09);
+    transition: width 180ms ease, transform 220ms ease;
+}
+
+/* Opt-in only: use when the owning action shell really spans the viewport. */
+.o_rds_sidebar_layout--viewport .o_rds_sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+}
+
+.o_rds_sidebar__header {
+    display: flex;
+    align-items: center;
+    min-height: 84px;
+    padding: 17px 14px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.o_rds_sidebar__brand {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    color: inherit;
+    text-align: start;
+    background: transparent;
+    border: 0;
+}
+
+.o_rds_sidebar__brand-icon {
+    display: grid;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 9px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+
+    img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+}
+
+.o_rds_sidebar__brand-label {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.o_rds_sidebar__close {
+    display: none;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    color: var(--rds-sidebar-muted);
+    font-size: 28px;
+    line-height: 1;
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+}
+
+.o_rds_sidebar__nav {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 12px;
+}
+
+.o_rds_sidebar__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 11px;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 9px 11px;
+    color: var(--rds-sidebar-muted);
+    text-align: start;
+    background: transparent;
+    border: 0;
+    border-radius: 8px;
+    transition: color 150ms ease, background-color 150ms ease, transform 150ms ease;
+
+    &:hover:not(:disabled) {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    &.is-active {
+        color: #ffffff;
+        font-weight: 650;
+        background: var(--rds-sidebar-active);
+        box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.78);
+    }
+
+    &.is-disabled,
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+    }
+}
+
+.o_rds_sidebar__item-icon {
+    display: grid;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+
+    img {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+        opacity: 0.72;
+    }
+
+    .is-active & img,
+    .o_rds_sidebar__item:hover & img {
+        opacity: 1;
+    }
+}
+
+.o_rds_sidebar__item-label {
+    min-width: 0;
+    overflow: visible;
+    font-size: 14.5px;
+    line-height: 1.35;
+    white-space: normal;
+}
+
+.o_rds_sidebar__footer {
+    margin-top: auto;
+    padding-block: 8px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+
+    .o_rds_sidebar__nav {
+        padding-block: 4px;
+    }
+}
+
+.o_rds_sidebar__collapse {
+    position: absolute;
+    inset-inline-end: -13px;
+    inset-block-start: 98px;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    place-items: center;
+    color: var(--rds-sidebar-navy);
+    font-size: 22px;
+    line-height: 1;
+    background: #ffffff;
+    border: 1px solid #dce2ea;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.13);
+}
+
+.o_rds_sidebar__mobile-toggle,
+.o_rds_sidebar__backdrop {
+    display: none;
+}
+
+/* Tablet: retain every destination as a compact 72 px icon rail. */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .o_rds_sidebar_host {
+        flex-basis: var(--rds-sidebar-rail-width, 72px);
+        width: var(--rds-sidebar-rail-width, 72px);
+
+        .o_rds_sidebar {
+            width: var(--rds-sidebar-rail-width, 72px);
+        }
+
+        .o_rds_sidebar__brand-label,
+        .o_rds_sidebar__item-label,
+        .o_rds_sidebar__footer > :not(.o_rds_sidebar__nav),
+        .o_rds_sidebar__collapse {
+            display: none;
+        }
+
+        .o_rds_sidebar__header,
+        .o_rds_sidebar__nav {
+            padding-inline: 10px;
+        }
+
+        .o_rds_sidebar__brand,
+        .o_rds_sidebar__item {
+            justify-content: center;
+        }
+    }
+}
+
+/* Phone: the rail becomes an accessible modal drawer. */
+@media (max-width: 767.98px) {
+    .o_rds_sidebar_layout {
+        overflow: visible;
+    }
+
+    .o_rds_sidebar_host,
+    .o_rds_sidebar_host.is-collapsed {
+        position: absolute;
+        inset: 0 auto auto 0;
+        z-index: 1055;
+        flex-basis: 0;
+        width: 0;
+        min-height: 0;
+
+        .o_rds_sidebar {
+            position: fixed;
+            z-index: 2;
+            inset-block: 0;
+            inset-inline-start: 0;
+            width: calc(100vw - 48px);
+            max-width: 188px;
+            min-height: 100dvh;
+            transform: translateX(-105%);
+        }
+
+        &.is-drawer-open .o_rds_sidebar {
+            transform: translateX(0);
+        }
+
+        .o_rds_sidebar__header {
+            padding-inline: 14px 8px;
+        }
+
+        .o_rds_sidebar__close {
+            display: grid;
+            place-items: center;
+        }
+
+        .o_rds_sidebar__brand-label,
+        .o_rds_sidebar__item-label {
+            display: initial;
+        }
+
+        .o_rds_sidebar__brand,
+        .o_rds_sidebar__item {
+            justify-content: flex-start;
+        }
+
+        .o_rds_sidebar__collapse {
+            display: none;
+        }
+    }
+
+    .o_rds_sidebar__mobile-toggle {
+        position: fixed;
+        z-index: 1050;
+        inset-inline-start: 12px;
+        inset-block-start: calc(var(--o-navbar-height, 46px) + 12px);
+        display: grid;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        place-items: center;
+        color: #ffffff;
+        background: #17223b;
+        border: 0;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.2);
+    }
+
+    .o_rds_sidebar__hamburger {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        i {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: currentColor;
+            border-radius: 999px;
+        }
+    }
+
+    .o_rds_sidebar__backdrop {
+        position: fixed;
+        z-index: 1;
+        inset: 0;
+        display: block;
+        width: 100vw;
+        height: 100dvh;
+        padding: 0;
+        background: rgba(15, 23, 42, 0.52);
+        border: 0;
+        backdrop-filter: blur(1px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_rds_sidebar,
+    .o_rds_sidebar__item {
+        transition: none;
+    }
+}

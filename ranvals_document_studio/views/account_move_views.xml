@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Belge Studio has its own invoice browser so users do not need to leave
+        the app before choosing records and opening the export wizard.  The
+        normal account.move record rules still provide company/access
+        isolation; the action only narrows the model to commercial documents.
+    -->
+    <record id="view_account_move_list_rds" model="ir.ui.view">
+        <field name="name">account.move.list.rds</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <list string="Faturalar"
+                  create="true"
+                  delete="false"
+                  multi_edit="false"
+                  js_class="rds_sidebar_list"
+                  class="rds-invoice-list">
+                <header>
+                    <button name="action_rds_download_pdf"
+                            type="object"
+                            string="PDF İndir"
+                            icon="fa-file-pdf-o"
+                            class="btn-secondary"
+                            groups="account.group_account_invoice"/>
+                    <button name="action_rds_download_editable_word"
+                            type="object"
+                            string="Word İndir"
+                            icon="fa-file-word-o"
+                            class="btn-primary"
+                            groups="account.group_account_invoice"/>
+                    <button name="action_open_rds_export"
+                            type="object"
+                            string="Diğer Biçimler"
+                            icon="fa-ellipsis-h"
+                            class="btn-link"
+                            groups="account.group_account_invoice"/>
+                </header>
+                <field name="name" string="Fatura No"/>
+                <field name="move_type" string="Belge Türü"/>
+                <field name="partner_id" string="İş Ortağı"/>
+                <field name="ref" string="Referans" optional="show"/>
+                <field name="invoice_date" string="Fatura Tarihi" optional="show"/>
+                <field name="invoice_date_due" string="Vade Tarihi" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="amount_total"
+                       string="Toplam"
+                       sum="Toplam"
+                       widget="monetary"
+                       options="{'currency_field': 'currency_id'}"/>
+                <field name="payment_state" string="Ödeme Durumu" widget="badge" optional="show"/>
+                <field name="state" string="Durumu" widget="badge" optional="show"/>
+                <field name="company_id" string="Firma" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_move_search_rds" model="ir.ui.view">
+        <field name="name">account.move.search.rds</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search string="Faturalarda Ara">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="ref"/>
+                <separator/>
+                <filter name="rds_customer_documents"
+                        string="Müşteri Faturaları"
+                        domain="[('move_type', 'in', ('out_invoice', 'out_refund'))]"/>
+                <filter name="rds_vendor_documents"
+                        string="Tedarikçi Faturaları"
+                        domain="[('move_type', 'in', ('in_invoice', 'in_refund'))]"/>
+                <!-- Odoo 19's search-view schema does not accept the legacy
+                     ``string`` or ``expand`` attributes on ``group``. -->
+                <group>
+                    <filter name="rds_group_move_type" string="Belge Türü" context="{'group_by': 'move_type'}"/>
+                    <filter name="rds_group_partner" string="İş Ortağı" context="{'group_by': 'partner_id'}"/>
+                    <filter name="rds_group_company" string="Şirket" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rds_invoice" model="ir.actions.act_window">
+        <field name="name">Faturalar</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_account_move_search_rds"/>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'))]</field>
+        <field name="context">{'default_move_type': 'out_invoice', 'rds_sidebar_menu': 'ranvals_document_studio.menu_rds_invoices'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Belge oluşturmak için bir fatura seçin</p>
+            <p>PDF, Word veya PNG çıktısı için kayıtları seçip <strong>Belge Oluştur</strong> düğmesini kullanın.</p>
+        </field>
+    </record>
+
+    <!-- Keep every accounting-specific form controller/compiler behaviour, but
+         give the Document Studio action its own scoped sidebar view. -->
+    <record id="view_account_move_form_rds_primary" model="ir.ui.view">
+        <field name="name">account.move.form.rds.primary</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="js_class">rds_account_move_sidebar_form</attribute>
+                <attribute name="class" add="rds-invoice-form" separator=" "/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_rds_invoice_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_account_move_list_rds"/>
+        <field name="act_window_id" ref="action_rds_invoice"/>
+    </record>
+
+    <record id="action_rds_invoice_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_account_move_form_rds_primary"/>
+        <field name="act_window_id" ref="action_rds_invoice"/>
+    </record>
+
+    <menuitem id="menu_rds_invoices"
+              name="Faturalar"
+              parent="ranvals_document_studio.menu_rds_root"
+              action="action_rds_invoice"
+              sequence="15"
+              groups="account.group_account_invoice"/>
+
+    <record id="view_account_move_form_rds" model="ir.ui.view">
+        <field name="name">account.move.form.rds</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_rds_download_pdf"
+                        type="object"
+                        string="PDF İndir"
+                        icon="fa-file-pdf-o"
+                        class="btn-secondary"
+                        groups="account.group_account_invoice"
+                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
+                        help="Etkin DocuCraft tasarımını belge dilinde doğrudan PDF olarak indirin."/>
+                <button name="action_rds_download_editable_word"
+                        type="object"
+                        string="Word İndir"
+                        icon="fa-file-word-o"
+                        class="btn-primary"
+                        groups="account.group_account_invoice"
+                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
+                        help="Faturayı düzenlenebilir Word belgesi olarak indirin."/>
+                <button name="action_open_rds_export"
+                        type="object"
+                        string="Diğer Biçimler"
+                        icon="fa-ellipsis-h"
+                        class="btn-link"
+                        groups="account.group_account_invoice"
+                        invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_list_rds_quick_export" model="ir.ui.view">
+        <field name="name">account.invoice.list.rds.quick.export</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/header" position="inside">
+                <button name="action_rds_download_pdf"
+                        type="object"
+                        string="PDF İndir"
+                        icon="fa-file-pdf-o"
+                        class="btn-secondary"
+                        groups="account.group_account_invoice"
+                        invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+                <button name="action_rds_download_editable_word"
+                        type="object"
+                        string="Word İndir"
+                        icon="fa-file-word-o"
+                        class="btn-secondary"
+                        groups="account.group_account_invoice"
+                        invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rds_template_list" model="ir.ui.view">
+        <field name="name">rds.template.list</field>
+        <field name="model">rds.template</field>
+        <field name="arch" type="xml">
+            <list js_class="rds_sidebar_list"
+                  class="rds-template-list"
+                  decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="layout_style" string="Yerleşim Stili"/>
+                <field name="is_default" widget="boolean_toggle"/>
+                <field name="target_model_id" optional="show"/>
+                <field name="company_id" optional="show"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rds_template_search" model="ir.ui.view">
+        <field name="name">rds.template.search</field>
+        <field name="model">rds.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="target_model_id"/>
+                <field name="company_id"/>
+                <separator/>
+                <filter name="filter_active" string="Aktif" domain="[('active', '=', True)]"/>
+                <filter name="filter_default" string="Varsayılan" domain="[('is_default', '=', True)]"/>
+                <separator/>
+                <filter string="Tasarım" name="group_layout" context="{'group_by': 'layout_style'}"/>
+                <filter string="Model" name="group_model" context="{'group_by': 'target_model_id'}"/>
+                <filter string="Şirket" name="group_company" context="{'group_by': 'company_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_rds_template_form" model="ir.ui.view">
+        <field name="name">rds.template.form</field>
+        <field name="model">rds.template</field>
+        <field name="arch" type="xml">
+            <form string="Belge Şablonu"
+                  js_class="rds_sidebar_form"
+                  class="rds-template-form">
+                <header>
+                    <button name="action_open_add_field" type="object" string="Alan Ekle" icon="fa-plus" class="btn-primary" groups="ranvals_document_studio.group_rds_manager"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </header>
+                <sheet class="rds-template-sheet">
+                    <div class="oe_title">
+                        <label for="name" string="Şablon Adı"/>
+                        <h1><field name="name" placeholder="Örn. Kurumsal Teklif"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                            <field name="layout_style"/>
+                            <field name="is_default"/>
+                        </group>
+                        <group>
+                            <field name="target_model_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="logo_height_mm"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Önizleme" name="preview" class="rds-template-preview-page">
+                            <div class="rds-preview-stage">
+                                <field name="preview_html" widget="html" nolabel="1" readonly="1"/>
+                            </div>
+                        </page>
+                        <page string="Tasarım" name="design" class="rds-template-design-page">
+                            <div class="rds-template-settings-grid">
+                                <section class="rds-template-settings-card">
+                                    <div class="rds-template-settings-card__header">
+                                        <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Renkler"/></span>
+                                        <span><strong>Renkler</strong><small>Şablonunuzda kullanılan renk paletini özelleştirin.</small></span>
+                                    </div>
+                                    <group col="1" class="rds-template-settings-card__fields">
+                                    <field name="primary_color"/>
+                                    <field name="secondary_color"/>
+                                    <field name="accent_color"/>
+                                    <field name="text_color"/>
+                                    </group>
+                                </section>
+                                <section class="rds-template-settings-card">
+                                    <div class="rds-template-settings-card__header">
+                                        <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Tipografi"/></span>
+                                        <span><strong>Tipografi</strong><small>Yazı tiplerini ve metin ayarlarını yönetin.</small></span>
+                                    </div>
+                                    <group col="1" class="rds-template-settings-card__fields">
+                                    <field name="heading_font"/>
+                                    <field name="body_font"/>
+                                    <field name="tagline"/>
+                                    <field name="footer_text"/>
+                                    </group>
+                                </section>
+                            </div>
+                        </page>
+                        <page string="Bloklar" name="blocks" class="rds-template-blocks-page">
+                            <div class="rds-template-settings-card rds-template-settings-card--wide">
+                                <div class="rds-template-settings-card__header">
+                                    <span class="rds-template-settings-card__icon"><i class="fa fa-th-large" title="Belge Blokları"/></span>
+                                    <span><strong>Belge Blokları</strong><small>Çıktıda gösterilecek içerik bölümlerini seçin.</small></span>
+                                </div>
+                                <group>
+                                    <group>
+                                    <field name="show_company"/>
+                                    <field name="show_partner"/>
+                                    <field name="show_metadata"/>
+                                    </group>
+                                    <group>
+                                    <field name="show_notes"/>
+                                    <field name="show_bank"/>
+                                    <field name="show_footer"/>
+                                    </group>
+                                </group>
+                                <field name="notes_text" widget="html"/>
+                            </div>
+                        </page>
+                        <page string="Alanlar" name="fields" class="rds-template-fields-page">
+                            <div class="rds-fields-toolbar">
+                                <div>
+                                    <strong>Çıktı Alanları</strong>
+                                    <small>Belgede gösterilecek alanları, sıralarını ve biçimlerini yönetin.</small>
+                                </div>
+                                <button name="action_open_add_field"
+                                        type="object"
+                                        string="Alan Ekle"
+                                        icon="fa-plus"
+                                        class="btn-primary"
+                                        groups="ranvals_document_studio.group_rds_manager"/>
+                            </div>
+                            <field name="field_ids"
+                                   class="rds-template-fields-list"
+                                   context="{'default_template_id': id}"
+                                   nolabel="1">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="active"/>
+                                    <field name="section"/>
+                                    <field name="source_model_id"/>
+                                    <field name="field_id" domain="[('model_id', '=', source_model_id)]"/>
+                                    <field name="field_path"/>
+                                    <field name="label"/>
+                                    <field name="icon_class"/>
+                                    <field name="value_type"/>
+                                    <field name="alignment"/>
+                                    <field name="width_percent"/>
+                                    <field name="hide_if_empty"/>
+                                    <field name="bold"/>
+                                    <field name="highlight"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rds_template" model="ir.actions.act_window">
+        <field name="name">PDF Şablonları</field>
+        <field name="res_model">rds.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_rds_template_search"/>
+        <field name="context">{'search_default_filter_active': 1, 'rds_sidebar_menu': 'ranvals_document_studio.menu_rds_templates'}</field>
+    </record>
+
+    <record id="action_rds_template_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_rds_template_list"/>
+        <field name="act_window_id" ref="action_rds_template"/>
+    </record>
+
+    <record id="action_rds_template_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rds_template_form"/>
+        <field name="act_window_id" ref="action_rds_template"/>
+    </record>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- User-facing branding. Technical module names and XML IDs stay unchanged. -->
+    <record id="module_category_rds" model="ir.module.category">
+        <field name="name">DocuCraft – PDF, Word &amp; Document Designer for Odoo</field>
+        <field name="description">DocuCraft belge şablonları, PDF / DOCX / PNG dışa aktarımı ve erişim yetkileri</field>
+    </record>
+
+    <record id="privilege_rds" model="res.groups.privilege">
+        <field name="name">DocuCraft – PDF, Word &amp; Document Designer for Odoo</field>
+        <field name="description">DocuCraft belge şablonları ve dışa aktarım yetkileri</field>
+    </record>
+
+    <record id="paperformat_rds_a4" model="report.paperformat">
+        <field name="name">DocuCraft A4</field>
+    </record>
+
+    <record id="menu_rds_root" model="ir.ui.menu">
+        <field name="name">DocuCraft</field>
+        <field name="web_icon">ranvals_document_studio,static/description/docucraft_app_icon_v9_20260914.png</field>
+    </record>
+
+    <record id="action_rds_connectors" model="ir.actions.act_window">
+        <field name="name">DocuCraft Bağlayıcıları</field>
+    </record>
+    <record id="action_rds_connectors_dashboard" model="ir.actions.client">
+        <field name="name">DocuCraft Bağlayıcıları</field>
+    </record>
+    <record id="action_rds_template" model="ir.actions.act_window">
+        <field name="name">DocuCraft PDF Şablonları</field>
+    </record>
+    <record id="action_rds_export_log" model="ir.actions.act_window">
+        <field name="name">DocuCraft Dışa Aktarım Geçmişi</field>
+    </record>
+    <record id="action_rds_export_dashboard" model="ir.actions.client">
+        <field name="name">DocuCraft Dışa Aktarım Geçmişi</field>
+    </record>
+</odoo>

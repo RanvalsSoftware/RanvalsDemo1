@@ -1,0 +1,510 @@
+/*
+ * DocuCraft dark theme
+ * --------------------
+ * This file is loaded only through Odoo's web.assets_web_dark bundle.  Every
+ * rule is scoped to a DocuCraft root so native Odoo screens keep their own
+ * theme behaviour on Odoo 17, 18 and 19.
+ */
+
+.o_rds_sidebar_layout,
+.o_rds_sidebar_view {
+    color-scheme: dark;
+    background: #111827;
+}
+
+.o_rds_sidebar_layout__content,
+.o_rds_account_move_sidebar_view .o_form_view_container {
+    background: #111827;
+}
+
+.o_rds_sidebar__collapse {
+    color: #e7edf7;
+    background: #263247;
+    border-color: #63738d;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .32);
+}
+
+.o_rds_dashboard {
+    --rds-navy: #e7edf7;
+    --rds-muted: #a6b3c7;
+    --rds-purple: #d391df;
+    --rds-green: #55d9c0;
+    --rds-amber: #ffc45e;
+    --rds-blue: #77afff;
+    --rds-red: #ff8399;
+    --rds-border: #63738d;
+    --rds-surface: #1c2636;
+    color-scheme: dark;
+    background: #111827;
+
+    .rds-search-box input,
+    .rds-icon-button,
+    .rds-outline-button,
+    .rds-filter-menu,
+    .rds-history-pager button {
+        color: var(--rds-navy);
+        background: var(--rds-surface);
+        border-color: var(--rds-border);
+    }
+
+    .rds-search-box input {
+        &::placeholder {
+            color: #8795aa;
+        }
+
+        &:focus {
+            border-color: #77afff;
+            box-shadow: 0 0 0 3px rgba(119, 175, 255, .18);
+        }
+    }
+
+    .rds-icon-button:hover:not(:disabled),
+    .rds-outline-button:hover:not(:disabled),
+    .rds-history-pager button:hover:not(:disabled) {
+        background: #263247;
+        border-color: #53617a;
+    }
+
+    .rds-filter-menu {
+        box-shadow: 0 16px 36px rgba(0, 0, 0, .38);
+
+        button {
+            color: var(--rds-navy);
+
+            &:hover,
+            &.is-active {
+                color: #efc4f6;
+                background: #39283f;
+            }
+        }
+    }
+
+    .rds-stat-item small,
+    .rds-connector-card__identity code,
+    .rds-connector-card__description {
+        color: var(--rds-muted);
+    }
+
+    .rds-icon-surface--purple { background: rgba(185, 112, 204, .18); }
+    .rds-icon-surface--green { background: rgba(38, 196, 164, .16); }
+    .rds-icon-surface--amber { background: rgba(243, 163, 26, .17); }
+    .rds-icon-surface--blue { background: rgba(66, 139, 238, .18); }
+    .rds-icon-surface--red { background: rgba(244, 63, 94, .16); }
+
+    .rds-icon-surface--purple img {
+        filter: brightness(0) saturate(100%) invert(82%) sepia(16%) saturate(1145%) hue-rotate(238deg) brightness(101%);
+    }
+
+    .rds-icon-surface--blue img {
+        filter: brightness(0) saturate(100%) invert(78%) sepia(25%) saturate(1196%) hue-rotate(189deg) brightness(104%);
+    }
+
+    .rds-history-table tbody tr {
+        transition: background-color 140ms ease;
+
+        &:hover {
+            background: #222e41;
+        }
+    }
+
+    .rds-user-avatar {
+        color: #e8bcf0;
+        background: rgba(185, 112, 204, .2);
+    }
+
+    .rds-user-avatar--1 { color: #8ce5d4; background: rgba(38, 196, 164, .18); }
+    .rds-user-avatar--2 { color: #ffadc2; background: rgba(244, 63, 94, .17); }
+    .rds-user-avatar--3 { color: #a9cbff; background: rgba(66, 139, 238, .2); }
+
+    .rds-status-pill--installed,
+    .rds-status-pill--ready,
+    .rds-status-pill--attached {
+        color: #8ce5d4;
+        background: rgba(11, 165, 140, .18);
+    }
+
+    .rds-status-pill--update {
+        color: #ffd180;
+        background: rgba(243, 163, 26, .18);
+    }
+
+    .rds-status-pill--missing,
+    .rds-status-pill--denied {
+        color: #c1cbda;
+        background: #2a3548;
+    }
+
+    .rds-search-box > img,
+    .rds-dashboard-tools .rds-icon-button img,
+    .rds-connector-card .rds-icon-button img,
+    .rds-outline-button img,
+    .rds-sort-button img,
+    .rds-date-cell img,
+    .rds-history-table__download-cell img,
+    .rds-more-link img {
+        filter: brightness(0) invert(92%) sepia(8%) saturate(446%) hue-rotate(181deg) brightness(103%);
+    }
+
+    .rds-status-pill--attached img {
+        filter: brightness(0) invert(83%) sepia(19%) saturate(611%) hue-rotate(119deg) brightness(101%);
+    }
+}
+
+.o_rds_sidebar_view {
+    --rds-view-bg: #111827;
+    --rds-view-border: #63738d;
+    --rds-view-navy: #e7edf7;
+    --rds-view-muted: #a6b3c7;
+    --rds-view-purple: #d391df;
+    --rds-view-purple-soft: #39283f;
+    color: var(--rds-view-navy);
+
+    .btn-secondary,
+    .btn-outline-primary {
+        --btn-color: #dce5f2;
+        --btn-bg: #263247;
+        --btn-border-color: #63738d;
+        --btn-hover-color: #ffffff;
+        --btn-hover-bg: #303d53;
+        --btn-hover-border-color: #5a6981;
+    }
+
+    .o_searchview {
+        color: var(--rds-view-navy);
+        background: #1c2636;
+        border-color: var(--rds-view-border);
+    }
+}
+
+.o_rds_view_hero,
+.o_rds_sidebar_list_view > .o_control_panel,
+.o_rds_sidebar_list_view > .o_content {
+    background: var(--rds-view-bg);
+}
+
+.o_rds_view_hero__icon {
+    background: linear-gradient(145deg, #35263e, #202d43);
+    border-color: #4a3b54;
+}
+
+.o_rds_sidebar_list_view {
+    .o_boolean_toggle {
+        --form-switch-bg: #63738d;
+    }
+
+    .o_list_renderer {
+        background: #1c2636;
+        border-color: var(--rds-view-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    }
+
+    .o_list_table {
+        color: var(--rds-view-navy);
+
+        thead {
+            background: #202b3d;
+        }
+
+        tbody tr:hover {
+            background: #243044;
+        }
+
+        tbody td {
+            color: #d6dfec;
+            border-bottom-color: #334158;
+        }
+    }
+}
+
+.o_rds_sidebar_form_view:has(.rds-template-form) {
+    .o_control_panel,
+    .o_form_statusbar {
+        background: #1c2636;
+        border-color: var(--rds-view-border);
+    }
+
+    .o_form_renderer,
+    .o_form_sheet_bg {
+        background: var(--rds-view-bg);
+    }
+
+    .rds-template-sheet {
+        color: var(--rds-view-navy);
+        background: #1c2636;
+        border-color: var(--rds-view-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+
+        .nav-tabs .nav-link {
+            color: #b8c4d6;
+            background: #202b3d;
+            border-color: var(--rds-view-border);
+
+            &:hover {
+                color: #ffffff;
+                background: #29364a;
+            }
+
+            &.active {
+                color: #efc4f6;
+                background: #1c2636;
+                border-color: var(--rds-view-border);
+                border-top-color: var(--rds-view-purple);
+            }
+        }
+    }
+}
+
+.rds-template-settings-card,
+.rds-fields-toolbar,
+.rds-template-fields-list .o_list_renderer {
+    color: var(--rds-view-navy);
+    background: #1c2636;
+    border-color: var(--rds-view-border);
+}
+
+.rds-template-settings-card {
+    box-shadow: 0 7px 22px rgba(0, 0, 0, .18);
+
+    &__header,
+    &__fields .o_cell {
+        border-color: #334158;
+    }
+
+    &__fields .o_field_widget[name="primary_color"],
+    &__fields .o_field_widget[name="secondary_color"],
+    &__fields .o_field_widget[name="accent_color"],
+    &__fields .o_field_widget[name="text_color"] {
+        background: #263247;
+    }
+}
+
+.rds-fields-toolbar {
+    strong {
+        color: var(--rds-view-navy);
+    }
+}
+
+.rds-preview-stage {
+    background:
+        radial-gradient(circle at 50% 0, rgba(211, 145, 223, .1), transparent 42%),
+        #151e2c;
+    border-color: #38465d;
+}
+
+.o_rds_account_move_sidebar_view {
+    .o_form_view_container,
+    .o_form_renderer,
+    .o_form_sheet_bg {
+        background: #111827;
+    }
+
+    .o_control_panel,
+    .o_form_statusbar {
+        background: #1c2636;
+        border-color: #38465d;
+    }
+}
+
+.modal:has(.rds-export-wizard) {
+    .modal-content,
+    .modal-header,
+    .modal-footer {
+        color: #e7edf7;
+        background: #1c2636;
+        border-color: #38465d;
+    }
+
+    .modal-title {
+        color: #f2f6fc;
+    }
+
+    .btn-close {
+        filter: invert(1) grayscale(1) brightness(1.8);
+    }
+}
+
+.rds-export-wizard {
+    color: #e7edf7;
+
+    .o_form_sheet_bg,
+    .rds-export-wizard__sheet {
+        background: #151e2c;
+    }
+
+    .o_field_html {
+        color: #d7e0ed;
+        background: #1c2636;
+        border-color: #38465d;
+    }
+}
+
+.o_rds_pdf_preview_dialog .modal-body {
+    background: #111827;
+}
+
+/* The embedded PDF itself deliberately stays white and brand-accurate. */
+.o_rds_pdf_preview_dialog__frame {
+    background: #ffffff;
+}
+
+.rds-template-design-page {
+    --dc-navy: #edf3fb;
+    --dc-blue: #77afff;
+    --dc-muted: #a6b3c7;
+    --dc-border: #63738d;
+    --dc-soft: #202b3d;
+    color-scheme: dark;
+
+    .rds-design-toolbar {
+        background: linear-gradient(135deg, #202b3d, #182438);
+        border-color: var(--dc-border);
+    }
+
+    .rds-design-section,
+    .rds-template-settings-card,
+    .rds-design-live-preview {
+        color: var(--dc-navy);
+        background: #1c2636;
+        border-color: var(--dc-border);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, .2);
+    }
+
+    .rds-design-section__header,
+    .rds-template-settings-card__header {
+        background: linear-gradient(135deg, #202b3d, #1c2636);
+        border-color: #35435a;
+    }
+
+    .rds-template-settings-card__icon {
+        color: #9fc5ff;
+        background: #243654;
+    }
+
+    .rds-layout-style-selector__field {
+        .form-check-label {
+            color: #dbe4f1;
+            background: #202b3d;
+            border-color: #3b4960;
+        }
+
+        .form-check:hover .form-check-label {
+            background: #263247;
+            border-color: #5c6c86;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+        }
+
+        .form-check-input:checked + .form-check-label {
+            color: #b9d5ff;
+            background: #223a5c;
+            border-color: #77afff;
+            box-shadow: 0 0 0 3px rgba(119, 175, 255, .14);
+        }
+    }
+
+    .rds-color-setting-card,
+    .rds-font-setting-card {
+        color: var(--dc-navy);
+        background: #202b3d;
+        border-color: #3b4960;
+
+        &:hover {
+            border-color: #596984;
+            box-shadow: 0 9px 22px rgba(0, 0, 0, .24);
+        }
+    }
+
+    .rds-control-label {
+        color: #dce5f2;
+    }
+
+    .rds-control-copy small,
+    .rds-copy-setting .rds-control-label {
+        color: #9dabc0;
+    }
+
+    .rds-settings-card__tip {
+        color: #b8c6d9;
+        background: #22334d;
+    }
+
+    .rds-copy-settings-grid {
+        border-color: #35435a;
+    }
+
+    .rds-copy-setting .o_input,
+    .rds-copy-setting .o_field_selection select,
+    .rds-copy-setting input,
+    .rds-copy-setting select {
+        color: #edf3fb;
+        background: #151e2c;
+        border-color: #63738d;
+
+        &:focus {
+            border-color: #77afff;
+            box-shadow: 0 0 0 3px rgba(119, 175, 255, .15);
+        }
+    }
+
+    .rds-number-control > span {
+        color: #bac7d8;
+        background: #263247;
+        border-color: #63738d;
+    }
+
+    .rds-design-live-preview {
+        background: linear-gradient(135deg, #182438, #151e2c);
+
+        &__badge {
+            color: #b9d5ff;
+            background: #223a5c;
+        }
+    }
+}
+
+.rds-template-design-page .o_rds_color_picker {
+    &__swatch {
+        background: #1c2636;
+        border-color: #1c2636;
+        box-shadow: 0 0 0 1px #71819a, 0 7px 18px rgba(0, 0, 0, .26);
+    }
+
+    &__text {
+        color: #edf3fb;
+        background: #151e2c;
+        border-color: #63738d;
+    }
+
+    &__code {
+        color: #edf3fb;
+    }
+}
+
+.rds-template-design-page .o_rds_font_picker {
+    &__select {
+        color: #edf3fb;
+        background: #151e2c;
+        border-color: #63738d;
+    }
+
+    &__sample {
+        color: #dce6f4;
+        background: linear-gradient(135deg, #22344f, #1d2a3e);
+        border-color: #3b4b64;
+    }
+
+    &__sample_label {
+        color: #8dbbff;
+    }
+}
+
+/* Theme chrome may be dark; generated document previews must remain literal. */
+.rds-preview-stage .o_field_html,
+.rds-template-design-page .rds-design-live-preview .o_field_html,
+.rds-template-design-page .rds-live-document {
+    color-scheme: light;
+}
+
+.rds-preview-stage img,
+.rds-template-design-page .rds-live-document img {
+    filter: none;
+}
