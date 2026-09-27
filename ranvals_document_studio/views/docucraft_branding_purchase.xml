@@ -6,16 +6,16 @@
         <field name="inherit_id" ref="ranvals_document_studio.view_purchase_order_form_rds"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_open_rds_export']" position="attributes">
-                <attribute name="string">Print with DocuCraft</attribute>
-                <attribute name="help">Choose the design, language, and PDF, Word, PNG, or ZIP format in one dialog.</attribute>
+                <attribute name="string">DocuCraft Yazdır</attribute>
+                <attribute name="help">Tasarım, dil ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin.</attribute>
             </xpath>
         </field>
     </record>
 
     <record id="server_action_purchase_rds_export" model="ir.actions.server">
-        <field name="name">Print with DocuCraft</field>
+        <field name="name">DocuCraft Yazdır</field>
     </record>
     <record id="action_report_rds_purchase_document" model="ir.actions.report">
-        <field name="name">DocuCraft Document – Purchase</field>
+        <field name="name">DocuCraft Belgesi – Satın Alma</field>
     </record>
 </odoo>

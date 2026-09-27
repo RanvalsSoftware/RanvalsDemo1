@@ -70,7 +70,7 @@ test("unblocks and keeps the wizard open when the download fails", async () => {
 
 test("opens the generated PDF in the in-app preview dialog", () => {
     const url = "/web/content/rds.export.wizard/42/file_data/preview.pdf?download=false";
-    const title = "preview.pdf Preview";
+    const title = "preview.pdf Önizleme";
     const dialog = {
         add(Component, props) {
             expect.step("dialog");

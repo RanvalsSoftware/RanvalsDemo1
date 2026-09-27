@@ -4,7 +4,6 @@ from io import BytesIO
 from zipfile import BadZipFile, ZipFile
 
 from lxml import etree
-from odoo import _
 
 from .png_renderer import PngDependencyError, render_png_pages
 
@@ -156,7 +155,7 @@ def _validate_pdf_faithful_archive(content, expected_pages):
         relationships_root = etree.fromstring(relationships_xml, parser=parser)
     except (BadZipFile, etree.XMLSyntaxError, KeyError, ValueError) as exc:
         raise DocxDependencyError(
-            _("The Word output was created, but the DOCX archive could not be validated.")
+            "Word çıktısı oluşturuldu ancak DOCX arşivi doğrulanamadı."
         ) from exc
 
     word_namespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -277,10 +276,8 @@ def _validate_pdf_faithful_archive(content, expected_pages):
         or DOCX_RENDERER_FINGERPRINT.encode("utf-8") not in core_xml
     ):
         raise DocxDependencyError(
-            _(
-                "The Word output could not be created with a page layout identical to the PDF. "
-                "Update the DocuCraft core module and restart the Odoo workers."
-            )
+            "Word çıktısı PDF ile birebir sayfa yapısında oluşturulamadı. "
+            "Lütfen DocuCraft çekirdek modülünü güncelleyip Odoo çalışanlarını yeniden başlatın."
         )
 
 
@@ -295,16 +292,16 @@ def render_docx(pdf_bytes, max_pages=50):
         b"%PDF"
     ):
         raise DocxDependencyError(
-            _("A valid PDF document could not be created for Word output.")
+            "Word çıktısı için geçerli bir PDF belgesi oluşturulamadı."
         )
     if len(pdf_bytes) > MAX_DOCX_BYTES:
-        raise DocxDependencyError(_("The Word output exceeds the 100 MB processing limit."))
+        raise DocxDependencyError("Word çıktısı 100 MB işleme sınırını aşıyor.")
 
     try:
         from docx import Document
     except ImportError as exc:  # pragma: no cover - depends on Odoo.sh requirements
         raise DocxDependencyError(
-            _("The python-docx package is required for Word output. Add requirements.txt to the Odoo.sh root.")
+            "Word çıktısı için python-docx paketi kurulmalıdır. requirements.txt dosyasını Odoo.sh köküne ekleyin."
         ) from exc
 
     try:
@@ -316,11 +313,11 @@ def render_docx(pdf_bytes, max_pages=50):
         )
     except PngDependencyError as exc:
         raise DocxDependencyError(
-            _("The PDF pages could not be prepared for Word output: %s") % exc
+            "Word çıktısı için PDF sayfaları hazırlanamadı: %s" % exc
         ) from exc
     if not pages:
         raise DocxDependencyError(
-            _("No usable pages were found in the PDF for Word output.")
+            "Word çıktısı için PDF içinde kullanılabilir sayfa bulunamadı."
         )
 
     document = Document()
@@ -338,6 +335,6 @@ def render_docx(pdf_bytes, max_pages=50):
     document.save(output)
     content = output.getvalue()
     if len(content) > MAX_DOCX_BYTES:
-        raise DocxDependencyError(_("The Word output exceeds the 100 MB limit."))
+        raise DocxDependencyError("Word çıktısı 100 MB sınırını aşıyor.")
     _validate_pdf_faithful_archive(content, pages)
     return content

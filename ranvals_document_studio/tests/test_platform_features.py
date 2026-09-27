@@ -150,7 +150,7 @@ class TestPlatformFeatures(TransactionCase):
         action = wizard.action_create_copy()
         imported = self.env["rds.template"].browse(action["res_id"])
         self.assertLessEqual(len(imported.name), 200)
-        self.assertIn("Imported", imported.name)
+        self.assertIn("İçe Aktarıldı", imported.name)
 
     def test_05_json_rejects_non_whitelisted_keys(self):
         payload = self.template._rds_portable_payload()

@@ -13,13 +13,13 @@
                 <field name="template_id"/>
                 <field name="output_format"/>
                 <field name="file_name"/>
-                <field name="file_size_display" string="Size"/>
+                <field name="file_size_display" string="Boyut"/>
                 <field name="has_stored_file" column_invisible="True"/>
-                <field name="attached_to_record" string="Attached to Record" optional="show"/>
+                <field name="attached_to_record" string="Kayda Ekli" optional="show"/>
                 <field name="attachment_id"/>
                 <button name="action_download"
                         type="object"
-                        string="Download"
+                        string="İndir"
                         icon="fa-download"
                         invisible="not has_stored_file"/>
             </list>
@@ -30,21 +30,21 @@
         <field name="name">rds.export.log.search</field>
         <field name="model">rds.export.log</field>
         <field name="arch" type="xml">
-            <search string="Search Export History">
+            <search string="Dışa Aktarım Geçmişinde Ara">
                 <field name="file_name"/>
                 <field name="record_name"/>
                 <field name="template_id"/>
                 <field name="user_id"/>
                 <separator/>
                 <filter name="rds_format_pdf" string="PDF" domain="[('output_format', '=', 'pdf')]"/>
-                <filter name="rds_format_docx" string="Word (PDF Layout)" domain="[('output_format', '=', 'docx')]"/>
-                <filter name="rds_format_docx_editable" string="Word (Editable)" domain="[('output_format', '=', 'docx_editable')]"/>
+                <filter name="rds_format_docx" string="Word (PDF Görünümü)" domain="[('output_format', '=', 'docx')]"/>
+                <filter name="rds_format_docx_editable" string="Word (Düzenlenebilir)" domain="[('output_format', '=', 'docx_editable')]"/>
                 <filter name="rds_format_png" string="PNG" domain="[('output_format', '=', 'png')]"/>
                 <filter name="rds_format_zip" string="ZIP" domain="[('output_format', '=', 'zip')]"/>
                 <group>
                     <filter name="rds_group_format" string="Format" context="{'group_by': 'output_format'}"/>
-                    <filter name="rds_group_user" string="User" context="{'group_by': 'user_id'}"/>
-                    <filter name="rds_group_template" string="Template" context="{'group_by': 'template_id'}"/>
+                    <filter name="rds_group_user" string="Kullanıcı" context="{'group_by': 'user_id'}"/>
+                    <filter name="rds_group_template" string="Şablon" context="{'group_by': 'template_id'}"/>
                 </group>
             </search>
         </field>
@@ -60,7 +60,7 @@
                 <header>
                     <button name="action_download"
                             type="object"
-                            string="Download"
+                            string="İndir"
                             icon="fa-download"
                             class="btn-primary"
                             invisible="not has_stored_file"/>
@@ -94,7 +94,7 @@
     </record>
 
     <record id="action_rds_export_log" model="ir.actions.act_window">
-        <field name="name">Export History</field>
+        <field name="name">Dışa Aktarım Geçmişi</field>
         <field name="res_model">rds.export.log</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_rds_export_log_search"/>

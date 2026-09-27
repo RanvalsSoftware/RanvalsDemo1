@@ -123,7 +123,7 @@ class RdsTemplate(models.Model):
     design_preview_html = fields.Html(
         compute="_compute_design_preview_html",
         sanitize=False,
-        string="Live Design Preview",
+        string="Canlı Tasarım Önizlemesi",
     )
 
     @api.onchange("layout_style")
@@ -149,8 +149,8 @@ class RdsTemplate(models.Model):
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
-                "title": _("Design saved"),
-                "message": _("Your color, font, and copy settings will be used in document exports."),
+                "title": _("Tasarım kaydedildi"),
+                "message": _("Renk, yazı tipi ve metin ayarlarınız belge çıktılarında kullanılacak."),
                 "type": "success",
                 "sticky": False,
                 "next": {"type": "ir.actions.client", "tag": "reload"},

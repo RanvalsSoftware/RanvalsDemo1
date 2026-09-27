@@ -8,12 +8,12 @@
                     class="o_rds_sidebar__mobile-toggle"
                     t-att-aria-controls="sidebarId"
                     t-att-aria-expanded="isDrawerOpen ? 'true' : 'false'"
-                    aria-label="Open the DocuCraft menu"
-                    title="Open menu"
+                    aria-label="DocuCraft menüsünü aç"
+                    title="Menüyü aç"
                     t-on-click="toggleDrawer">
                 <span aria-hidden="true" class="o_rds_sidebar__hamburger"><i/><i/><i/></span>
             </button>
-            <button t-if="isDrawerOpen" type="button" class="o_rds_sidebar__backdrop" aria-label="Close the DocuCraft menu" t-on-click="closeDrawer"/>
+            <button t-if="isDrawerOpen" type="button" class="o_rds_sidebar__backdrop" aria-label="DocuCraft menüsünü kapat" t-on-click="closeDrawer"/>
             <aside t-ref="panel"
                    t-att-id="sidebarId"
                    class="o_rds_sidebar"
@@ -23,15 +23,15 @@
                    t-att-aria-hidden="state.isMobile &amp;&amp; !isDrawerOpen ? 'true' : undefined"
                    t-att-inert="state.isMobile &amp;&amp; !isDrawerOpen ? true : undefined">
                 <header class="o_rds_sidebar__header">
-                    <button type="button" class="o_rds_sidebar__brand" aria-label="Open the DocuCraft home section" title="DocuCraft" t-on-click="openHome">
+                    <button type="button" class="o_rds_sidebar__brand" aria-label="DocuCraft ana bölümünü aç" title="DocuCraft" t-on-click="openHome">
                         <span class="o_rds_sidebar__brand-icon">
                             <img src="/ranvals_document_studio/static/description/docucraft_app_icon_v9_20260914.png" alt="" aria-hidden="true"/>
                         </span>
                         <span class="o_rds_sidebar__brand-label">DocuCraft</span>
                     </button>
-                    <button type="button" class="o_rds_sidebar__close" aria-label="Close menu" title="Close menu" t-on-click="closeDrawer"><span aria-hidden="true">&#215;</span></button>
+                    <button type="button" class="o_rds_sidebar__close" aria-label="Menüyü kapat" title="Menüyü kapat" t-on-click="closeDrawer"><span aria-hidden="true">&#215;</span></button>
                 </header>
-                <nav class="o_rds_sidebar__nav" aria-label="Main sections">
+                <nav class="o_rds_sidebar__nav" aria-label="Ana bölümler">
                     <button t-foreach="navigationItems" t-as="item" t-key="item.key" type="button"
                             t-att-class="navClass(item)"
                             t-att-disabled="item.disabled ? true : undefined"
@@ -44,7 +44,7 @@
                     </button>
                 </nav>
                 <footer t-if="footerItems.length || (props.slots ? props.slots.footer : false)" class="o_rds_sidebar__footer">
-                    <nav t-if="footerItems.length" class="o_rds_sidebar__nav o_rds_sidebar__nav--auxiliary" aria-label="Additional sections">
+                    <nav t-if="footerItems.length" class="o_rds_sidebar__nav o_rds_sidebar__nav--auxiliary" aria-label="Yardımcı bölümler">
                         <button t-foreach="footerItems" t-as="item" t-key="item.key" type="button"
                                 t-att-class="navClass(item)"
                                 t-att-disabled="item.disabled ? true : undefined"
@@ -59,8 +59,8 @@
                     <t t-if="props.slots ? props.slots.footer : false" t-slot="footer"/>
                 </footer>
                 <button t-if="props.collapsible" type="button" class="o_rds_sidebar__collapse"
-                        t-att-aria-label="rdsCollapseTitle"
-                        t-att-title="rdsCollapseTitle"
+                        t-att-aria-label="isCollapsed ? 'Menüyü genişlet' : 'Menüyü daralt'"
+                        t-att-title="isCollapsed ? 'Menüyü genişlet' : 'Menüyü daralt'"
                         t-on-click="toggleCollapsed">
                     <span aria-hidden="true" t-out="isCollapsed ? '&#8250;' : '&#8249;'"/>
                 </button>

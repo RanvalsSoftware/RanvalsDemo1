@@ -111,13 +111,9 @@
     </template>
 
     <template id="rds_logo">
-        <!-- Always use the eagerly loaded bytes from the export context.  A
-             form-view RPC can set bin_size=True, in which case reading
-             company.logo directly returns a value such as "1.10 Mb" rather
-             than image bytes and produces a broken data URI in the preview. -->
-        <t t-if="ctx.get('logo_data_uri')">
+        <t t-if="ctx.get('company') and ctx['company'].logo">
             <img class="rds-logo"
-                 t-att-src="ctx['logo_data_uri']"
+                 t-att-src="image_data_uri(ctx['company'].logo)"
                  t-att-style="'max-height:%smm;' % rds_template.logo_height_mm"
                  alt="Logo"/>
         </t>
@@ -270,18 +266,18 @@
             <div t-att-style="'border-top:1.5px solid %s;margin:4mm 0 6mm 0;' % ctx['theme']['primary']"/>
             <table class="rds-three-columns">
                 <tr>
-                    <td style="width:29%;border-right:1px solid #d8cdca;">
-                        <div class="rds-title" t-att-style="'color:%s;font-family:%s;font-size:25px;letter-spacing:.3px;overflow-wrap:normal;word-break:normal;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
+                    <td style="width:27%;border-right:1px solid #d8cdca;">
+                        <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
                         <div t-att-style="'width:38px;border-top:3px solid %s;margin:9px 0;' % ctx['theme']['accent']"/>
                         <div class="rds-number"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<strong t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['number']"/></div>
                     </td>
-                    <td style="width:35.5%;border-right:1px solid #d8cdca;">
+                    <td style="width:36.5%;border-right:1px solid #d8cdca;">
                         <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
                         <t t-set="block_info" t-value="ctx['company_info']"/>
                         <t t-set="block_icon" t-value="'fa-building-o'"/>
                         <t t-call="ranvals_document_studio.rds_info_block"/>
                     </td>
-                    <td style="width:35.5%;">
+                    <td style="width:36.5%;">
                         <t t-set="block_title" t-value="ctx['labels']['partner_info']"/>
                         <t t-set="block_info" t-value="ctx['partner_info']"/>
                         <t t-set="block_icon" t-value="'fa-user-o'"/>

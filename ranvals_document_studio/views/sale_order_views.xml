@@ -8,12 +8,12 @@
             <xpath expr="//header" position="inside">
                 <button name="action_open_rds_export"
                         type="object"
-                        string="Print with DocuCraft"
+                        string="DocuCraft Yazdır"
                         icon="fa-print"
                         class="btn-primary rds-docucraft-print-button"
                         invisible="not id"
                         groups="sales_team.group_sale_salesman"
-                        help="Choose the design, document language, and PDF, Word, PNG, or ZIP format in one dialog."/>
+                        help="Tasarım, belge dili ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>
@@ -26,11 +26,11 @@
             <xpath expr="//list/header" position="inside">
                 <button name="action_open_rds_export"
                         type="object"
-                        string="Print with DocuCraft"
+                        string="DocuCraft Yazdır"
                         icon="fa-print"
                         class="btn-primary rds-docucraft-print-button"
                         groups="sales_team.group_sale_salesman"
-                        help="Choose the design and output format for the selected documents in one dialog."/>
+                        help="Seçilen belgeler için tasarım ve çıktı biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>

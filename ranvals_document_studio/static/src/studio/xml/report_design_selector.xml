@@ -7,35 +7,35 @@
         </xpath>
     </t>
     <t t-name="ranvals_document_studio.ReportDesignSelector">
-        <section t-if="visible" class="rds-studio-design-selector" aria-label="PDF Design" t-att-aria-busy="state.busy or !state.ready">
+        <section t-if="visible" class="rds-studio-design-selector" aria-label="PDF Tasarımı" t-att-aria-busy="state.busy or !state.ready">
             <div class="rds-design-heading">
                 <span class="rds-design-brand-icon"><i class="fa fa-file-pdf-o" aria-hidden="true"/></span>
                 <div class="rds-design-brand">
                     <span class="rds-design-eyebrow">DOCUCRAFT</span>
-                    <strong>PDF Design</strong>
+                    <strong>PDF Tasarımı</strong>
                 </div>
-                <span t-if="state.ready and state.supported" class="rds-design-count"><t t-esc="state.templates.length"/> templates</span>
+                <span t-if="state.ready and state.supported" class="rds-design-count"><t t-esc="state.templates.length"/> şablon</span>
             </div>
-            <p class="rds-design-hint">Select a template and apply it to this report.</p>
-            <div t-if="!state.ready" class="rds-design-message" role="status"><i class="fa fa-spinner fa-spin me-1" aria-hidden="true"/> Loading designs…</div>
-            <div t-elif="state.error" class="rds-design-message rds-design-warning" role="alert"><t t-esc="state.error"/><button type="button" class="btn rds-design-button rds-design-button--retry" t-on-click="load">Retry</button></div>
+            <p class="rds-design-hint">Şablonu seçin, bu rapora uygulayın.</p>
+            <div t-if="!state.ready" class="rds-design-message" role="status"><i class="fa fa-spinner fa-spin me-1" aria-hidden="true"/> Tasarımlar yükleniyor…</div>
+            <div t-elif="state.error" class="rds-design-message rds-design-warning" role="alert"><t t-esc="state.error"/><button type="button" class="btn rds-design-button rds-design-button--retry" t-on-click="load">Tekrar dene</button></div>
             <t t-elif="state.supported">
-                <label class="rds-design-label">Document template
-                    <select class="form-select" t-model="state.templateId" aria-label="DocuCraft template" t-att-title="selectedName" t-att-disabled="state.busy or !state.canManage or (!hasTemplates and !state.savedId)">
-                        <option value="">Current / default design</option>
+                <label class="rds-design-label">Belge şablonu
+                    <select class="form-select" t-model="state.templateId" aria-label="DocuCraft şablonu" t-att-title="selectedName" t-att-disabled="state.busy or !state.canManage or (!hasTemplates and !state.savedId)">
+                        <option value="">Mevcut / varsayılan tasarım</option>
                         <option t-foreach="state.templates" t-as="item" t-key="item.id" t-att-value="item.id"><t t-esc="item.name"/></option>
                     </select>
                 </label>
-                <div class="rds-design-scope"><span>Selected design</span><strong t-esc="selectedName"/><div class="rds-design-company"><i class="fa fa-building-o" aria-hidden="true"/><span>Company: <t t-esc="state.company"/></span></div></div>
-                <div t-if="!hasTemplates" class="rds-design-message rds-design-warning" role="status">No active template is available for this company and document model. Check DocuCraft → Templates.</div>
-                <button type="button" class="btn btn-primary rds-design-button rds-design-button--apply" t-on-click="apply" t-att-disabled="!canApply"><i t-if="state.busy" class="fa fa-spinner fa-spin" aria-hidden="true"/><i t-else="" class="fa fa-check" aria-hidden="true"/> Apply and Preview</button>
-                <p t-if="changed" class="rds-design-pending" role="status">The selection has not been applied yet.</p>
-                <p class="rds-design-note"><i class="fa fa-info-circle" aria-hidden="true"/><span>Saved only for this report and company. Other reports are unchanged.</span></p>
-                <p t-if="!state.canManage" class="rds-design-message">DocuCraft manager access is required to save the design.</p>
-                <p t-if="!hasRecord" class="rds-design-message rds-design-warning">Select a record in the upper-right corner to preview a real document.</p>
+                <div class="rds-design-scope"><span>Seçili tasarım</span><strong t-esc="selectedName"/><div class="rds-design-company"><i class="fa fa-building-o" aria-hidden="true"/><span>Şirket: <t t-esc="state.company"/></span></div></div>
+                <div t-if="!hasTemplates" class="rds-design-message rds-design-warning" role="status">Bu şirket ve belge modeli için etkin şablon bulunamadı. DocuCraft → Şablonlar bölümünü kontrol edin.</div>
+                <button type="button" class="btn btn-primary rds-design-button rds-design-button--apply" t-on-click="apply" t-att-disabled="!canApply"><i t-if="state.busy" class="fa fa-spinner fa-spin" aria-hidden="true"/><i t-else="" class="fa fa-check" aria-hidden="true"/> Uygula ve Önizle</button>
+                <p t-if="changed" class="rds-design-pending" role="status">Seçim henüz uygulanmadı.</p>
+                <p class="rds-design-note"><i class="fa fa-info-circle" aria-hidden="true"/><span>Yalnız bu rapor ve şirket için kaydedilir. Diğer raporlar değişmez.</span></p>
+                <p t-if="!state.canManage" class="rds-design-message">Tasarımı kaydetmek için DocuCraft yöneticisi yetkisi gerekir.</p>
+                <p t-if="!hasRecord" class="rds-design-message rds-design-warning">Gerçek belge önizlemesi için sağ üstten bir kayıt seçin.</p>
             </t>
-            <p t-else="" class="rds-design-message">Design selection is not available for this report type.</p>
-            <div class="rds-design-version">DocuCraft · Design Selector</div>
+            <p t-else="" class="rds-design-message">Bu rapor türünde tasarım seçimi kullanılamıyor.</p>
+            <div class="rds-design-version">DocuCraft · Tasarım Seçici</div>
         </section>
     </t>
 </templates>

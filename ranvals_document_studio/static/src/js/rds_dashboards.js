@@ -64,7 +64,7 @@ export class RdsConnectorsDashboard extends RdsDashboardComponent {
             this.state.stats = data.stats;
         } catch (error) {
             this.state.error = true;
-            this.notification.add(_t("Could not load connector information."), {
+            this.notification.add(_t("Bağlayıcı bilgileri yüklenemedi."), {
                 type: "danger",
             });
         } finally {
@@ -103,7 +103,7 @@ export class RdsConnectorsDashboard extends RdsDashboardComponent {
 
     async openConnector(connector) {
         if (!connector.id) {
-            this.notification.add(_t("The connector module was not found in the Apps list."), {
+            this.notification.add(_t("Bağlayıcı modül uygulama listesinde bulunamadı."), {
                 type: "warning",
             });
             return;
@@ -179,7 +179,7 @@ export class RdsExportDashboard extends RdsDashboardComponent {
                 return;
             }
             this.state.error = true;
-            this.notification.add(_t("Could not load export history."), {
+            this.notification.add(_t("Dışa aktarım geçmişi yüklenemedi."), {
                 type: "danger",
             });
         } finally {
@@ -245,7 +245,7 @@ export class RdsExportDashboard extends RdsDashboardComponent {
 
     downloadRecord(record) {
         if (!record.can_download) {
-            this.notification.add(_t("No downloadable file is available for this record."), {
+            this.notification.add(_t("Bu kayıt için indirilebilir dosya bulunamadı."), {
                 type: "warning",
             });
             return;
@@ -255,7 +255,7 @@ export class RdsExportDashboard extends RdsDashboardComponent {
 
     downloadVisible() {
         if (!this.visibleDownloadIds.length) {
-            this.notification.add(_t("None of the visible records has a downloadable file."), {
+            this.notification.add(_t("Görünen kayıtlarda indirilebilir dosya yok."), {
                 type: "warning",
             });
             return;
@@ -271,7 +271,7 @@ export class RdsExportDashboard extends RdsDashboardComponent {
                 data: {},
             });
         } catch (error) {
-            this.notification.add(_t("Download failed. Please try again."), {
+            this.notification.add(_t("Dosya indirilemedi. Lütfen tekrar deneyin."), {
                 type: "danger",
             });
             throw error;

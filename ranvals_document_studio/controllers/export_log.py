@@ -189,7 +189,7 @@ class RdsExportLogDownloadController(http.Controller):
         if len(content) > MAX_BULK_DOWNLOAD_BYTES:
             raise RequestEntityTooLarge()
         file_name = _safe_download_name(
-            _("DocuCraft Exports") + ".zip"
+            _("DocuCraft Dışa Aktarımları") + ".zip"
         )
         return request.make_response(
             content,

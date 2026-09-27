@@ -2,60 +2,60 @@
 <odoo>
     <record id="module_category_rds" model="ir.module.category">
         <field name="name">DocuCraft</field>
-        <field name="description">Corporate document templates and export permissions</field>
+        <field name="description">Kurumsal belge şablonları ve dışa aktarım yetkileri</field>
         <field name="sequence">35</field>
     </record>
 
     <record id="privilege_rds" model="res.groups.privilege">
-        <field name="name">DocuCraft Management</field>
-        <field name="description">Corporate document templates and export permissions</field>
+        <field name="name">DocuCraft Yönetimi</field>
+        <field name="description">Kurumsal belge şablonları ve dışa aktarım yetkileri</field>
         <field name="sequence">35</field>
         <field name="category_id" ref="ranvals_document_studio.module_category_rds"/>
     </record>
 
     <record id="group_rds_manager" model="res.groups">
-        <field name="name">Manager</field>
+        <field name="name">Yönetici</field>
         <field name="privilege_id" ref="ranvals_document_studio.privilege_rds"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="rule_rds_template_company" model="ir.rule">
-        <field name="name">Document templates: permitted companies</field>
+        <field name="name">Belge şablonları: izinli şirketler</field>
         <field name="model_id" ref="model_rds_template"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="rule_rds_template_field_company" model="ir.rule">
-        <field name="name">Document template fields: permitted companies</field>
+        <field name="name">Belge şablonu alanları: izinli şirketler</field>
         <field name="model_id" ref="model_rds_template_field"/>
         <field name="domain_force">['|', ('template_id.company_id', '=', False), ('template_id.company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="rule_rds_export_log_user" model="ir.rule">
-        <field name="name">Export history: user own records</field>
+        <field name="name">Dışa aktarım geçmişi: kullanıcı kendi kayıtları</field>
         <field name="model_id" ref="model_rds_export_log"/>
         <field name="domain_force">[('user_id', '=', user.id), ('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="rule_rds_export_log_manager" model="ir.rule">
-        <field name="name">Export history: managers all records</field>
+        <field name="name">Dışa aktarım geçmişi: yöneticiler tüm kayıtlar</field>
         <field name="model_id" ref="model_rds_export_log"/>
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
         <field name="groups" eval="[(4, ref('ranvals_document_studio.group_rds_manager'))]"/>
     </record>
 
     <record id="rule_rds_export_wizard_owner" model="ir.rule">
-        <field name="name">Export wizard: creator only</field>
+        <field name="name">Dışa aktarım sihirbazı: yalnız oluşturan kullanıcı</field>
         <field name="model_id" ref="model_rds_export_wizard"/>
         <field name="domain_force">[('create_uid', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="rule_rds_export_field_line_owner" model="ir.rule">
-        <field name="name">Export fields: wizard owner only</field>
+        <field name="name">Dışa aktarım alanları: yalnız sihirbaz sahibi</field>
         <field name="model_id" ref="model_rds_export_field_line"/>
         <field name="domain_force">[('wizard_id.create_uid', '=', user.id)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>

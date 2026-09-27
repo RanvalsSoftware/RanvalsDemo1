@@ -9,33 +9,33 @@
     <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#132344" flood-opacity=".18"/></filter>
   </defs>
   <rect width="1280" height="720" rx="34" fill="url(#bg)"/>
-  <rect x="48" y="42" width="444" height="42" rx="21" fill="#e8f1ff"/>
-  <text x="72" y="69" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700" fill="#1d68eb">ODOO 17 · 18 · 19 • WORD &amp; DOCUMENT DESIGN</text>
+  <rect x="48" y="42" width="286" height="42" rx="21" fill="#e8f1ff"/>
+  <text x="72" y="69" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700" fill="#1d68eb">ODOO 17 · 18 · 19 • DOCUMENT DESIGN</text>
   <text x="52" y="166" font-family="Arial,Helvetica,sans-serif" font-size="68" font-weight="800" fill="#142444">DocuCraft</text>
-  <text x="52" y="226" font-family="Arial,Helvetica,sans-serif" font-size="38" font-weight="800" fill="#1d68eb">Word PDF Report Designer</text>
-  <text x="52" y="278" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="800" fill="#1d68eb">for Odoo Enterprise</text>
-  <text x="54" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#5b6a87">Create editable Word documents and design-faithful output</text>
-  <text x="54" y="378" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#5b6a87">for quotations, invoices and purchase orders in one module.</text>
-  <g font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700" fill="#142444">
-    <rect x="52" y="420" width="140" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="70" cy="444" r="6" fill="#7a3ec7"/><text x="84" y="450">14 Templates</text>
-    <rect x="202" y="420" width="112" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="220" cy="444" r="6" fill="#1d68eb"/><text x="234" y="450">23 Fonts</text>
-    <rect x="324" y="420" width="132" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="342" cy="444" r="6" fill="#10b981"/><text x="356" y="450">9 Languages</text>
-    <rect x="466" y="420" width="220" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="484" cy="444" r="6" fill="#ef4444"/><text x="498" y="450" font-size="14">PDF • 2×DOCX • PNG • ZIP</text>
+  <text x="52" y="226" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="800" fill="#1d68eb">PDF, Word &amp; Document</text>
+  <text x="52" y="278" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="800" fill="#1d68eb">Designer for Odoo</text>
+  <text x="54" y="344" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#5b6a87">Teklif, sipariş, fatura ve satın alma belgelerinizi</text>
+  <text x="54" y="378" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#5b6a87">profesyonel şablonlarla PDF, DOCX ve PNG olarak üretin.</text>
+  <g font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#142444">
+    <rect x="52" y="420" width="170" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="72" cy="444" r="6" fill="#7a3ec7"/><text x="88" y="450">6 Hazır Şablon</text>
+    <rect x="236" y="420" width="158" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="256" cy="444" r="6" fill="#1d68eb"/><text x="272" y="450">Çok Şirketli</text>
+    <rect x="408" y="420" width="102" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="428" cy="444" r="6" fill="#10b981"/><text x="444" y="450">6 Dil</text>
+    <rect x="524" y="420" width="202" height="48" rx="16" fill="#fff" stroke="#d9e2f0"/><circle cx="544" cy="444" r="6" fill="#ef4444"/><text x="560" y="450">PDF • DOCX • PNG</text>
   </g>
-  <rect x="52" y="516" width="238" height="58" rx="16" fill="#1d68eb"/><text x="82" y="552" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700" fill="#fff">Word-first Workflow</text>
+  <rect x="52" y="516" width="238" height="58" rx="16" fill="#1d68eb"/><text x="84" y="552" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700" fill="#fff">Profesyonel Belgeler</text>
   <g filter="url(#shadow)">
     <rect x="692" y="54" width="468" height="566" rx="36" fill="#0d1d38" stroke="#3c66ad" stroke-width="4"/>
     <rect x="726" y="84" width="400" height="500" rx="18" fill="#f7faff"/>
     <rect x="726" y="84" width="400" height="74" fill="#123054"/><path d="M1034 84h92v74h-48z" fill="#f97316"/>
     <text x="758" y="130" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="800" fill="#fff">DOCUCRAFT</text>
-    <text x="758" y="194" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800" fill="#142444">QUOTATION / ORDER</text>
+    <text x="758" y="194" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800" fill="#142444">TEKLİF / PROFORMA</text>
     <line x1="758" y1="215" x2="1094" y2="215" stroke="#d7e0ee" stroke-width="2"/>
     <rect x="758" y="238" width="150" height="120" rx="12" fill="#fff" stroke="#d7e0ee"/><rect x="936" y="238" width="150" height="120" rx="12" fill="#fff" stroke="#d7e0ee"/>
     <rect x="758" y="238" width="150" height="30" fill="#edf4ff"/><rect x="936" y="238" width="150" height="30" fill="#edf4ff"/>
     <g fill="#9aaac4"><rect x="774" y="286" width="110" height="8" rx="4"/><rect x="774" y="306" width="92" height="8" rx="4"/><rect x="774" y="326" width="104" height="8" rx="4"/><rect x="952" y="286" width="110" height="8" rx="4"/><rect x="952" y="306" width="92" height="8" rx="4"/><rect x="952" y="326" width="104" height="8" rx="4"/></g>
     <rect x="758" y="382" width="328" height="118" rx="8" fill="#fff" stroke="#d7e0ee"/><rect x="758" y="382" width="328" height="30" fill="url(#accent)"/>
     <g stroke="#e1e7f1"><line x1="758" y1="438" x2="1086" y2="438"/><line x1="758" y1="466" x2="1086" y2="466"/><line x1="852" y1="382" x2="852" y2="500"/><line x1="932" y1="382" x2="932" y2="500"/><line x1="1002" y1="382" x2="1002" y2="500"/></g>
-    <rect x="934" y="522" width="152" height="42" rx="6" fill="#142444"/><text x="956" y="548" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700" fill="#fff">GRAND TOTAL</text>
+    <rect x="934" y="522" width="152" height="42" rx="6" fill="#142444"/><text x="952" y="548" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700" fill="#fff">GENEL TOPLAM</text>
   </g>
   <g font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="800" fill="#fff">
     <rect x="630" y="190" width="84" height="58" rx="15" fill="#ef4444"/><text x="649" y="225">PDF</text>

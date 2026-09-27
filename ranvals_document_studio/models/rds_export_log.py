@@ -9,7 +9,7 @@ from ..tools.common import check_record_access
 
 class RdsExportLog(models.Model):
     _name = "rds.export.log"
-    _description = "DocuCraft Export History"
+    _description = "DocuCraft Dışa Aktarım Geçmişi"
     _order = "create_date desc, id desc"
 
     name = fields.Char(required=True)
@@ -22,8 +22,8 @@ class RdsExportLog(models.Model):
     output_format = fields.Selection(
         [
             ("pdf", "PDF"),
-            ("docx_editable", "Word / DOCX – Editable"),
-            ("docx", "Word / DOCX – Preserve Exact Design"),
+            ("docx_editable", "Word / DOCX – Düzenlenebilir"),
+            ("docx", "Word / DOCX – Tasarımı Birebir Korur"),
             ("png", "PNG"),
             ("zip", "ZIP"),
         ],
@@ -100,7 +100,7 @@ class RdsExportLog(models.Model):
             try:
                 content = base64.b64decode(file_data, validate=True)
             except (binascii.Error, TypeError, ValueError) as error:
-                raise UserError(_("The file data in this history record is corrupt.")) from error
+                raise UserError(_("Bu geçmiş kaydındaki dosya verisi bozuk.")) from error
             return (
                 self.file_name,
                 content,
@@ -108,13 +108,13 @@ class RdsExportLog(models.Model):
             )
         attachment = self.attachment_id.exists()
         if not attachment:
-            raise UserError(_("No downloadable file was found for this history record."))
+            raise UserError(_("Bu geçmiş kaydına ait indirilebilir dosya bulunamadı."))
         if attachment.res_model != self.res_model or attachment.res_id != self.res_id:
-            raise AccessError(_("The attachment in the history record does not match the source document."))
+            raise AccessError(_("Geçmiş kaydındaki ek kaynak belgeyle eşleşmiyor."))
         check_record_access(attachment)
         content = attachment.raw
         if not content:
-            raise UserError(_("No downloadable file was found for this history record."))
+            raise UserError(_("Bu geçmiş kaydına ait indirilebilir dosya bulunamadı."))
         return (
             self.file_name or attachment.name,
             content,
@@ -127,10 +127,10 @@ class RdsExportLog(models.Model):
         """Apply the source document's current ACLs to archived snapshots."""
         self.ensure_one()
         if self.res_model not in self.env.registry.models:
-            raise AccessError(_("You do not have access to the source document."))
+            raise AccessError(_("Kaynak belgeye erişim izniniz bulunmuyor."))
         source = self.env[self.res_model].browse(self.res_id).exists()
         if not source:
-            raise AccessError(_("You do not have access to the source document."))
+            raise AccessError(_("Kaynak belgeye erişim izniniz bulunmuyor."))
         check_record_access(source)
 
     def _has_source_access(self):
@@ -146,7 +146,7 @@ class RdsExportLog(models.Model):
         self.ensure_one()
         check_record_access(self)
         if not self.has_stored_file:
-            raise UserError(_("No downloadable file was found for this history record."))
+            raise UserError(_("Bu geçmiş kaydına ait indirilebilir dosya bulunamadı."))
         return {
             "type": "ir.actions.client",
             "tag": "ranvals_document_studio.download_export",

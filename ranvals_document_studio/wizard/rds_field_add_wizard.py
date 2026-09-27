@@ -4,11 +4,11 @@ from odoo.exceptions import UserError
 
 class RdsFieldAddWizard(models.TransientModel):
     _name = "rds.field.add.wizard"
-    _description = "Add a Field to a Document Template"
+    _description = "Belge Şablonuna Alan Ekle"
 
     template_id = fields.Many2one("rds.template", required=True)
     section = fields.Selection(
-        [("metadata", "Document Detail Card"), ("line", "Line / Table Column")],
+        [("metadata", "Belge Bilgi Kartı"), ("line", "Satır / Tablo Kolonu")],
         default="metadata",
         required=True,
     )
@@ -23,24 +23,24 @@ class RdsFieldAddWizard(models.TransientModel):
         domain="[('model_id', '=', source_model_id)]",
     )
     field_path = fields.Char(
-        string="Field Path",
+        string="Alan Yolu",
         required=True,
-        help="Use name for a direct field or partner_id.vat for a related field. Maximum 4 levels.",
+        help="Doğrudan alan için name; ilişkili alan için partner_id.vat. En fazla 4 seviye.",
     )
     label = fields.Char(required=True)
     sequence = fields.Integer(default=10)
     icon_class = fields.Char(default="fa-circle-o")
     value_type = fields.Selection(
         [
-            ("auto", "Automatic"), ("text", "Text"), ("date", "Date"),
-            ("monetary", "Monetary"), ("percentage", "Percentage"),
-            ("integer", "Integer"), ("float", "Decimal Number"),
+            ("auto", "Otomatik"), ("text", "Metin"), ("date", "Tarih"),
+            ("monetary", "Para"), ("percentage", "Yüzde"),
+            ("integer", "Tam Sayı"), ("float", "Ondalık Sayı"),
         ],
         default="auto",
         required=True,
     )
     alignment = fields.Selection(
-        [("left", "Left"), ("center", "Center"), ("right", "Right")],
+        [("left", "Sol"), ("center", "Orta"), ("right", "Sağ")],
         default="left",
         required=True,
     )
@@ -70,7 +70,7 @@ class RdsFieldAddWizard(models.TransientModel):
     def action_add(self):
         self.ensure_one()
         if not self.template_id:
-            raise UserError(_("No template was selected."))
+            raise UserError(_("Şablon seçilmedi."))
         self.env["rds.template.field"].create(
             {
                 "template_id": self.template_id.id,

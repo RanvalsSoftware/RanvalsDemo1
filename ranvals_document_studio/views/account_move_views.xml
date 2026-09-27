@@ -10,7 +10,7 @@
         <field name="name">account.move.list.rds</field>
         <field name="model">account.move</field>
         <field name="arch" type="xml">
-            <list string="Invoices"
+            <list string="Faturalar"
                   create="true"
                   delete="false"
                   multi_edit="false"
@@ -19,27 +19,27 @@
                 <header>
                     <button name="action_open_rds_export"
                             type="object"
-                            string="Print with DocuCraft"
+                            string="DocuCraft Yazdır"
                             icon="fa-print"
                             class="btn-primary rds-docucraft-print-button"
                             groups="account.group_account_invoice"
-                            help="Choose the design and output format for the selected invoices in one dialog."/>
+                            help="Seçilen faturalar için tasarım ve çıktı biçimini tek pencereden seçin."/>
                 </header>
-                <field name="name" string="Invoice Number"/>
-                <field name="move_type" string="Document Type"/>
-                <field name="partner_id" string="Partner"/>
-                <field name="ref" string="Reference" optional="show"/>
-                <field name="invoice_date" string="Invoice Date" optional="show"/>
-                <field name="invoice_date_due" string="Due Date" optional="show"/>
+                <field name="name" string="Fatura No"/>
+                <field name="move_type" string="Belge Türü"/>
+                <field name="partner_id" string="İş Ortağı"/>
+                <field name="ref" string="Referans" optional="show"/>
+                <field name="invoice_date" string="Fatura Tarihi" optional="show"/>
+                <field name="invoice_date_due" string="Vade Tarihi" optional="show"/>
                 <field name="currency_id" column_invisible="True"/>
                 <field name="amount_total"
-                       string="Total"
-                       sum="Total"
+                       string="Toplam"
+                       sum="Toplam"
                        widget="monetary"
                        options="{'currency_field': 'currency_id'}"/>
-                <field name="payment_state" string="Payment Status" widget="badge" optional="show"/>
-                <field name="state" string="Status" widget="badge" optional="show"/>
-                <field name="company_id" string="Company" optional="show"/>
+                <field name="payment_state" string="Ödeme Durumu" widget="badge" optional="show"/>
+                <field name="state" string="Durumu" widget="badge" optional="show"/>
+                <field name="company_id" string="Firma" optional="show"/>
             </list>
         </field>
     </record>
@@ -48,38 +48,38 @@
         <field name="name">account.move.search.rds</field>
         <field name="model">account.move</field>
         <field name="arch" type="xml">
-            <search string="Search Invoices">
+            <search string="Faturalarda Ara">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="ref"/>
                 <separator/>
                 <filter name="rds_customer_documents"
-                        string="Customer Invoices"
+                        string="Müşteri Faturaları"
                         domain="[('move_type', 'in', ('out_invoice', 'out_refund'))]"/>
                 <filter name="rds_vendor_documents"
-                        string="Vendor Bills"
+                        string="Tedarikçi Faturaları"
                         domain="[('move_type', 'in', ('in_invoice', 'in_refund'))]"/>
                 <!-- Odoo 19's search-view schema does not accept the legacy
                      ``string`` or ``expand`` attributes on ``group``. -->
                 <group>
-                    <filter name="rds_group_move_type" string="Document Type" context="{'group_by': 'move_type'}"/>
-                    <filter name="rds_group_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
-                    <filter name="rds_group_company" string="Company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                    <filter name="rds_group_move_type" string="Belge Türü" context="{'group_by': 'move_type'}"/>
+                    <filter name="rds_group_partner" string="İş Ortağı" context="{'group_by': 'partner_id'}"/>
+                    <filter name="rds_group_company" string="Şirket" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
                 </group>
             </search>
         </field>
     </record>
 
     <record id="action_rds_invoice" model="ir.actions.act_window">
-        <field name="name">Invoices</field>
+        <field name="name">Faturalar</field>
         <field name="res_model">account.move</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_account_move_search_rds"/>
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'))]</field>
         <field name="context">{'default_move_type': 'out_invoice', 'rds_sidebar_menu': 'ranvals_document_studio.menu_rds_invoices'}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Select an invoice to print with DocuCraft</p>
-            <p>Select records and use <strong>Print with DocuCraft</strong> to create a PDF, Word, PNG, or ZIP export.</p>
+            <p class="o_view_nocontent_smiling_face">DocuCraft ile yazdırmak için bir fatura seçin</p>
+            <p>PDF, Word, PNG veya ZIP çıktısı için kayıtları seçip <strong>DocuCraft Yazdır</strong> düğmesini kullanın.</p>
         </field>
     </record>
 
@@ -113,7 +113,7 @@
     </record>
 
     <menuitem id="menu_rds_invoices"
-              name="Invoices"
+              name="Faturalar"
               parent="ranvals_document_studio.menu_rds_root"
               action="action_rds_invoice"
               sequence="15"
@@ -127,12 +127,12 @@
             <xpath expr="//header" position="inside">
                 <button name="action_open_rds_export"
                         type="object"
-                        string="Print with DocuCraft"
+                        string="DocuCraft Yazdır"
                         icon="fa-print"
                         class="btn-primary rds-docucraft-print-button"
                         groups="account.group_account_invoice"
                         invisible="not id or move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
-                        help="Choose the design, document language, and PDF, Word, PNG, or ZIP format in one dialog."/>
+                        help="Tasarım, belge dili ve PDF, Word, PNG veya ZIP biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>
@@ -145,12 +145,12 @@
             <xpath expr="//list/header" position="inside">
                 <button name="action_open_rds_export"
                         type="object"
-                        string="Print with DocuCraft"
+                        string="DocuCraft Yazdır"
                         icon="fa-print"
                         class="btn-primary rds-docucraft-print-button"
                         groups="account.group_account_invoice"
                         invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')"
-                        help="Choose the design and output format for the selected invoices in one dialog."/>
+                        help="Seçilen faturalar için tasarım ve çıktı biçimini tek pencereden seçin."/>
             </xpath>
         </field>
     </record>

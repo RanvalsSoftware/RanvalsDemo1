@@ -1,12 +1,10 @@
 # RanvalsDemo1
 
-Ranvals Software Odoo uygulamaları deposu. DocuCraft sürümleri Odoo'nun major
-sürüm kuralına uygun olarak `17.0`, `18.0` ve `19.0` dallarında yayınlanır;
-`main` dalı güncel Odoo 19 geliştirme sürümünü izler.
+Odoo 19 demo addon deposu.
 
-## DocuCraft Word PDF Report Designer
+## DocuCraft All-in-One
 
-`ranvals_document_studio` sürüm `19.0.3.5.0`; belge tasarım motorunu,
+`ranvals_document_studio` sürüm `19.0.3.3.1`; belge tasarım motorunu,
 Satış, Muhasebe, Satın Alma ve Odoo Studio entegrasyonlarını tek addon altında
 toplar.
 
@@ -20,8 +18,7 @@ toplar.
 - 14 farklı kurumsal belge tasarımı
 - Satış, fatura ve satın almada tek **DocuCraft Yazdır** deneyimi
 - Gerçek belge verisiyle canlı tasarım ön izlemesi
-- Firma dilini otomatik izleyen Türkçe, İngilizce, Almanca, Fransızca,
-  İspanyolca, İtalyanca, Portekizce, Rusça ve Arapça belge/arayüz desteği
+- Firma dilini otomatik izleyen çok dilli belge ve alan başlıkları
 - Ayrı Önizleme/Alanlar sayfaları ve temizlenmiş otomatik alan kataloğu
 - PDF, canlı ön izleme ve Word ile uyumlu 23 başlık/gövde yazı tipi
 - Ekrandaki standart ve Studio alanlarını otomatik bulan yeşil/açık,
@@ -29,9 +26,7 @@ toplar.
 - PDF, Word, PNG, ZIP ve arka plan işlerinde ortak alan seçimi
 - Pasif şablonları bulup tek tıkla yeniden etkinleştiren Aktif/Pasif/Tümü filtreleri
 
-Modül Odoo 19 Enterprise ve `web_studio` gerektirir. Odoo Proprietary
-License v1.0 (`OPL-1`) ile lisanslanır ve Odoo Apps satış fiyatı 87 EUR'dur.
-Demo kurulumu öncesinde
+Modül Odoo 19 Enterprise ve `web_studio` gerektirir. Demo kurulumu öncesinde
 kök dizindeki Python bağımlılıkları yüklenmelidir:
 
 ```bash
@@ -39,4 +34,4 @@ pip install -r requirements.txt
 ```
 
 Ardından Odoo uygulama listesini güncelleyip
-**DocuCraft Word PDF Report Designer** uygulamasını kurun.
+**DocuCraft – All-in-One Document Designer for Odoo** uygulamasını kurun.

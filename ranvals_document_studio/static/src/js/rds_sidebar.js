@@ -54,17 +54,17 @@ export const RDS_SIDEBAR_ITEMS = Object.freeze([
 export const RDS_SIDEBAR_OPTIONAL_ITEMS = Object.freeze({
     overview: Object.freeze({
         key: "overview",
-        label: _t("Overview"),
+        label: _t("Genel Bakış"),
         icon: "01_app_document.svg",
     }),
     settings: Object.freeze({
         key: "settings",
-        label: _t("Settings"),
+        label: _t("Ayarlar"),
         icon: "20_tools_settings.svg",
     }),
     help: Object.freeze({
         key: "help",
-        label: _t("Help"),
+        label: _t("Yardım"),
         icon: "12_info_circle.svg",
     }),
 });
@@ -201,7 +201,7 @@ export class RdsSidebar extends Component {
         showMobileToggle: true,
         closeOnNavigate: true,
         homeKey: "connectors",
-        ariaLabel: _t("DocuCraft sections"),
+        ariaLabel: _t("DocuCraft bölümleri"),
     };
 
     setup() {
@@ -282,10 +282,6 @@ export class RdsSidebar extends Component {
         return this.props.collapsed === undefined
             ? this.state.collapsed
             : this.props.collapsed;
-    }
-
-    get rdsCollapseTitle() {
-        return this.isCollapsed ? _t("Expand menu") : _t("Collapse menu");
     }
 
     get hostClass() {

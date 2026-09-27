@@ -20,7 +20,6 @@ from odoo.addons.ranvals_document_studio.tools.docx_editable_renderer import (
     MAX_TOTALS,
     EditableDocxError,
     _font,
-    _resolve_docx_locale,
     render_editable_docx,
 )
 from odoo.addons.ranvals_document_studio.tools.docx_renderer import (
@@ -82,10 +81,6 @@ class TestRdsExportWizard(TransactionCase):
                 "document_info": "Belge Bilgileri",
                 "notes": "Notlar",
                 "bank_info": "Banka Bilgileri",
-                "phone": "Telefon",
-                "email": "E-posta",
-                "website": "Web Sitesi",
-                "tax_no": "Vergi No",
             },
             "tax_label": "Vergi No",
             "metadata": [
@@ -117,7 +112,6 @@ class TestRdsExportWizard(TransactionCase):
         mimetype = (
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
-
         with patch.object(
             RdsExportWizard,
             "_build_output",
@@ -165,13 +159,6 @@ class TestRdsExportWizard(TransactionCase):
         )
         self.assertEqual(len(stored_attachment), 1)
 
-    def test_editable_word_proofing_locale_uses_supported_language_prefix(self):
-        self.assertEqual(_resolve_docx_locale("de_AT"), "de-DE")
-        self.assertEqual(_resolve_docx_locale("es_MX"), "es-ES")
-        self.assertEqual(_resolve_docx_locale("fr_CA"), "fr-FR")
-        self.assertEqual(_resolve_docx_locale("ar_AE"), "ar-SA")
-        self.assertEqual(_resolve_docx_locale("ja_JP"), "en-US")
-
     def test_pdf_preview_uses_popup_free_dialog(self):
         self.wizard.output_format = "pdf"
         content = b"%PDF-test"
@@ -199,7 +186,7 @@ class TestRdsExportWizard(TransactionCase):
             action["params"]["url"],
             "/ranvals_document_studio/export_wizard/%s/preview" % self.wizard.id,
         )
-        self.assertEqual(action["params"]["title"], "preview.pdf Preview")
+        self.assertEqual(action["params"]["title"], "preview.pdf Önizleme")
         self.assertFalse(
             self.env["rds.export.log"].search(
                 [("file_name", "=", "preview.pdf")]
@@ -319,15 +306,10 @@ class TestRdsExportWizard(TransactionCase):
                 "vat": "1234567890",
             },
             "labels": {
-                "company_info": "Şirket Bilgileri",
                 "partner_info": "Müşteri Bilgileri",
                 "document_info": "Belge Bilgileri",
                 "notes": "Notlar ve Ödeme Koşulları",
                 "bank_info": "Banka Bilgileri",
-                "phone": "Telefon",
-                "email": "E-posta",
-                "website": "Web Sitesi",
-                "tax_no": "Vergi No",
             },
             "tax_label": "Vergi No",
             "metadata": [
@@ -387,9 +369,6 @@ class TestRdsExportWizard(TransactionCase):
         self.assertIn("Danışmanlık", table_text)
         self.assertIn("1.200,00 TL", table_text)
         self.assertGreaterEqual(len(document.tables), 4)
-        self.assertEqual(document.core_properties.author, "Ranvals Software")
-        self.assertEqual(document.core_properties.last_modified_by, "DocuCraft")
-        self.assertEqual(document.core_properties.title, "Satış Teklifi S00042")
         company_cells = [
             cell
             for table in document.tables
@@ -400,33 +379,6 @@ class TestRdsExportWizard(TransactionCase):
         ]
         self.assertEqual(len(company_cells), 1)
         self.assertEqual(company_cells[0].paragraphs[1].text, "Ranvals AŞ")
-        self.assertIn("Telefon: +90 212 000 00 00", table_text)
-        self.assertIn("E-posta: musteri@example.com", table_text)
-
-    def test_editable_docx_uses_document_language_for_contact_labels(self):
-        context = self._editable_context()
-        context["labels"].update({
-            "phone": "Phone",
-            "email": "Email",
-            "website": "Website",
-            "tax_no": "Tax ID",
-        })
-        context["tax_label"] = "Tax ID"
-
-        from docx import Document
-
-        document = Document(BytesIO(render_editable_docx(context, "en_US")))
-        text = "\n".join(
-            cell.text
-            for table in document.tables
-            for row in table.rows
-            for cell in row.cells
-        )
-        self.assertIn("Email: company@example.com", text)
-        self.assertIn("Email: partner@example.com", text)
-        self.assertIn("Tax ID: ŞİRKET-VKN-123", text)
-        self.assertNotIn("E-posta:", text)
-        self.assertNotIn("Vergi No:", text)
 
     def test_editable_docx_supports_every_template_font_and_script_slot(self):
         expected_word_fonts = {
@@ -525,18 +477,18 @@ class TestRdsExportWizard(TransactionCase):
             with self.subTest(name=name):
                 context = self._editable_context()
                 mutate(context)
-                with self.assertRaisesRegex(EditableDocxError, "at most"):
+                with self.assertRaisesRegex(EditableDocxError, "en fazla"):
                     render_editable_docx(context, "tr_TR")
 
     def test_editable_docx_never_silently_truncates_or_drops_input(self):
         context = self._editable_context()
         context["notes"] = ["X" * (MAX_TEXT_CHARS + 1)]
-        with self.assertRaisesRegex(EditableDocxError, "character limit"):
+        with self.assertRaisesRegex(EditableDocxError, "karakter sınırını"):
             render_editable_docx(context, "tr_TR")
 
         context = self._editable_context()
         context["metadata"] = {"label": "Beklenmeyen yapı"}
-        with self.assertRaisesRegex(EditableDocxError, "valid list"):
+        with self.assertRaisesRegex(EditableDocxError, "geçerli bir liste"):
             render_editable_docx(context, "tr_TR")
 
     def test_editable_docx_applies_visibility_flags_independently(self):
@@ -637,7 +589,7 @@ class TestRdsExportWizard(TransactionCase):
         record_context.assert_called_once_with(record, "tr_TR")
         render_word.assert_called_once_with(context, language_code="tr_TR")
         self.assertEqual(len(outputs), 1)
-        self.assertTrue(outputs[0][0].endswith("_Editable_Word.docx"))
+        self.assertTrue(outputs[0][0].endswith("_Word_Duzenlenebilir.docx"))
         self.assertEqual(outputs[0][2], DOCX_MIMETYPE)
 
     def test_editable_docx_applies_rtl_language_and_bounded_logo(self):
@@ -795,7 +747,7 @@ class TestRdsExportWizard(TransactionCase):
 
         with (
             patch("PIL.Image.open", return_value=image),
-            self.assertRaisesRegex(EditableDocxError, "dimensions exceed"),
+            self.assertRaisesRegex(EditableDocxError, "piksel boyutu"),
         ):
             render_editable_docx(context, "tr_TR")
 
@@ -811,7 +763,7 @@ class TestRdsExportWizard(TransactionCase):
                 "PIL.Image.open",
                 side_effect=PillowImage.DecompressionBombError("bomb"),
             ),
-            self.assertRaisesRegex(EditableDocxError, "valid, safe image"),
+            self.assertRaisesRegex(EditableDocxError, "geçerli ve güvenli"),
         ):
             render_editable_docx(context, "tr_TR")
 
@@ -916,7 +868,7 @@ class TestRdsExportWizard(TransactionCase):
 
     def test_explicit_zip_contains_pdf_docx_and_png(self):
         self.wizard.output_format = "zip"
-        expected_language = self.wizard.language_id.code or self.env.user.lang or "en_US"
+        expected_language = self.wizard.language_id.code or self.env.user.lang or "tr_TR"
         with (
             patch.object(
                 RdsExportWizard, "_render_pdf", return_value=b"%PDF-test"
@@ -964,8 +916,8 @@ class TestRdsExportWizard(TransactionCase):
             self.assertTrue(any(name.endswith(".pdf") for name in names))
             docx_names = [name for name in names if name.endswith(".docx")]
             self.assertEqual(len(docx_names), 2)
-            self.assertTrue(any("Design_Preserved_Word" in name for name in docx_names))
-            self.assertTrue(any("Editable_Word" in name for name in docx_names))
+            self.assertTrue(any("Word_PDF_Gorunumu" in name for name in docx_names))
+            self.assertTrue(any("Word_Duzenlenebilir" in name for name in docx_names))
             self.assertEqual(sum(name.endswith(".png") for name in names), 2)
 
     def test_record_ids_are_strictly_validated(self):

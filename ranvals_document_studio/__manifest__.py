@@ -1,23 +1,19 @@
 {
-    "name": "DocuCraft Word PDF Report Designer",
-    "summary": "Design and export Odoo quotations, invoices and purchase documents as editable Word, visual Word, PDF, PNG or ZIP",
+    "name": "DocuCraft – All-in-One Document Designer for Odoo",
+    "summary": "PDF ve düzenlenebilir Word tasarımını satış, muhasebe, satın alma ve Studio ile birleştirir",
     "description": (
-        "DocuCraft Word PDF Report Designer is an Odoo Enterprise document-design and export "
-        "application for sales quotations and orders, customer and vendor invoices, "
-        "credit notes, requests for quotation and purchase orders. It provides "
-        "editable DOCX, design-faithful visual DOCX, PDF, PNG and ZIP output, "
-        "14 corporate starter templates, dynamic record and line fields, localized "
-        "document labels, multi-company templates and monitored background jobs. "
-        "Odoo Enterprise with the Studio application is required."
+        "DocuCraft All-in-One; satış teklifleri, faturalar ve satın alma belgeleri "
+        "için PDF, düzenlenebilir DOCX, PDF görünümünde DOCX, PNG ve ZIP çıktıları, "
+        "tek DocuCraft Yazdır akışı, 14 kurumsal tasarım, arka plan kuyruğu, "
+        "dinamik alanlar, çok şirketli şablonlar, belge dili ve Odoo Studio "
+        "rapor seçicisini tek kurulumda sunar. "
+        "Bu birleşik sürüm Odoo Enterprise Studio ile birlikte kurulur."
     ),
-    "version": "19.0.3.5.0",
+    "version": "19.0.3.3.1",
     "category": "Productivity/Documents",
     "author": "Ranvals Software",
     "website": "https://odooranvals.com",
-    "license": "OPL-1",
-    "price": 87.0,
-    "currency": "EUR",
-    "support": "odoo@ranvals.com",
+    "license": "LGPL-3",
     "depends": [
         "base",
         "web",
@@ -115,16 +111,12 @@
             "ranvals_document_studio/static/src/scss/rds_theme.dark.scss",
         ],
     },
-    "icon": "/ranvals_document_studio/static/description/icon.png",
+    "icon": "/ranvals_document_studio/static/description/docucraft_app_icon_v9_20260914.png",
     "images": [
-        "static/description/docucraft_word_export_screenshot.png",
-        "static/description/docucraft_live_preview_screenshot.png",
-        "static/description/docucraft_fields_screenshot.png",
-        "static/description/docucraft_typography_screenshot.png",
-        "static/description/docucraft_word_output_screenshot.png",
-        "static/description/docucraft_designer_screenshot.png",
-        "static/description/docucraft_templates_screenshot.png",
-        "static/description/docucraft_archived_templates_screenshot.png",
+        "static/description/product_showcase.png",
+        "static/description/promo_hero.png",
+        "static/description/promo_features.png",
+        "static/description/promo_formats.png",
     ],
     "application": True,
     "installable": True,

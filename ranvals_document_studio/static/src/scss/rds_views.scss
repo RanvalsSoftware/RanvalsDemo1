@@ -428,20 +428,6 @@
             padding-block: 3px;
         }
     }
-
-    &--processing {
-        .o_field_radio {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 5px;
-        }
-
-        .form-check {
-            min-height: 26px;
-            margin: 0;
-            padding-block: 2px;
-        }
-    }
 }
 
 .rds-export-language-note {
@@ -864,7 +850,7 @@
         width: 100%;
     }
 
-    .rds-template-static-preview__image {
+    img {
         max-height: 680px !important;
     }
 }

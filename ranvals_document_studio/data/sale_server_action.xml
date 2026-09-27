@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="server_action_sale_rds_export" model="ir.actions.server">
-        <field name="name">DocuCraft Compatibility – Selector</field>
+        <field name="name">DocuCraft Uyumluluk – Seçici</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <!-- Kept for API/XML-ID compatibility; the dedicated Print binding
              below is the single user-facing menu entry. -->
@@ -14,7 +14,7 @@
 
     <!-- A real Print-menu entry that opens the design/output chooser. -->
     <record id="server_action_sale_rds_print" model="ir.actions.server">
-        <field name="name">Print with DocuCraft</field>
+        <field name="name">DocuCraft Yazdır</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
@@ -25,7 +25,7 @@
     </record>
 
     <record id="server_action_sale_rds_quick_pdf" model="ir.actions.server">
-        <field name="name">DocuCraft Compatibility – PDF</field>
+        <field name="name">DocuCraft Uyumluluk – PDF</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
@@ -36,7 +36,7 @@
     </record>
 
     <record id="server_action_sale_rds_quick_word" model="ir.actions.server">
-        <field name="name">DocuCraft Compatibility – Word</field>
+        <field name="name">DocuCraft Uyumluluk – Word</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>

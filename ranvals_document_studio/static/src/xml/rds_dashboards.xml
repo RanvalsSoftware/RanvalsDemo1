@@ -7,14 +7,14 @@
             <main class="rds-dashboard-shell o_rds_sidebar_layout__content">
                 <header class="rds-dashboard-hero">
                     <div>
-                        <h1>Connectors</h1>
-                        <p>Install or update the required modules to enable document types.</p>
+                        <h1>Bağlayıcılar</h1>
+                        <p>Belge türlerini aktif etmek için gerekli modülleri kurun veya güncelleyin.</p>
                     </div>
                     <div class="rds-dashboard-tools">
                         <label class="rds-search-box">
-                            <span class="visually-hidden">Search connectors</span>
+                            <span class="visually-hidden">Bağlayıcılarda ara</span>
                             <input type="search"
-                                   placeholder="Search..."
+                                   placeholder="Ara..."
                                    t-att-value="state.query"
                                    t-on-input="onSearchInput"/>
                             <img t-att-src="icon('08_search.svg')" alt="" aria-hidden="true"/>
@@ -22,52 +22,52 @@
                         <div class="rds-filter-wrap" t-on-keydown="onFilterKeydown">
                             <button type="button"
                                     class="rds-icon-button"
-                                    aria-label="Filter connectors"
+                                    aria-label="Bağlayıcıları filtrele"
                                     aria-controls="rds-connector-filter-menu"
                                     t-att-aria-expanded="state.filterOpen ? 'true' : 'false'"
-                                    title="Filter"
+                                    title="Filtrele"
                                     t-on-click="toggleFilter">
                                 <img t-att-src="icon('09_filter.svg')" alt="" aria-hidden="true"/>
                             </button>
                             <div id="rds-connector-filter-menu" class="rds-filter-menu" t-if="state.filterOpen">
-                                <button type="button" t-att-class="state.filter === 'all' ? 'is-active' : ''" t-on-click="() => this.selectFilter('all')">All</button>
-                                <button type="button" t-att-class="state.filter === 'installed' ? 'is-active' : ''" t-on-click="() => this.selectFilter('installed')">Installed</button>
-                                <button type="button" t-att-class="state.filter === 'update' ? 'is-active' : ''" t-on-click="() => this.selectFilter('update')">Update Available</button>
-                                <button type="button" t-att-class="state.filter === 'missing' ? 'is-active' : ''" t-on-click="() => this.selectFilter('missing')">Not Installed</button>
+                                <button type="button" t-att-class="state.filter === 'all' ? 'is-active' : ''" t-on-click="() => this.selectFilter('all')">Tümü</button>
+                                <button type="button" t-att-class="state.filter === 'installed' ? 'is-active' : ''" t-on-click="() => this.selectFilter('installed')">Kurulu</button>
+                                <button type="button" t-att-class="state.filter === 'update' ? 'is-active' : ''" t-on-click="() => this.selectFilter('update')">Güncelleme Bekliyor</button>
+                                <button type="button" t-att-class="state.filter === 'missing' ? 'is-active' : ''" t-on-click="() => this.selectFilter('missing')">Kurulu Değil</button>
                             </div>
                         </div>
                     </div>
                 </header>
 
-                <section class="rds-stat-strip rds-stat-strip--three" aria-label="Connector summary">
+                <section class="rds-stat-strip rds-stat-strip--three" aria-label="Bağlayıcı özeti">
                     <article class="rds-stat-item">
                         <span class="rds-icon-surface rds-icon-surface--purple">
                             <img t-att-src="icon('02_cube_total.svg')" alt="" aria-hidden="true"/>
                         </span>
-                        <span><strong t-out="state.stats.total"/><small>Total Connectors</small></span>
+                        <span><strong t-out="state.stats.total"/><small>Toplam Bağlayıcı</small></span>
                     </article>
                     <article class="rds-stat-item">
                         <span class="rds-icon-surface rds-icon-surface--green">
                             <img t-att-src="icon('03_check_circle.svg')" alt="" aria-hidden="true"/>
                         </span>
-                        <span><strong t-out="state.stats.installed"/><small>Installed</small></span>
+                        <span><strong t-out="state.stats.installed"/><small>Kurulu</small></span>
                     </article>
                     <article class="rds-stat-item">
                         <span class="rds-icon-surface rds-icon-surface--amber">
                             <img t-att-src="icon('04_refresh_sync.svg')" alt="" aria-hidden="true"/>
                         </span>
-                        <span><strong t-out="state.stats.updates"/><small>Update Available</small></span>
+                        <span><strong t-out="state.stats.updates"/><small>Güncelleme Bekliyor</small></span>
                     </article>
                 </section>
 
                 <div class="rds-loading-state" t-if="state.loading" aria-live="polite">
-                    <span class="spinner-border" role="status"/><span>Loading connectors...</span>
+                    <span class="spinner-border" role="status"/><span>Bağlayıcılar yükleniyor...</span>
                 </div>
                 <div class="rds-error-state" t-elif="state.error" role="alert">
-                    <p>Connector information is currently unavailable.</p>
-                    <button type="button" class="btn btn-outline-primary" t-on-click="load">Retry</button>
+                    <p>Bağlayıcı bilgileri şu anda görüntülenemiyor.</p>
+                    <button type="button" class="btn btn-outline-primary" t-on-click="load">Yeniden Dene</button>
                 </div>
-                <section class="rds-connector-grid" t-else="" aria-label="DocuCraft connectors">
+                <section class="rds-connector-grid" t-else="" aria-label="DocuCraft bağlayıcıları">
                     <article class="rds-connector-card" t-foreach="visibleConnectors" t-as="connector" t-key="connector.technical_name">
                         <div class="rds-connector-card__header">
                             <span t-attf-class="rds-icon-surface rds-icon-surface--{{ connector.tone }} rds-icon-surface--large">
@@ -87,27 +87,27 @@
                         <div class="rds-connector-card__actions">
                             <button type="button" class="rds-outline-button" t-on-click="() => this.openConnector(connector)">
                                 <img t-att-src="icon('10_external_link_open.svg')" alt="" aria-hidden="true"/>
-                                <span>Open</span>
+                                <span>Aç</span>
                             </button>
                             <button type="button"
                                     class="rds-icon-button rds-icon-button--small"
-                                    aria-label="Open connector details"
-                                    title="Details"
+                                    aria-label="Bağlayıcı ayrıntılarını aç"
+                                    title="Ayrıntılar"
                                     t-on-click="() => this.openConnector(connector)">
                                 <img t-att-src="icon('11_more_vertical.svg')" alt="" aria-hidden="true"/>
                             </button>
                         </div>
                     </article>
                     <div class="rds-empty-state" t-if="!visibleConnectors.length">
-                        <p>No connectors match your search.</p>
+                        <p>Aramanızla eşleşen bağlayıcı bulunamadı.</p>
                     </div>
                 </section>
 
                 <aside class="rds-info-strip">
                     <img t-att-src="icon('12_info_circle.svg')" alt="" aria-hidden="true"/>
-                    <p>Connectors enable document types and make their templates available.</p>
+                    <p>Bağlayıcılar, belge türlerini etkinleştirir ve ilgili şablonların kullanılabilir olmasını sağlar.</p>
                     <button type="button" class="rds-more-link" t-on-click="openConnectorList">
-                        <span>Learn more</span>
+                        <span>Daha fazla bilgi</span>
                         <img t-att-src="icon('10_external_link_open.svg')" alt="" aria-hidden="true"/>
                     </button>
                 </aside>
@@ -121,14 +121,14 @@
             <main class="rds-dashboard-shell o_rds_sidebar_layout__content">
                 <header class="rds-dashboard-hero">
                     <div>
-                        <h1>Export History</h1>
-                        <p>View generated PDF, Word, PNG, and ZIP documents and download them again.</p>
+                        <h1>Dışa Aktarım Geçmişi</h1>
+                        <p>Oluşturulan PDF, Word, PNG ve ZIP belgelerini görüntüleyin ve tekrar indirin.</p>
                     </div>
                     <div class="rds-dashboard-tools">
                         <label class="rds-search-box">
-                            <span class="visually-hidden">Search export history</span>
+                            <span class="visually-hidden">Dışa aktarım geçmişinde ara</span>
                             <input type="search"
-                                   placeholder="Search..."
+                                   placeholder="Ara..."
                                    t-att-value="state.query"
                                    t-on-input="onSearchInput"/>
                             <img t-att-src="icon('08_search.svg')" alt="" aria-hidden="true"/>
@@ -136,26 +136,26 @@
                         <div class="rds-filter-wrap" t-on-keydown="onFormatKeydown">
                             <button type="button"
                                     class="rds-icon-button"
-                                    aria-label="Filter by file format"
+                                    aria-label="Dosya biçimine göre filtrele"
                                     aria-controls="rds-format-filter-menu"
                                     t-att-aria-expanded="state.formatOpen ? 'true' : 'false'"
-                                    title="Filter"
+                                    title="Filtrele"
                                     t-on-click="toggleFormatMenu">
                                 <img t-att-src="icon('09_filter.svg')" alt="" aria-hidden="true"/>
                             </button>
                             <div id="rds-format-filter-menu" class="rds-filter-menu" t-if="state.formatOpen">
-                                <button type="button" t-att-class="state.format === 'all' ? 'is-active' : ''" t-on-click="() => this.selectFormat('all')">All</button>
+                                <button type="button" t-att-class="state.format === 'all' ? 'is-active' : ''" t-on-click="() => this.selectFormat('all')">Tümü</button>
                                 <button type="button" t-att-class="state.format === 'pdf' ? 'is-active' : ''" t-on-click="() => this.selectFormat('pdf')">PDF</button>
-                                <button type="button" t-att-class="state.format === 'docx_editable' ? 'is-active' : ''" t-on-click="() => this.selectFormat('docx_editable')">Word – Editable</button>
-                                <button type="button" t-att-class="state.format === 'docx' ? 'is-active' : ''" t-on-click="() => this.selectFormat('docx')">Word – PDF Layout</button>
+                                <button type="button" t-att-class="state.format === 'docx_editable' ? 'is-active' : ''" t-on-click="() => this.selectFormat('docx_editable')">Word – Düzenlenebilir</button>
+                                <button type="button" t-att-class="state.format === 'docx' ? 'is-active' : ''" t-on-click="() => this.selectFormat('docx')">Word – PDF Görünümü</button>
                                 <button type="button" t-att-class="state.format === 'png' ? 'is-active' : ''" t-on-click="() => this.selectFormat('png')">PNG</button>
                                 <button type="button" t-att-class="state.format === 'zip' ? 'is-active' : ''" t-on-click="() => this.selectFormat('zip')">ZIP</button>
                             </div>
                         </div>
                         <button type="button"
                                 class="rds-icon-button"
-                                aria-label="Download visible files"
-                                title="Download visible files"
+                                aria-label="Görünen dosyaları indir"
+                                title="Görünen dosyaları indir"
                                 t-att-disabled="state.loading || !visibleDownloadIds.length"
                                 t-on-click="downloadVisible">
                             <img t-att-src="icon('16_download.svg')" alt="" aria-hidden="true"/>
@@ -163,10 +163,10 @@
                     </div>
                 </header>
 
-                <section class="rds-stat-strip rds-stat-strip--five" aria-label="Export summary">
+                <section class="rds-stat-strip rds-stat-strip--five" aria-label="Dışa aktarım özeti">
                     <article class="rds-stat-item">
                         <span class="rds-icon-surface rds-icon-surface--purple"><img t-att-src="icon('02_cube_total.svg')" alt="" aria-hidden="true"/></span>
-                        <span><strong t-out="state.stats.total"/><small>Total Exports</small></span>
+                        <span><strong t-out="state.stats.total"/><small>Toplam Çıktı</small></span>
                     </article>
                     <article class="rds-stat-item">
                         <span class="rds-icon-surface rds-icon-surface--red"><img t-att-src="icon('13_pdf_file.svg')" alt="" aria-hidden="true"/></span>
@@ -186,32 +186,32 @@
                     </article>
                 </section>
 
-                <section class="rds-history-card" aria-label="Export records">
+                <section class="rds-history-card" aria-label="Dışa aktarım kayıtları">
                     <div class="rds-loading-state rds-loading-state--table" t-if="state.loading" aria-live="polite">
-                        <span class="spinner-border" role="status"/><span>Loading history...</span>
+                        <span class="spinner-border" role="status"/><span>Geçmiş yükleniyor...</span>
                     </div>
                     <div class="rds-error-state" t-elif="state.error" role="alert">
-                        <p>Export history is currently unavailable.</p>
-                        <button type="button" class="btn btn-outline-primary" t-on-click="load">Retry</button>
+                        <p>Dışa aktarım geçmişi şu anda görüntülenemiyor.</p>
+                        <button type="button" class="btn btn-outline-primary" t-on-click="load">Yeniden Dene</button>
                     </div>
-                    <div class="rds-table-scroll" t-else="" tabindex="0" aria-label="Export history table">
+                    <div class="rds-table-scroll" t-else="" tabindex="0" aria-label="Dışa aktarım kayıtları tablosu">
                         <table class="rds-history-table">
                             <thead>
                                 <tr>
                                     <th t-att-aria-sort="state.sortDirection === 'asc' ? 'ascending' : 'descending'">
                                         <button type="button" class="rds-sort-button" t-on-click="toggleSort">
-                                            <span>Date</span>
+                                            <span>Tarih</span>
                                             <img t-att-src="icon('22_sort_up_down.svg')" alt="" aria-hidden="true"/>
                                         </button>
                                     </th>
-                                    <th>User</th>
-                                    <th>Record</th>
-                                    <th>Template</th>
+                                    <th>Kullanıcı</th>
+                                    <th>Kayıt</th>
+                                    <th>Şablon</th>
                                     <th>Format</th>
-                                    <th>File Name</th>
-                                    <th>Size</th>
-                                    <th>Status</th>
-                                    <th class="rds-history-table__download-heading">Download</th>
+                                    <th>Dosya Adı</th>
+                                    <th>Boyut</th>
+                                    <th>Durum</th>
+                                    <th class="rds-history-table__download-heading">İndir</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -245,31 +245,31 @@
                                         <button type="button"
                                                 class="rds-icon-button rds-icon-button--small"
                                                 t-att-disabled="!record.can_download"
-                                                aria-label="Download file"
-                                                title="Download"
+                                                aria-label="Dosyayı indir"
+                                                title="İndir"
                                                 t-on-click="() => this.downloadRecord(record)">
                                             <img t-att-src="icon('16_download.svg')" alt="" aria-hidden="true"/>
                                         </button>
                                     </td>
                                 </tr>
                                 <tr t-if="!state.records.length">
-                                    <td colspan="9" class="rds-table-empty">No exports match your search.</td>
+                                    <td colspan="9" class="rds-table-empty">Aramanızla eşleşen dışa aktarım kaydı bulunamadı.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <nav class="rds-history-pager" t-if="!state.loading and !state.error and pageCount &gt; 1" aria-label="History pages">
-                        <button type="button" t-att-disabled="state.page === 0" t-on-click="previousPage">Previous</button>
+                    <nav class="rds-history-pager" t-if="!state.loading and !state.error and pageCount &gt; 1" aria-label="Geçmiş sayfaları">
+                        <button type="button" t-att-disabled="state.page === 0" t-on-click="previousPage">Önceki</button>
                         <span><t t-out="state.page + 1"/> / <t t-out="pageCount"/></span>
-                        <button type="button" t-att-disabled="state.page + 1 &gt;= pageCount" t-on-click="nextPage">Next</button>
+                        <button type="button" t-att-disabled="state.page + 1 &gt;= pageCount" t-on-click="nextPage">Sonraki</button>
                     </nav>
                 </section>
 
                 <aside class="rds-info-strip">
                     <img t-att-src="icon('12_info_circle.svg')" alt="" aria-hidden="true"/>
-                    <p>Use search and filters to find exports and safely download stored files again.</p>
+                    <p>Dışa aktarılan belgeleri arama ve filtrelerle bulabilir, kayıtlı dosyaları güvenle yeniden indirebilirsiniz.</p>
                     <button type="button" class="rds-more-link" t-on-click="openHistoryList">
-                        <span>Learn more</span>
+                        <span>Daha fazla bilgi</span>
                         <img t-att-src="icon('10_external_link_open.svg')" alt="" aria-hidden="true"/>
                     </button>
                 </aside>

@@ -6,15 +6,15 @@ class RdsExportWizardBackground(models.TransientModel):
 
     processing_mode = fields.Selection(
         [
-            ("auto", "Automatic – Recommended"),
-            ("immediate", "Generate and Download Now"),
-            ("background", "Prepare in Background"),
+            ("auto", "Otomatik – Önerilen"),
+            ("immediate", "Şimdi oluştur ve indir"),
+            ("background", "Arka planda hazırla"),
         ],
         required=True,
         default="auto",
         help=(
-            "Automatic mode sends large, multi-record, or all-format exports "
-            "to the background and downloads small documents immediately."
+            "Otomatik mod; büyük, çok kayıtlı veya tüm-format çıktıları arka "
+            "plana alır, küçük belgeleri hemen indirir."
         ),
     )
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="server_action_account_rds_export" model="ir.actions.server">
-        <field name="name">Print with DocuCraft</field>
+        <field name="name">DocuCraft Yazdır</field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
@@ -12,7 +12,7 @@
     </record>
 
     <record id="server_action_account_rds_quick_pdf" model="ir.actions.server">
-        <field name="name">DocuCraft Compatibility – PDF</field>
+        <field name="name">DocuCraft Uyumluluk – PDF</field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
@@ -23,7 +23,7 @@
     </record>
 
     <record id="server_action_account_rds_quick_word" model="ir.actions.server">
-        <field name="name">DocuCraft Compatibility – Word</field>
+        <field name="name">DocuCraft Uyumluluk – Word</field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>

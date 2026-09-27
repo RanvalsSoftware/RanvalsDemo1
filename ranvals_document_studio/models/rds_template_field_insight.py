@@ -5,11 +5,11 @@ class RdsTemplateFieldInsight(models.Model):
     _inherit = "rds.template.field"
 
     technical_risk = fields.Selection(
-        [("safe", "Fast"), ("related", "Related"), ("costly", "Caution"), ("restricted", "Restricted")],
+        [("safe", "Hızlı"), ("related", "İlişkili"), ("costly", "Dikkat"), ("restricted", "Kısıtlı")],
         compute="_compute_technical_insight",
-        string="Field Profile",
+        string="Alan Profili",
     )
-    technical_risk_help = fields.Text(compute="_compute_technical_insight", string="Technical Explanation")
+    technical_risk_help = fields.Text(compute="_compute_technical_insight", string="Teknik Açıklama")
 
     @api.depends("field_path", "source_model_id")
     def _compute_technical_insight(self):
@@ -23,27 +23,27 @@ class RdsTemplateFieldInsight(models.Model):
             for index, part in enumerate(parts):
                 if not current_model or part not in current_model._fields:
                     risk = "restricted"
-                    messages.append(_("The field path can no longer be resolved."))
+                    messages.append(_("Alan yolu artık çözümlenemiyor."))
                     break
                 field = current_model._fields[part]
                 terminal = field
                 if getattr(field, "groups", None):
                     risk = "restricted"
-                    messages.append(_("This field has group-based access restrictions; the document engine applies the current user permissions."))
+                    messages.append(_("Bu alan grup tabanlı erişim kısıtına sahiptir; belge motoru mevcut kullanıcı yetkisini uygular."))
                 if index < len(parts) - 1:
                     if risk != "restricted":
                         risk = "related"
-                    messages.append(_("Read through a related record; it may generate more queries than a direct field."))
+                    messages.append(_("İlişkili kayıt üzerinden okunur; doğrudan alana göre daha fazla sorgu oluşturabilir."))
                     current_model = self.env[field.comodel_name] if field.comodel_name in self.env.registry.models else False
             if terminal and terminal.type in ("one2many", "many2many"):
                 if risk != "restricted":
                     risk = "costly"
-                messages.append(_("Multi-value relations are limited to 100 visible values and may be expensive on large records."))
+                messages.append(_("Çoklu ilişki en fazla 100 görünen değerle sınırlandırılır ve büyük kayıtlarda pahalı olabilir."))
             if terminal and getattr(terminal, "compute", None) and not getattr(terminal, "store", False):
                 if risk not in ("restricted", "costly"):
                     risk = "costly"
-                messages.append(_("A non-stored computed field is recalculated during export."))
+                messages.append(_("Saklanmayan hesaplanan alan çıktı sırasında yeniden hesaplanır."))
             if not messages:
-                messages.append(_("Direct low-cost field read."))
+                messages.append(_("Doğrudan ve düşük maliyetli alan okuması."))
             record.technical_risk = risk
             record.technical_risk_help = " ".join(dict.fromkeys(messages))

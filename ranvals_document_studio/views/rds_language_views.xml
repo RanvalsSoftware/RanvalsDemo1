@@ -4,26 +4,26 @@
         <field name="name">rds.language.wizard.form</field>
         <field name="model">rds.language.wizard</field>
         <field name="arch" type="xml">
-            <form string="DocuCraft Language Settings">
+            <form string="DocuCraft Dil Ayarları">
                 <div class="alert alert-info" role="status">
-                    The interface language changes only your Odoo user preference. Other users and the customer's document language are not affected. The page reloads when you apply it.
+                    Arayüz dili yalnız sizin Odoo kullanıcı tercihinizi değiştirir. Diğer kullanıcılar ve müşterinin belge dili etkilenmez. Uygularken sayfa yeniden yüklenir.
                 </div>
                 <group><field name="language_code"/><field name="language_active" invisible="1"/><field name="missing_language_count" invisible="1"/></group>
                 <div class="alert alert-warning" invisible="language_active" role="alert">
-                    This language is not active yet. A system administrator can activate it and the installed modules' translations with the button below.
+                    Bu dil henüz etkin değil. Sistem yöneticisi aşağıdaki düğmeyle dili ve yüklü modüllerin çevirilerini etkinleştirebilir.
                 </div>
-                <p class="text-muted">You can choose the document language for PDF, Word, and PNG separately in the export dialog or DocuCraft Studio design panel.</p>
+                <p class="text-muted">PDF, Word ve PNG için belge dilini dışa aktarım penceresinden veya DocuCraft Studio tasarım panelinden ayrıca seçebilirsiniz.</p>
                 <footer>
-                    <button name="action_apply" type="object" string="Apply Language" class="btn-primary" invisible="not language_active"/>
-                    <button name="action_activate_language" type="object" string="Activate Selected Language" class="btn-secondary" groups="base.group_system" invisible="language_active"/>
-                    <button name="action_activate_supported_languages" type="object" string="Activate Supported Languages" class="btn-secondary" groups="base.group_system" invisible="not missing_language_count"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    <button name="action_apply" type="object" string="Dili Uygula" class="btn-primary" invisible="not language_active"/>
+                    <button name="action_activate_language" type="object" string="Seçilen Dili Etkinleştir" class="btn-secondary" groups="base.group_system" invisible="language_active"/>
+                    <button name="action_activate_supported_languages" type="object" string="Desteklenen Dilleri Etkinleştir" class="btn-secondary" groups="base.group_system" invisible="not missing_language_count"/>
+                    <button string="İptal" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>
         </field>
     </record>
     <record id="action_rds_language_wizard" model="ir.actions.act_window">
-        <field name="name">DocuCraft Language Settings</field><field name="res_model">rds.language.wizard</field>
+        <field name="name">DocuCraft Dil Ayarları</field><field name="res_model">rds.language.wizard</field>
         <field name="view_mode">form</field><field name="target">new</field>
     </record>
     <record id="access_rds_language_wizard_user" model="ir.model.access">

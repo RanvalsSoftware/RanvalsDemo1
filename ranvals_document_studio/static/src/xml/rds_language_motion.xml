@@ -2,9 +2,9 @@
 <templates xml:space="preserve">
     <t t-name="ranvals_document_studio.LanguageButton">
         <button type="button" class="rds-language-button" t-att-disabled="state.busy" t-on-click="open"
-                title="Language settings" aria-label="Change interface language">
+                title="Dil ayarları" aria-label="Arayüz dilini değiştir">
             <i class="fa fa-globe" aria-hidden="true"/>
-            <span class="rds-language-button__label">Language</span>
+            <span class="rds-language-button__label">Dil / Language</span>
             <span class="rds-language-button__code" t-esc="code"/>
         </button>
     </t>

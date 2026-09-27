@@ -50,7 +50,7 @@ _logger = logging.getLogger(__name__)
 
 class RdsExportFieldLine(models.TransientModel):
     _name = "rds.export.field.line"
-    _description = "DocuCraft Export Field"
+    _description = "DocuCraft Dışa Aktarım Alanı"
     _order = "sequence, id"
 
     wizard_id = fields.Many2one(
@@ -60,34 +60,34 @@ class RdsExportFieldLine(models.TransientModel):
         index=True,
     )
     section = fields.Selection(
-        [("metadata", "Document Detail"), ("line", "Line Column")],
+        [("metadata", "Belge Bilgisi"), ("line", "Satır Sütunu")],
         required=True,
         readonly=True,
     )
-    enabled = fields.Boolean(string="Include in Export")
+    enabled = fields.Boolean(string="Çıktıya Ekle")
     sequence = fields.Integer(default=10)
     source_model = fields.Char(required=True, readonly=True)
     field_key = fields.Char(required=True, readonly=True)
     field_path = fields.Char(required=True, readonly=True)
-    label = fields.Char(string="Label", required=True)
+    label = fields.Char(string="Başlık", required=True)
     auto_label = fields.Char(readonly=True)
-    sample_value = fields.Char(string="Sample Value", readonly=True)
+    sample_value = fields.Char(string="Örnek Değer", readonly=True)
     origin = fields.Selection(
-        [("builtin", "Standard"), ("template", "Template"), ("screen", "Screen")],
+        [("builtin", "Standart"), ("template", "Şablon"), ("screen", "Ekran")],
         required=True,
         readonly=True,
     )
-    is_custom = fields.Boolean(string="Studio Field", readonly=True)
+    is_custom = fields.Boolean(string="Studio Alanı", readonly=True)
 
     @api.constrains("label", "field_key", "field_path")
     def _check_safe_values(self):
         for line in self:
             if not line.label or not line.label.strip() or len(line.label.strip()) > 200:
                 raise ValidationError(
-                    _("The document field label must be between 1 and 200 characters.")
+                    _("Belge alanı başlığı 1 ile 200 karakter arasında olmalıdır.")
                 )
             if not line.field_key or len(line.field_key) > 255:
-                raise ValidationError(_("The document field key is invalid."))
+                raise ValidationError(_("Belge alanı anahtarı geçersiz."))
             parts = (line.field_path or "").split(".")
             if (
                 not parts
@@ -97,7 +97,7 @@ class RdsExportFieldLine(models.TransientModel):
                     for part in parts
                 )
             ):
-                raise ValidationError(_("The document field path is invalid."))
+                raise ValidationError(_("Belge alanı yolu geçersiz."))
 
     def _check_wizard_mutable(self):
         for wizard in self.mapped("wizard_id"):
@@ -105,8 +105,8 @@ class RdsExportFieldLine(models.TransientModel):
             if wizard.sudo().file_data:
                 raise ValidationError(
                     _(
-                        "Document fields cannot be changed after output has been generated. "
-                        "Open a new export dialog."
+                        "Çıktısı oluşturulmuş bir işlemde belge alanları değiştirilemez. "
+                        "Yeni bir dışa aktarım penceresi açın."
                     )
                 )
 
@@ -120,14 +120,14 @@ class RdsExportFieldLine(models.TransientModel):
                 check_record_access(wizard, "write")
                 if wizard.sudo().file_data:
                     raise ValidationError(
-                        _("A field cannot be added after output has been generated.")
+                        _("Çıktısı oluşturulmuş bir işleme alan eklenemez.")
                     )
         return super().create(vals_list)
 
     def write(self, vals):
         if "wizard_id" in vals:
             raise ValidationError(
-                _("An export field cannot be moved to another operation.")
+                _("Dışa aktarım alanı başka bir işleme taşınamaz.")
             )
         self._check_wizard_mutable()
         return super().write(vals)
@@ -139,7 +139,7 @@ class RdsExportFieldLine(models.TransientModel):
 
 class RdsExportWizard(models.TransientModel):
     _name = "rds.export.wizard"
-    _description = "DocuCraft Export"
+    _description = "DocuCraft Dışa Aktarım"
 
     res_model = fields.Char(required=True, readonly=True)
     res_ids_json = fields.Text(required=True, readonly=True, default="[]")
@@ -152,14 +152,14 @@ class RdsExportWizard(models.TransientModel):
     )
     template_preview_html = fields.Html(compute="_compute_template_preview", sanitize=False)
     field_selection_mode = fields.Selection(
-        [("inherit", "Template Defaults"), ("custom", "Fields for This Export")],
+        [("inherit", "Şablon Varsayılanları"), ("custom", "Bu Çıktının Alanları")],
         required=True,
         default="inherit",
     )
     field_line_ids = fields.One2many(
         "rds.export.field.line",
         "wizard_id",
-        string="Export Fields",
+        string="Çıktı Alanları",
         copy=False,
     )
     enabled_field_count = fields.Integer(compute="_compute_field_counts")
@@ -169,36 +169,36 @@ class RdsExportWizard(models.TransientModel):
     output_format = fields.Selection(
         [
             ("pdf", "PDF"),
-            ("docx_editable", "Word / DOCX – Editable"),
-            ("docx", "Word / DOCX – Preserve Exact Design"),
+            ("docx_editable", "Word / DOCX – Düzenlenebilir"),
+            ("docx", "Word / DOCX – Tasarımı Birebir Korur"),
             ("png", "PNG"),
-            ("zip", "ZIP – PDF + 2 Word Types + PNG"),
+            ("zip", "ZIP – PDF + 2 Word türü + PNG"),
         ],
         required=True,
         default="pdf",
     )
     dpi = fields.Selection(
-        [("96", "96 DPI – Screen"), ("150", "150 DPI – Standard"), ("300", "300 DPI – Print")],
+        [("96", "96 DPI – Ekran"), ("150", "150 DPI – Standart"), ("300", "300 DPI – Baskı")],
         default="150",
         required=True,
     )
     language_mode = fields.Selection(
         [
-            ("company", "Company Language (Automatic)"),
-            ("partner", "Customer / Vendor Language"),
-            ("manual", "Choose Language Manually"),
+            ("company", "Firma dili (otomatik)"),
+            ("partner", "Müşteri / tedarikçi dili"),
+            ("manual", "Dili elle seç"),
         ],
-        string="Language Source",
+        string="Dil Kaynağı",
         required=True,
         default="company",
     )
     language_id = fields.Many2one(
         "res.lang",
-        string="Document Language",
+        string="Belge Dili",
         domain=DOCUMENT_LANGUAGE_DOMAIN,
     )
-    attach_to_record = fields.Boolean(string="Attach to Record", default=False)
-    file_name_prefix = fields.Char(string="File Name Prefix")
+    attach_to_record = fields.Boolean(string="Kayda Ekle", default=False)
+    file_name_prefix = fields.Char(string="Dosya Adı Öneki")
     file_data = fields.Binary(
         readonly=True,
         attachment=False,
@@ -255,16 +255,16 @@ class RdsExportWizard(models.TransientModel):
             raise UserError(message)
 
         if not isinstance(value, str) or len(value) > MAX_RES_IDS_JSON_CHARS:
-            return invalid(_("The record list could not be read."))
+            return invalid(_("Kayıt listesi okunamadı."))
         try:
             payload = json.loads(value or "[]")
         except (TypeError, ValueError):
-            return invalid(_("The record list could not be read."))
+            return invalid(_("Kayıt listesi okunamadı."))
         if not isinstance(payload, list):
-            return invalid(_("The record list must be a JSON list."))
+            return invalid(_("Kayıt listesi bir JSON listesi olmalıdır."))
         if len(payload) > MAX_EXPORT_RECORDS:
             return invalid(
-                _("A maximum of %s records can be exported in one operation.")
+                _("Tek işlemde en fazla %s kayıt dışa aktarılabilir.")
                 % MAX_EXPORT_RECORDS
             )
         ids = []
@@ -276,7 +276,7 @@ class RdsExportWizard(models.TransientModel):
                 or record_id <= 0
                 or record_id > MAX_DATABASE_ID
             ):
-                return invalid(_("The record list contains an invalid record ID."))
+                return invalid(_("Kayıt listesinde geçersiz bir kayıt kimliği var."))
             if record_id not in seen:
                 ids.append(record_id)
                 seen.add(record_id)
@@ -287,7 +287,7 @@ class RdsExportWizard(models.TransientModel):
         if not isinstance(model_name, str) or model_name not in self.env.registry.models:
             if silent:
                 return False
-            raise UserError(_("Invalid source model."))
+            raise UserError(_("Geçersiz kaynak model."))
         source_model = self.env[model_name]
         if (
             getattr(source_model, "_abstract", False)
@@ -296,21 +296,21 @@ class RdsExportWizard(models.TransientModel):
         ):
             if silent:
                 return False
-            raise UserError(_("Invalid source model."))
+            raise UserError(_("Geçersiz kaynak model."))
         return source_model
 
     @api.constrains("res_model", "res_ids_json")
     def _check_source_reference(self):
         for wizard in self:
             if wizard._source_model(wizard.res_model, silent=True) is False:
-                raise ValidationError(_("Invalid source model."))
+                raise ValidationError(_("Geçersiz kaynak model."))
             if wizard._parse_record_ids(wizard.res_ids_json, silent=True) == []:
                 try:
                     payload = json.loads(wizard.res_ids_json or "[]")
                 except (TypeError, ValueError):
                     payload = None
                 if payload != []:
-                    raise ValidationError(_("The record list is invalid or exceeds the allowed limit."))
+                    raise ValidationError(_("Kayıt listesi geçersiz veya izin verilen sınırı aşıyor."))
 
     @api.constrains("file_data", "file_name", "file_mimetype")
     def _check_download_payload(self):
@@ -318,17 +318,17 @@ class RdsExportWizard(models.TransientModel):
         for wizard in self.filtered("file_data"):
             encoded = wizard.file_data
             if not isinstance(encoded, (bytes, bytearray, str)) or len(encoded) > max_encoded_size:
-                raise ValidationError(_("The export file exceeds the 100 MB limit."))
+                raise ValidationError(_("Dışa aktarım dosyası 100 MB sınırını aşıyor."))
             try:
                 decoded = base64.b64decode(encoded, validate=True)
             except (binascii.Error, TypeError, ValueError) as error:
-                raise ValidationError(_("The export file is not valid Base64 data.")) from error
+                raise ValidationError(_("Dışa aktarım dosyası geçerli Base64 verisi değil.")) from error
             if len(decoded) > MAX_EXPORT_BYTES:
-                raise ValidationError(_("The export file exceeds the 100 MB limit."))
+                raise ValidationError(_("Dışa aktarım dosyası 100 MB sınırını aşıyor."))
             if not wizard.file_name or len(wizard.file_name) > 255:
-                raise ValidationError(_("The export file name is invalid."))
+                raise ValidationError(_("Dışa aktarım dosya adı geçersiz."))
             if wizard.file_mimetype not in EXPORT_MIMETYPES:
-                raise ValidationError(_("The export file type is invalid."))
+                raise ValidationError(_("Dışa aktarım dosya türü geçersiz."))
 
     def write(self, vals):
         """Keep a rendered blob bound to the source records it came from."""
@@ -343,8 +343,8 @@ class RdsExportWizard(models.TransientModel):
             if self.sudo().filtered("file_data"):
                 raise ValidationError(
                     _(
-                        "Source records cannot be changed after output has been generated. "
-                        "Open a new export dialog."
+                        "Çıktısı oluşturulmuş bir işlemde kaynak kayıtlar değiştirilemez. "
+                        "Yeni bir dışa aktarım penceresi açın."
                     )
                 )
         return super().write(vals)
@@ -352,16 +352,16 @@ class RdsExportWizard(models.TransientModel):
     @api.model
     def open_for_records(self, records):
         if not records:
-            raise UserError(_("Select at least one record to generate a document."))
+            raise UserError(_("Belge oluşturmak için en az bir kayıt seçin."))
         if len(records) > MAX_EXPORT_RECORDS:
             raise UserError(
-                _("A maximum of %s records can be exported in one operation.")
+                _("Tek işlemde en fazla %s kayıt dışa aktarılabilir.")
                 % MAX_EXPORT_RECORDS
             )
         check_record_access(records)
         return {
             "type": "ir.actions.act_window",
-            "name": _("Print with DocuCraft"),
+            "name": _("DocuCraft Yazdır"),
             "res_model": "rds.export.wizard",
             "view_mode": "form",
             "target": "new",
@@ -740,17 +740,17 @@ class RdsExportWizard(models.TransientModel):
             if silent:
                 return source_model.browse()
             raise UserError(
-                _("One of the selected documents no longer exists; refresh the list and try again.")
+                _("Seçilen belgelerden biri artık mevcut değil; listeyi yenileyip tekrar deneyin.")
             )
         if not records and not silent:
-            raise UserError(_("No records are available for export."))
+            raise UserError(_("Dışa aktarılacak kayıt bulunamadı."))
         check_record_access(records)
         return records
 
     def _render_pdf(self, record, language_code):
         check_record_access(record)
         if not hasattr(record, "_rds_report_action_xmlid"):
-            raise UserError(_("The DocuCraft connector is not installed for the %s model.") % record._name)
+            raise UserError(_("%s modeli için DocuCraft bağlayıcısı kurulmamış.") % record._name)
         # Sales provides a separate QWeb root for every studio-editable
         # design.  Passing the selected template lets PDF and PNG use the
         # same report users edit in Odoo Studio; other connectors retain
@@ -759,10 +759,10 @@ class RdsExportWizard(models.TransientModel):
         if not isinstance(report_xmlid, str) or not re.fullmatch(
             r"[A-Za-z0-9_]+\.[A-Za-z0-9_]+", report_xmlid
         ):
-            raise UserError(_("The document report action is invalid."))
+            raise UserError(_("Belge rapor aksiyonu geçersiz."))
         report = self.env.ref(report_xmlid, raise_if_not_found=False)
         if not report or report._name != "ir.actions.report":
-            raise UserError(_("The document report action was not found: %s") % report_xmlid)
+            raise UserError(_("Belge rapor aksiyonu bulunamadı: %s") % report_xmlid)
         # Odoo intentionally resolves report actions with sudo: standard
         # internal users do not have direct read ACLs on ir.actions.report.
         # The trusted connector supplies an XMLID; validate all security-
@@ -773,9 +773,9 @@ class RdsExportWizard(models.TransientModel):
             and report.group_ids
             and set(report.group_ids.ids).isdisjoint(self.env.user.all_group_ids.ids)
         ):
-            raise AccessError(_("You do not have permission to generate this document report."))
+            raise AccessError(_("Bu belge raporunu oluşturma yetkiniz bulunmuyor."))
         if report.model != record._name or report.report_type != "qweb-pdf":
-            raise UserError(_("The document report action does not match the source model or PDF report type."))
+            raise UserError(_("Belge rapor aksiyonu kaynak model veya PDF türüyle eşleşmiyor."))
         data = {
             "rds_template_id": self.template_id.id,
             "model_name": record._name,
@@ -801,14 +801,14 @@ class RdsExportWizard(models.TransientModel):
             or not isinstance(pdf_content, (bytes, bytearray))
             or not pdf_content.startswith(b"%PDF")
         ):
-            raise UserError(_("The PDF engine did not return a valid PDF output."))
+            raise UserError(_("PDF motoru geçerli bir PDF çıktısı döndürmedi."))
         pdf_content = bytes(pdf_content)
         self._ensure_output_size(pdf_content)
         return pdf_content
 
     def _record_context(self, record, language_code):
         if not hasattr(record, "_rds_document_context"):
-            raise UserError(_("The DocuCraft connector is not installed for the %s model.") % record._name)
+            raise UserError(_("%s modeli için DocuCraft bağlayıcısı kurulmamış.") % record._name)
         extra_context = {"lang": language_code}
         field_specs = self._selected_field_specs(
             record=record,
@@ -827,12 +827,12 @@ class RdsExportWizard(models.TransientModel):
         elif isinstance(content, (bytes, bytearray)):
             content_size = len(content)
         else:
-            raise UserError(_("The document engine returned invalid file data."))
+            raise UserError(_("Belge motoru geçersiz dosya verisi döndürdü."))
         if content_size < 0 or current_size + content_size > MAX_EXPORT_BYTES:
             raise UserError(
                 _(
-                    "The generated output exceeds the 100 MB limit. Use fewer records, "
-                    "a lower PNG resolution, or smaller images."
+                    "Oluşturulan çıktı 100 MB sınırını aşıyor. Daha az kayıt, "
+                    "daha düşük PNG çözünürlüğü veya daha küçük görseller kullanın."
                 )
             )
 
@@ -890,7 +890,7 @@ class RdsExportWizard(models.TransientModel):
                     raise UserError(str(exc)) from exc
                 self._append_output(
                     outputs,
-                    "%s_Design_Preserved_Word.docx" % base_name,
+                    "%s_Word_PDF_Gorunumu.docx" % base_name,
                     content,
                     DOCX_MIMETYPE,
                 )
@@ -910,7 +910,7 @@ class RdsExportWizard(models.TransientModel):
                     raise UserError(str(exc)) from exc
                 self._append_output(
                     outputs,
-                    "%s_Editable_Word.docx" % base_name,
+                    "%s_Word_Duzenlenebilir.docx" % base_name,
                     content,
                     DOCX_MIMETYPE,
                 )
@@ -928,7 +928,7 @@ class RdsExportWizard(models.TransientModel):
                 except PngDependencyError as exc:
                     raise UserError(str(exc)) from exc
                 if not pages:
-                    raise UserError(_("The PDF contains no pages that can be converted to PNG."))
+                    raise UserError(_("PDF içinde PNG'ye dönüştürülebilecek sayfa bulunamadı."))
                 for index, page in enumerate(pages):
                     self._append_output(
                         outputs,
@@ -938,7 +938,7 @@ class RdsExportWizard(models.TransientModel):
                     )
                 continue
 
-            raise UserError(_("Unsupported output format."))
+            raise UserError(_("Desteklenmeyen çıktı formatı."))
 
         return outputs
 
@@ -953,31 +953,31 @@ class RdsExportWizard(models.TransientModel):
         if len(record_companies) > 1:
             raise ValidationError(
                 _(
-                    "Select documents from the same company in one export. "
-                    "Export different companies in separate operations."
+                    "Tek dışa aktarımda aynı şirkete ait belgeleri seçin. "
+                    "Farklı şirketleri ayrı işlemlerde dışa aktarabilirsiniz."
                 )
             )
         render_company = record_companies or self.env.company
         if not self.env.su and render_company not in self.env.companies:
-            raise AccessError(_("You do not have access to the source documents' company."))
+            raise AccessError(_("Kaynak belgelerin şirketine erişim izniniz bulunmuyor."))
         if render_company != self.env.company:
             return self.with_company(render_company)._build_output()
         check_record_access(self.template_id)
         if self.template_id not in self.available_template_ids:
-            raise ValidationError(_("The selected template is not available for this model or company."))
+            raise ValidationError(_("Seçilen şablon bu model veya şirket için kullanılamaz."))
         if self.template_id.target_model_id and self.template_id.target_model_id.model != self.res_model:
-            raise ValidationError(_("The selected template is not defined for this record model."))
+            raise ValidationError(_("Seçilen şablon bu kayıt modeli için tanımlı değildir."))
         if self.template_id.company_id and "company_id" not in records._fields:
             raise ValidationError(
-                _("A company-specific template cannot be used on a model without a company field.")
+                _("Şirkete özel şablon şirket alanı olmayan bir modelde kullanılamaz.")
             )
         if self.template_id.company_id:
             foreign_records = records.filtered(lambda item: item.company_id != self.template_id.company_id)
             if foreign_records:
-                raise ValidationError(_("A company-specific template can be used only with records from its company."))
+                raise ValidationError(_("Şirkete özel şablon yalnız kendi şirketinin kayıtlarında kullanılabilir."))
         if self.language_id and not self.language_id.active:
-            raise ValidationError(_("The selected document language is not active."))
-        language_code = self.language_id.code if self.language_id else self.env.user.lang or "en_US"
+            raise ValidationError(_("Seçilen belge dili etkin değil."))
+        language_code = self.language_id.code if self.language_id else self.env.user.lang or "tr_TR"
         outputs = []
         record_map = []
         total_output_size = 0
@@ -1014,8 +1014,8 @@ class RdsExportWizard(models.TransientModel):
         if len(content) > MAX_EXPORT_BYTES:
             raise UserError(
                 _(
-                    "The generated output exceeds the 100 MB limit. Use fewer records, "
-                    "a lower PNG resolution, or smaller images."
+                    "Oluşturulan çıktı 100 MB sınırını aşıyor. Daha az kayıt, "
+                    "daha düşük PNG çözünürlüğü veya daha küçük görseller kullanın."
                 )
             )
         # The raw transient blob is hidden from generic ORM and /web/content
@@ -1059,7 +1059,7 @@ class RdsExportWizard(models.TransientModel):
             # real caller/company are always written explicitly.
             self.env["rds.export.log"].sudo().create(
                 {
-                    "name": _("%s export") % record.display_name,
+                    "name": _("%s dışa aktarımı") % record.display_name,
                     "user_id": self.env.user.id,
                     "template_id": self.template_id.id,
                     "res_model": record._name,
@@ -1101,7 +1101,7 @@ class RdsExportWizard(models.TransientModel):
             "tag": "ranvals_document_studio.preview_export",
             "params": {
                 "url": preview_url,
-                "title": _("%s Preview") % file_name,
+                "title": _("%s Önizleme") % file_name,
             },
         }
 
@@ -1111,7 +1111,7 @@ class RdsExportWizard(models.TransientModel):
     def action_preview(self):
         self.ensure_one()
         if self.output_format != "pdf":
-            raise UserError(_("Browser preview is available only for PDF output."))
+            raise UserError(_("Tarayıcı önizlemesi yalnız PDF formatında kullanılabilir."))
         if self.record_count != 1:
-            raise UserError(_("Select exactly one record for preview."))
+            raise UserError(_("Önizleme için tek bir kayıt seçin."))
         return self._save_result(download=False)

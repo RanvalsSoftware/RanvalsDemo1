@@ -10,10 +10,8 @@ from ..tools.common import check_record_access
 RDS_LANGUAGES = [
     ("tr_TR", "Türkçe"), ("en_US", "English (US)"),
     ("en_GB", "English (UK)"),
-    ("de_DE", "Deutsch"), ("fr_FR", "Français"),
-    ("es_ES", "Español"), ("it_IT", "Italiano"),
-    ("pt_PT", "Português"), ("ru_RU", "Русский"),
-    ("ar_001", "العربية"),
+    ("ru_RU", "Русский"), ("fr_FR", "Français"),
+    ("it_IT", "Italiano"), ("ar_001", "العربية"),
 ]
 RDS_LANGUAGE_CODES = tuple(code for code, _label in RDS_LANGUAGES)
 
@@ -47,25 +45,25 @@ class RdsLanguageWizard(models.TransientModel):
             "en_US",
         )
 
-    language_code = fields.Selection(RDS_LANGUAGES, string="Interface Language", required=True,
+    language_code = fields.Selection(RDS_LANGUAGES, string="Arayüz dili", required=True,
         default=lambda self: self._default_language_code())
     language_active = fields.Boolean(compute="_compute_language_active")
     missing_language_count = fields.Integer(compute="_compute_language_active")
 
     def _check_internal_user(self):
         if not self.env.user.has_group("base.group_user"):
-            raise AccessError(_("This operation is available only to internal users."))
+            raise AccessError(_("Bu işlem yalnız iç kullanıcılar içindir."))
 
     def _selected_language(self):
         self.ensure_one()
         self._check_internal_user()
         check_record_access(self)
         if self.language_code not in RDS_LANGUAGE_CODES:
-            raise UserError(_("Unsupported language selection."))
+            raise UserError(_("Desteklenmeyen dil seçimi."))
         lang = self.env["res.lang"].with_context(active_test=False).search(
             [("code", "=", self.language_code)], limit=1)
         if not lang:
-            raise UserError(_("The language record was not found. Contact your system administrator."))
+            raise UserError(_("Dil kaydı bulunamadı. Sistem yöneticinize başvurun."))
         return lang
 
     @api.depends("language_code")
@@ -80,7 +78,7 @@ class RdsLanguageWizard(models.TransientModel):
         self.ensure_one()
         self._check_internal_user()
         if not self.env.user.has_group("base.group_system"):
-            raise AccessError(_("Only a system administrator can activate languages."))
+            raise AccessError(_("Dilleri yalnız sistem yöneticisi etkinleştirebilir."))
         lang = self._selected_language()
         # Native language installer, no sudo and no overwrite of customised terms.
         self.env["base.language.install"].create({
@@ -89,29 +87,29 @@ class RdsLanguageWizard(models.TransientModel):
         self.invalidate_recordset(["language_active", "missing_language_count"])
         return {"type": "ir.actions.act_window", "res_model": self._name,
                 "res_id": self.id, "views": [(False, "form")], "target": "new",
-                "name": _("Language Settings")}
+                "name": _("Dil ayarları")}
 
     def action_activate_supported_languages(self):
         self.ensure_one()
         self._check_internal_user()
         if not self.env.user.has_group("base.group_system"):
-            raise AccessError(_("Only a system administrator can activate languages."))
+            raise AccessError(_("Dilleri yalnız sistem yöneticisi etkinleştirebilir."))
         languages = self.env["res.lang"].with_context(active_test=False).search(
             [("code", "in", RDS_LANGUAGE_CODES)])
         if len(languages) != len(RDS_LANGUAGE_CODES):
-            raise UserError(_("The language record was not found. Contact your system administrator."))
+            raise UserError(_("Dil kaydı bulunamadı. Sistem yöneticinize başvurun."))
         self.env["base.language.install"].create({
             "lang_ids": [(6, 0, languages.ids)], "overwrite": False,
         }).lang_install()
         self.invalidate_recordset(["language_active", "missing_language_count"])
         return {"type": "ir.actions.act_window", "res_model": self._name,
                 "res_id": self.id, "views": [(False, "form")], "target": "new",
-                "name": _("Language Settings")}
+                "name": _("Dil ayarları")}
 
     def action_apply(self):
         lang = self._selected_language()
         if not lang.active:
-            raise UserError(_("This language is not active yet. A system administrator must activate it first."))
+            raise UserError(_("Bu dil henüz etkin değil. Önce sistem yöneticisi dili etkinleştirmelidir."))
         # SELF_WRITEABLE_FIELDS: only the authenticated user's own preference.
         self.env.user.write({"lang": lang.code})
         return {"type": "ir.actions.client", "tag": "reload_context"}

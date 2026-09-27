@@ -1,25 +1,5 @@
 # DocuCraft All-in-One — Odoo 19 Enterprise
 
-## English quick start
-
-DocuCraft Word PDF Report Designer is one all-in-one Odoo Enterprise add-on
-for quotations and sales orders, customer/vendor invoices and credit notes,
-RFQs and purchase orders. It exports native editable DOCX, design-preserved
-DOCX, PDF, PNG and ZIP, with 14 templates, 23 font choices, record-aware field
-selection and localized documents.
-
-1. Add the single `ranvals_document_studio` folder to your custom addons path.
-2. Run `pip install -r requirements.txt` in Odoo's Python environment.
-3. Ensure Odoo's supported `wkhtmltopdf` engine works for PDF-derived output.
-4. Restart Odoo, update the Apps list and install **DocuCraft Word PDF Report Designer**.
-
-Requirements: Odoo 19 Enterprise with Studio, deployed on Odoo.sh or an
-on-premise server. Odoo Online/SaaS and Community Edition are not supported.
-Native editable Word does not require `wkhtmltopdf`; PDF, PNG,
-design-preserved Word and ZIP do.
-
-The Turkish operational and upgrade guide follows below.
-
 Bu dağıtım gerçek anlamda **tek Odoo modülüdür**. `ranvals_document_studio`
 klasörü; çekirdek motoru, Satış, Muhasebe, Satın Alma ve Studio rapor seçiciyi
 birlikte içerir.
@@ -28,7 +8,7 @@ birlikte içerir.
 
 1. Yalnız `ranvals_document_studio` klasörünü Odoo addons dizinine kopyalayın.
 2. Uygulama listesini güncelleyin.
-3. **DocuCraft Word PDF Report Designer** uygulamasını kurun.
+3. **DocuCraft – All-in-One Document Designer for Odoo** uygulamasını kurun.
 
 Odoo; `sale_management`, `account`, `purchase` ve Enterprise `web_studio`
 bağımlılıklarını otomatik kurar. Bu nedenle bu paket Odoo 19 Enterprise içindir.
@@ -56,9 +36,7 @@ Satış siparişi, fatura/iade veya satın alma siparişi formunda:
   PNG, ZIP ve arka plan işlerinde korunur.
 - Belge dili varsayılan olarak firma dilini izler; istenirse müşteri/tedarikçi
   dili veya elle seçilen, DocuCraft etiket sözlüğü tarafından desteklenen etkin
-  bir Odoo dili kullanılabilir. Türkçe, İngilizce, Almanca, Fransızca,
-  İspanyolca, İtalyanca, Portekizce, Rusça ve Arapça belge etiketleri ile
-  modül arayüzü birlikte sağlanır.
+  bir Odoo dili kullanılabilir.
 - Başlık ve gövde için 23 yazı tipi bulunur. Odoo ile paketlenen fontların ve
   güvenli sistem fontlarının karşılıkları PDF, canlı ön izleme ve
   düzenlenebilir Word çıktısında birlikte uygulanır.
@@ -111,13 +89,3 @@ varlıklarının gelmesi için tarayıcıda sert yenileme yapın.
 pasif şablonları bulmayı sağlayan **Pasif**/**Tümü** filtreleri ve tek tıkla
 yeniden etkinleştirme görünümü yüklenir. Odoo çalışanlarını yeniden başlatıp
 tarayıcıda sert yenileme yapın.
-
-19.0.3.3.1 sürümünden 19.0.3.4.0'a yükseltirken modülü yükseltin; böylece
-tamamlanan çok dilli arayüz katalogları, firma dilini izleyen belge etiketleri,
-dil bağımsız Word dosya adları ve geliştirilmiş pasif şablon araması yüklenir.
-Odoo çalışanlarını yeniden başlatıp tarayıcıda sert yenileme yapın.
-
-19.0.3.4.0 sürümünden 19.0.3.5.0'a yükseltirken modülü yükseltin; böylece
-tasarım ekranının yatay yerleşim düzeltmesi, güvenli tam çözünürlüklü logo
-önizlemesi, doğru logo ölçeklendirmesi ve son Odoo Apps mağaza görselleri
-yüklenir. Odoo çalışanlarını yeniden başlatıp tarayıcıda sert yenileme yapın.

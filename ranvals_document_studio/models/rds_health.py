@@ -33,7 +33,7 @@ REPORT_XMLIDS = (
 
 class RdsSystemHealth(models.TransientModel):
     _name = "rds.system.health"
-    _description = "DocuCraft System Health"
+    _description = "DocuCraft Sistem Sağlığı"
 
     checked_at = fields.Datetime(readonly=True)
     line_ids = fields.One2many("rds.system.health.line", "health_id", readonly=True)
@@ -92,7 +92,7 @@ class RdsSystemHealth(models.TransientModel):
                 try:
                     version = importlib.metadata.version(distribution)
                 except importlib.metadata.PackageNotFoundError:
-                    version = _("version information unavailable")
+                    version = _("sürüm bilgisi yok")
                 checks.append(self._check("dependency", distribution, "ok", str(version)))
             except Exception as error:
                 # A broken native wheel may raise RuntimeError/ValueError (not
@@ -103,7 +103,7 @@ class RdsSystemHealth(models.TransientModel):
                     distribution,
                     exc_info=True,
                 )
-                checks.append(self._check("dependency", distribution, "error", _("Could not load: %s") % type(error).__name__))
+                checks.append(self._check("dependency", distribution, "error", _("Yüklenemedi: %s") % type(error).__name__))
 
         executable = self._find_wkhtmltopdf()
         if executable:
@@ -127,7 +127,7 @@ class RdsSystemHealth(models.TransientModel):
                 status = "warning"
             checks.append(self._check("render", "wkhtmltopdf", status, detail))
         else:
-            checks.append(self._check("render", "wkhtmltopdf", "error", _("Executable not found.")))
+            checks.append(self._check("render", "wkhtmltopdf", "error", _("Çalıştırılabilir dosya bulunamadı.")))
 
         font_roots = [Path("C:/Windows/Fonts"), Path("/usr/share/fonts"), Path("/usr/local/share/fonts")]
         available_roots = [path for path in font_roots if path.is_dir()]
@@ -138,20 +138,20 @@ class RdsSystemHealth(models.TransientModel):
             except OSError:
                 continue
         checks.append(self._check(
-            "render", _("System Fonts"), "ok" if font_count else "warning",
-            _("%s TTF/OTF fonts found.") % font_count if font_count else _("No TTF/OTF font directory was found."),
+            "render", _("Sistem fontları"), "ok" if font_count else "warning",
+            _("%s adet TTF/OTF font bulundu.") % font_count if font_count else _("TTF/OTF font dizini bulunamadı."),
         ))
 
         paper = self.env.ref("ranvals_document_studio.paperformat_rds_a4", raise_if_not_found=False)
         checks.append(self._check(
-            "configuration", _("A4 Paper Format"),
+            "configuration", _("A4 kâğıt biçimi"),
             "ok" if paper and paper._name == "report.paperformat" else "error",
-            paper.display_name if paper else _("XML ID not found."),
+            paper.display_name if paper else _("XML kimliği bulunamadı."),
         ))
         missing_reports = [xmlid for xmlid in REPORT_XMLIDS if not self.env.ref(xmlid, raise_if_not_found=False)]
         checks.append(self._check(
-            "configuration", _("Report Bindings"), "error" if missing_reports else "ok",
-            _("Missing: %s") % ", ".join(missing_reports) if missing_reports else _("%s report actions verified.") % len(REPORT_XMLIDS),
+            "configuration", _("Rapor bağlantıları"), "error" if missing_reports else "ok",
+            _("Eksik: %s") % ", ".join(missing_reports) if missing_reports else _("%s rapor aksiyonu doğrulandı.") % len(REPORT_XMLIDS),
         ))
 
         studio = self.env["ir.module.module"].sudo().search([("name", "=", "web_studio")], limit=1)
@@ -163,24 +163,24 @@ class RdsSystemHealth(models.TransientModel):
             studio_asset = False
         studio_ok = studio.state == "installed" and bool(studio_asset and Path(studio_asset).is_file())
         checks.append(self._check(
-            "configuration", _("Enterprise Studio Assets"), "ok" if studio_ok else "error",
-            _("web_studio is installed and the DocuCraft Studio assets are present.") if studio_ok else _("web_studio or a Studio asset file is missing."),
+            "configuration", _("Enterprise Studio varlıkları"), "ok" if studio_ok else "error",
+            _("web_studio kurulu ve DocuCraft Studio dosyaları mevcut.") if studio_ok else _("web_studio veya Studio varlık dosyası eksik."),
         ))
 
         cron = self.env.ref("ranvals_document_studio.ir_cron_rds_export_retention", raise_if_not_found=False)
         checks.append(self._check(
-            "maintenance", _("Retention Policy Job"),
+            "maintenance", _("Saklama politikası görevi"),
             "ok" if cron and cron.active else "warning",
-            _("Active") if cron and cron.active else _("Missing or disabled."),
+            _("Etkin") if cron and cron.active else _("Bulunamadı veya devre dışı."),
         ))
         export_cron = self.env.ref(
             "ranvals_document_studio.ir_cron_rds_export_jobs",
             raise_if_not_found=False,
         )
         checks.append(self._check(
-            "maintenance", _("Background export job"),
+            "maintenance", _("Arka plan dışa aktarım görevi"),
             "ok" if export_cron and export_cron.active else "error",
-            _("Active") if export_cron and export_cron.active else _("Missing or disabled."),
+            _("Etkin") if export_cron and export_cron.active else _("Bulunamadı veya devre dışı."),
         ))
         return checks
 
@@ -195,14 +195,14 @@ class RdsSystemHealth(models.TransientModel):
 
 class RdsSystemHealthLine(models.TransientModel):
     _name = "rds.system.health.line"
-    _description = "DocuCraft System Health Line"
+    _description = "DocuCraft Sistem Sağlığı Satırı"
     _order = "category, id"
 
     health_id = fields.Many2one("rds.system.health", required=True, ondelete="cascade")
     category = fields.Selection(
-        [("runtime", "Runtime"), ("dependency", "Dependency"), ("render", "Render"),
-         ("configuration", "Configuration"), ("maintenance", "Maintenance")], required=True
+        [("runtime", "Çalışma Ortamı"), ("dependency", "Bağımlılık"), ("render", "Render"),
+         ("configuration", "Yapılandırma"), ("maintenance", "Bakım")], required=True
     )
     name = fields.Char(required=True)
-    status = fields.Selection([("ok", "Ready"), ("warning", "Warning"), ("error", "Error")], required=True)
+    status = fields.Selection([("ok", "Hazır"), ("warning", "Uyarı"), ("error", "Hata")], required=True)
     detail = fields.Char(readonly=True)

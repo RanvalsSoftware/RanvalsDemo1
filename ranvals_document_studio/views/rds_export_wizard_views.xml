@@ -4,27 +4,27 @@
         <field name="name">rds.export.wizard.form</field>
         <field name="model">rds.export.wizard</field>
         <field name="arch" type="xml">
-            <form string="Print with DocuCraft" class="rds-export-wizard">
+            <form string="DocuCraft Yazdır" class="rds-export-wizard">
                 <sheet class="rds-export-wizard__sheet">
                     <div class="rds-export-wizard__intro">
-                        <span class="rds-export-wizard__intro-icon" aria-hidden="true"><i class="fa fa-print" title="Print with DocuCraft"/></span>
+                        <span class="rds-export-wizard__intro-icon" aria-hidden="true"><i class="fa fa-print" title="DocuCraft Yazdır"/></span>
                         <div>
-                            <h2>Print with DocuCraft</h2>
-                            <p>Choose your corporate design, document language, and output format in one place.</p>
+                            <h2>DocuCraft Yazdır</h2>
+                            <p>Kurumsal tasarımınızı, belge dilini ve çıktı biçimini tek yerden seçin.</p>
                         </div>
                     </div>
                     <notebook class="rds-export-workspace">
-                        <page string="Preview" name="preview">
+                        <page string="Önizleme" name="preview">
                             <div class="rds-export-page rds-export-page--preview">
                                 <div class="rds-export-options-grid">
                                     <section class="rds-export-option-card">
                                         <div class="rds-export-option-card__header">
                                             <span class="rds-export-option-card__icon">
-                                                <i class="fa fa-file-text-o" title="Document and design"/>
+                                                <i class="fa fa-file-text-o" title="Belge ve tasarım"/>
                                             </span>
                                             <span>
-                                                <strong>Document and Design</strong>
-                                                <small>Choose the template and the company, customer, or custom document language.</small>
+                                                <strong>Belge ve Tasarım</strong>
+                                                <small>Şablonu ve firma, müşteri veya özel belge dilini belirleyin.</small>
                                             </span>
                                         </div>
                                         <div class="rds-export-option-card__body">
@@ -49,7 +49,7 @@
                                                        readonly="language_mode != 'manual'"
                                                        force_save="1"
                                                        options="{'no_create': True}"/>
-                                                <small class="rds-export-language-note" invisible="language_mode == 'manual'">Automatic field labels are translated into this language.</small>
+                                                <small class="rds-export-language-note" invisible="language_mode == 'manual'">Otomatik alan başlıkları bu dile göre çevrilir.</small>
                                             </div>
                                         </div>
                                     </section>
@@ -57,11 +57,11 @@
                                     <section class="rds-export-option-card">
                                         <div class="rds-export-option-card__header">
                                             <span class="rds-export-option-card__icon rds-export-option-card__icon--format">
-                                                <i class="fa fa-download" title="Export options"/>
+                                                <i class="fa fa-download" title="Çıktı seçenekleri"/>
                                             </span>
                                             <span>
-                                                <strong>Export Options</strong>
-                                                <small>Choose the file type and download behavior.</small>
+                                                <strong>Çıktı Seçenekleri</strong>
+                                                <small>Dosya türünü ve indirme davranışını seçin.</small>
                                             </span>
                                         </div>
                                         <div class="rds-export-option-card__body">
@@ -74,13 +74,13 @@
                                                 <field name="dpi" nolabel="1"/>
                                             </div>
                                             <div class="rds-export-format-note alert alert-success" role="status" invisible="output_format != 'docx_editable'">
-                                                Editable Word creates headings, lines, amounts, notes, and bank details as real Word text and tables.
+                                                Düzenlenebilir Word; başlıkları, satırları, tutarları, notları ve banka bilgilerini gerçek Word metni ve tabloları olarak oluşturur.
                                             </div>
                                             <div class="rds-export-format-note alert alert-info" role="status" invisible="output_format != 'docx'">
-                                                PDF-layout Word preserves the design exactly; text cannot be edited because pages are high-resolution images.
+                                                PDF görünümündeki Word, tasarımı birebir korur; sayfalar yüksek çözünürlüklü görsel olduğu için metinler düzenlenemez.
                                             </div>
                                             <div class="rds-export-format-note alert alert-info" role="status" invisible="output_format != 'zip'">
-                                                The ZIP package includes a PDF, editable Word, PDF-layout Word, and high-resolution PNG pages for every selected record.
+                                                ZIP paketi seçilen her kayıt için PDF, düzenlenebilir Word, PDF görünümündeki Word ve yüksek çözünürlüklü PNG sayfalarını birlikte içerir.
                                             </div>
                                             <div class="rds-export-switch">
                                                 <field name="attach_to_record" nolabel="1"/>
@@ -88,7 +88,7 @@
                                             </div>
                                             <div class="rds-export-control">
                                                 <label for="file_name_prefix"/>
-                                                <field name="file_name_prefix" nolabel="1" placeholder="Optional"/>
+                                                <field name="file_name_prefix" nolabel="1" placeholder="İsteğe bağlı"/>
                                             </div>
                                         </div>
                                     </section>
@@ -97,10 +97,10 @@
                                 <section class="rds-export-preview">
                                     <div class="rds-export-preview__heading">
                                         <span>
-                                            <strong>Design Preview</strong>
-                                            <small>Shows the selected document's real data, language, design, and enabled fields.</small>
+                                            <strong>Tasarım Önizlemesi</strong>
+                                            <small>Seçili belgenin gerçek verileri, dili, tasarımı ve açık alanları gösterilir.</small>
                                         </span>
-                                        <span class="rds-export-preview__badge">Live</span>
+                                        <span class="rds-export-preview__badge">Canlı</span>
                                     </div>
                                     <field name="template_preview_html"
                                            class="rds-export-preview__content"
@@ -111,38 +111,38 @@
                             </div>
                         </page>
 
-                        <page string="Fields" name="fields">
+                        <page string="Alanlar" name="fields">
                             <div class="rds-export-page rds-export-page--fields">
                                 <section class="rds-export-fields-panel">
                                     <div class="rds-export-fields-panel__header">
                                         <div class="rds-export-fields-panel__title">
                                             <span class="rds-export-fields-panel__icon">
-                                                <i class="fa fa-sliders" title="Document fields"/>
+                                                <i class="fa fa-sliders" title="Belge alanları"/>
                                             </span>
                                             <span>
-                                                <strong>Fields Included in the Document</strong>
-                                                <small>Green fields are included in PDF, Word, PNG, and ZIP exports; gray fields are excluded. You can edit labels and drag fields to reorder them. Automatic labels follow the selected document language. You can select up to 24 document details and 12 line columns.</small>
+                                                <strong>Belgede Gösterilecek Alanlar</strong>
+                                                <small>Yeşil alanlar PDF, Word, PNG ve ZIP çıktısına eklenir; gri alanlar dışarıda kalır. Başlığı düzenleyebilir ve sürükleyerek sıralayabilirsiniz. Otomatik başlıklar seçili belge diline göre yenilenir. En fazla 24 belge bilgisi ve 12 satır sütunu seçilebilir.</small>
                                             </span>
                                         </div>
-                                        <div class="rds-export-fields-panel__summary" aria-label="Field summary">
+                                        <div class="rds-export-fields-panel__summary" aria-label="Alan özeti">
                                             <span class="rds-export-count rds-export-count--enabled">
-                                                <i class="fa fa-check-circle" title="Enabled fields"/>
-                                                <field name="enabled_field_count" nolabel="1" readonly="1"/> enabled
+                                                <i class="fa fa-check-circle" title="Açık alanlar"/>
+                                                <field name="enabled_field_count" nolabel="1" readonly="1"/> açık
                                             </span>
                                             <span class="rds-export-count">
-                                                <field name="total_field_count" nolabel="1" readonly="1"/> total
+                                                <field name="total_field_count" nolabel="1" readonly="1"/> toplam
                                             </span>
                                         </div>
                                     </div>
                                     <div class="rds-export-fields-panel__sections">
                                         <span>
-                                            <i class="fa fa-id-card-o" title="Document details"/>
-                                            Document details
+                                            <i class="fa fa-id-card-o" title="Belge bilgileri"/>
+                                            Belge bilgileri
                                             <strong><field name="metadata_field_count" nolabel="1" readonly="1"/></strong>
                                         </span>
                                         <span>
-                                            <i class="fa fa-list-alt" title="Line columns"/>
-                                            Line columns
+                                            <i class="fa fa-list-alt" title="Satır sütunları"/>
+                                            Satır sütunları
                                             <strong><field name="line_field_count" nolabel="1" readonly="1"/></strong>
                                         </span>
                                     </div>
@@ -157,17 +157,17 @@
                                             <field name="origin" column_invisible="1" readonly="1" force_save="1"/>
                                             <field name="auto_label" column_invisible="1" readonly="1" force_save="1"/>
                                             <field name="sequence" widget="handle"/>
-                                            <field name="enabled" widget="boolean_toggle" string="Include"/>
+                                            <field name="enabled" widget="boolean_toggle" string="Çıktıda"/>
                                             <field name="section"
                                                    widget="badge"
                                                    readonly="1"
                                                    force_save="1"
                                                    decoration-info="section == 'metadata'"
                                                    decoration-warning="section == 'line'"/>
-                                            <field name="label" string="Label"/>
-                                            <field name="sample_value" string="Sample Value" readonly="1" force_save="1"/>
-                                            <field name="field_path" string="Source Field" readonly="1" force_save="1" optional="show"/>
-                                            <field name="is_custom" string="Custom" widget="boolean_favorite" readonly="1" force_save="1" optional="show"/>
+                                            <field name="label" string="Başlık"/>
+                                            <field name="sample_value" string="Örnek Değer" readonly="1" force_save="1"/>
+                                            <field name="field_path" string="Kaynak Alan" readonly="1" force_save="1" optional="show"/>
+                                            <field name="is_custom" string="Özel" widget="boolean_favorite" readonly="1" force_save="1" optional="show"/>
                                         </list>
                                     </field>
                                 </section>
@@ -183,9 +183,9 @@
                     <field name="file_mimetype" invisible="1"/>
                 </sheet>
                 <footer>
-                    <button name="action_preview" type="object" string="Preview PDF" class="btn-secondary" icon="fa-eye" invisible="output_format != 'pdf' or record_count != 1"/>
-                    <button name="action_export" type="object" string="Generate and Download" class="btn-primary" icon="fa-download"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    <button name="action_preview" type="object" string="PDF Önizle" class="btn-secondary" icon="fa-eye" invisible="output_format != 'pdf' or record_count != 1"/>
+                    <button name="action_export" type="object" string="Oluştur ve İndir" class="btn-primary" icon="fa-download"/>
+                    <button string="İptal" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>
         </field>
@@ -195,16 +195,16 @@
         <field name="name">rds.field.add.wizard.form</field>
         <field name="model">rds.field.add.wizard</field>
         <field name="arch" type="xml">
-            <form string="Add Field to Template">
+            <form string="Şablona Alan Ekle">
                 <group>
                     <field name="template_id" options="{'no_create': True}"/>
                     <field name="section"/>
                     <field name="source_model_id" options="{'no_create': True}"/>
                     <field name="field_id" options="{'no_create': True}" domain="[('model_id', '=', source_model_id)]"/>
-                    <field name="field_path" placeholder="e.g. partner_id.vat"/>
+                    <field name="field_path" placeholder="Örn. partner_id.vat"/>
                     <field name="label"/>
                 </group>
-                <group string="Appearance">
+                <group string="Görünüm">
                     <field name="sequence"/>
                     <field name="icon_class"/>
                     <field name="value_type"/>
@@ -215,8 +215,8 @@
                     <field name="highlight"/>
                 </group>
                 <footer>
-                    <button name="action_add" type="object" string="Add Field" class="btn-primary"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    <button name="action_add" type="object" string="Alanı Ekle" class="btn-primary"/>
+                    <button string="İptal" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>
         </field>

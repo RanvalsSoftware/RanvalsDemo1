@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
     <record id="ir_cron_rds_export_retention" model="ir.cron">
-        <field name="name">DocuCraft: Purge old export files</field>
+        <field name="name">DocuCraft: Eski dışa aktarım dosyalarını temizle</field>
         <field name="model_id" ref="model_rds_export_log"/>
         <field name="state">code</field>
         <field name="code">model._cron_purge_expired_payloads()</field>

@@ -236,7 +236,7 @@ def is_document_language_supported(lang):
 
 
 def lang_code(lang):
-    code = document_language_prefix(lang or "en_US")
+    code = document_language_prefix(lang or "tr_TR")
     return code if code in LABELS else "en"
 
 

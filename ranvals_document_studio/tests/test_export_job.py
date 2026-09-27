@@ -345,5 +345,5 @@ class TestRdsExportJob(TransactionCase):
 
         self.assertEqual(job.state, "failed")
         self.assertFalse(job.file_data)
-        self.assertIn("source Studio report", job.error_message)
+        self.assertIn("kaynak Studio raporu", job.error_message)
         build.assert_not_called()

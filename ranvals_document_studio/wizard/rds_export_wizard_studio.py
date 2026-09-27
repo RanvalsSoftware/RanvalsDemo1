@@ -12,7 +12,7 @@ class RdsExportWizard(models.TransientModel):
         report = self.rds_source_report_id
         if report:
             if record._name != report.model or self.res_model != report.model:
-                raise ValidationError(_("The source report and document model do not match."))
+                raise ValidationError(_("Kaynak rapor ve belge modeli uyuşmuyor."))
             report._rds_sidebar_scope(record.id)
         return report
 
@@ -48,7 +48,7 @@ class RdsExportWizard(models.TransientModel):
             report.id, res_ids=[record.id], data=data
         )
         if not content or not content.startswith(b"%PDF"):
-            raise UserError(_("The PDF engine did not return a valid PDF output."))
+            raise UserError(_("PDF motoru geçerli bir PDF çıktısı döndürmedi."))
         return content
 
     def _record_context(self, record, language_code):

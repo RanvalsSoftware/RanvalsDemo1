@@ -5,40 +5,40 @@ from odoo.exceptions import AccessError
 CONNECTOR_SPECS = (
     {
         "technical_name": "account",
-        "name": "Accounting",
+        "name": "Muhasebe (Accounting)",
         "description": (
-            "Invoice and credit-note design integration installed "
-            "automatically with the All-in-One package."
+            "All-in-One paketle otomatik kurulan fatura ve iade belgesi "
+            "tasarım entegrasyonu."
         ),
         "icon": "05_accounting_document_calculator.svg",
         "tone": "green",
     },
     {
         "technical_name": "sale_management",
-        "name": "Sales",
+        "name": "Satış (Sales)",
         "description": (
-            "Quotation and sales-order design integration installed "
-            "automatically with the All-in-One package."
+            "All-in-One paketle otomatik kurulan teklif ve satış siparişi "
+            "tasarım entegrasyonu."
         ),
         "icon": "06_sales_cart.svg",
         "tone": "purple",
     },
     {
         "technical_name": "purchase",
-        "name": "Purchase",
+        "name": "Satınalma (Purchase)",
         "description": (
-            "Request-for-quotation and purchase-order design integration "
-            "installed automatically with the All-in-One package."
+            "All-in-One paketle otomatik kurulan satın alma teklifi ve "
+            "siparişi tasarım entegrasyonu."
         ),
         "icon": "07_purchase_bag.svg",
         "tone": "blue",
     },
     {
         "technical_name": "web_studio",
-        "name": "Studio Design Selector",
+        "name": "Studio Tasarım Seçici",
         "description": (
-            "Enterprise Studio report panel selector for templates, document "
-            "language, and PDF / Word / PNG / ZIP formats."
+            "All-in-One paketle kurulan Enterprise Studio rapor paneli "
+            "şablon, belge dili ve PDF / Word / PNG / ZIP seçicisi."
         ),
         "icon": "13_pdf_file.svg",
         "tone": "purple",
@@ -47,8 +47,8 @@ CONNECTOR_SPECS = (
 
 OUTPUT_FORMAT_LABELS = {
     "pdf": "PDF",
-    "docx_editable": "Word – Editable",
-    "docx": "Word – PDF Layout",
+    "docx_editable": "Word – Düzenlenebilir",
+    "docx": "Word – PDF Görünümü",
     "png": "PNG",
     "zip": "ZIP",
 }
@@ -56,7 +56,7 @@ OUTPUT_FORMAT_LABELS = {
 
 class RdsDashboard(models.AbstractModel):
     _name = "rds.dashboard"
-    _description = "DocuCraft Dashboard"
+    _description = "DocuCraft Gösterge Ekranı"
 
     @api.model
     def _get_connector_specs(self):
@@ -71,7 +71,7 @@ class RdsDashboard(models.AbstractModel):
     def get_connector_dashboard(self):
         """Return the fixed connector allow-list without bypassing module ACLs."""
         if not self.env.user.has_group("base.group_system"):
-            raise AccessError(_("Only system administrators can view connectors."))
+            raise AccessError(_("Bağlayıcıları yalnız sistem yöneticileri görüntüleyebilir."))
 
         specs = self._get_connector_specs()
         technical_names = [item["technical_name"] for item in specs]
@@ -101,13 +101,13 @@ class RdsDashboard(models.AbstractModel):
             )
             if has_update:
                 status_key = "update"
-                status_label = _("Update Available")
+                status_label = _("Güncelleme Bekliyor")
             elif is_installed:
                 status_key = "installed"
-                status_label = _("Installed")
+                status_label = _("Kurulu")
             else:
                 status_key = "missing"
-                status_label = _("Not Installed")
+                status_label = _("Kurulu Değil")
 
             connector_values.append(
                 {
@@ -149,7 +149,7 @@ class RdsDashboard(models.AbstractModel):
     ):
         """Return a paginated history payload under the caller's record rules."""
         if not self.env.user.has_group("base.group_user"):
-            raise AccessError(_("You do not have permission to view export history."))
+            raise AccessError(_("Dışa aktarım geçmişini görüntüleme yetkiniz yok."))
 
         Log = self.env["rds.export.log"]
         output_format = output_format if output_format in OUTPUT_FORMAT_LABELS else False
@@ -207,13 +207,13 @@ class RdsDashboard(models.AbstractModel):
         has_file = bool(record.has_stored_file)
         has_source_access = record._has_source_access()
         if not has_source_access:
-            status_key, status_label = "denied", _("Access Denied")
+            status_key, status_label = "denied", _("Erişim Yok")
         elif record.attached_to_record:
-            status_key, status_label = "attached", _("Attached")
+            status_key, status_label = "attached", _("Ekli")
         elif has_file:
-            status_key, status_label = "ready", _("Ready")
+            status_key, status_label = "ready", _("Hazır")
         else:
-            status_key, status_label = "missing", _("No File")
+            status_key, status_label = "missing", _("Dosya Yok")
 
         return {
             "id": record.id,

@@ -17,7 +17,7 @@
                    spellcheck="false"
                    t-att-value="value"
                    t-on-change="onTextChange"
-                   aria-label="HEX color code"/>
+                   aria-label="HEX renk kodu"/>
             <span t-else="" class="o_rds_color_picker__code" t-out="value"/>
         </div>
     </t>
@@ -28,7 +28,7 @@
                     class="form-select o_rds_font_picker__select"
                     t-att-value="value"
                     t-on-change="onFontChange"
-                    aria-label="Font selection">
+                    aria-label="Yazı tipi seçimi">
                 <option t-foreach="options" t-as="option" t-key="option[0]" t-att-value="option[0]" t-att-selected="option[0] === value">
                     <t t-out="option[1]"/>
                 </option>

@@ -136,7 +136,7 @@ SAFE_PREVIEW_PATH = re.compile(
 
 class RdsTemplate(models.Model):
     _name = "rds.template"
-    _description = "DocuCraft Document Template"
+    _description = "Ranvals Belge Şablonu"
     _order = "sequence, name, id"
 
     name = fields.Char(required=True, translate=True)
@@ -145,18 +145,18 @@ class RdsTemplate(models.Model):
     active = fields.Boolean(default=True)
     company_id = fields.Many2one(
         "res.company",
-        string="Company",
-        help="Leave empty to make the template available to every permitted company.",
+        string="Şirket",
+        help="Boş bırakılırsa şablon tüm izinli şirketlerde kullanılabilir.",
         ondelete="cascade",
     )
     target_model_id = fields.Many2one(
         "ir.model",
-        string="Target Model",
+        string="Hedef Model",
         domain="[('transient', '=', False)]",
         ondelete="cascade",
-        help="Leave empty to make the template available to every model supported by a DocuCraft connector.",
+        help="Boş bırakılırsa şablon, DocuCraft bağlayıcısı olan tüm modellerde kullanılabilir.",
     )
-    is_default = fields.Boolean(string="Default")
+    is_default = fields.Boolean(string="Varsayılan")
     layout_style = fields.Selection(
         [
             ("beauty", "Signature Burgundy"),
@@ -197,19 +197,19 @@ class RdsTemplate(models.Model):
     show_footer = fields.Boolean(default=True)
     preview_path = fields.Char(readonly=True)
     preview_html = fields.Html(compute="_compute_preview_html", sanitize=False)
-    field_ids = fields.One2many("rds.template.field", "template_id", string="Fields", copy=True)
+    field_ids = fields.One2many("rds.template.field", "template_id", string="Alanlar", copy=True)
 
     if hasattr(models, "Constraint"):
         _code_company_unique = models.Constraint(
             "UNIQUE(code, company_id)",
-            "Template codes must be unique per company.",
+            "Şablon kodu şirket bazında benzersiz olmalıdır.",
         )
     else:  # Odoo 17/18
         _sql_constraints = [
             (
                 "rds_template_code_company_unique",
                 "UNIQUE(code, company_id)",
-                "Template codes must be unique per company.",
+                "Şablon kodu şirket bazında benzersiz olmalıdır.",
             )
         ]
 
@@ -220,35 +220,35 @@ class RdsTemplate(models.Model):
     if hasattr(models, "UniqueIndex"):
         _code_company_value_unique = models.UniqueIndex(
             "(code, company_id) WHERE company_id IS NOT NULL",
-            "Template codes must be unique per company.",
+            "Şablon kodu şirket bazında benzersiz olmalıdır.",
         )
         _code_global_unique = models.UniqueIndex(
             "(code) WHERE company_id IS NULL",
-            "Template codes must be unique per company.",
+            "Şablon kodu şirket bazında benzersiz olmalıdır.",
         )
         _default_company_model_unique = models.UniqueIndex(
             "(company_id, target_model_id)"
             " WHERE is_default IS TRUE"
             " AND company_id IS NOT NULL AND target_model_id IS NOT NULL",
-            "Only one default template is allowed for the same company and target model.",
+            "Aynı şirket ve hedef model için yalnızca bir varsayılan şablon olabilir.",
         )
         _default_global_model_unique = models.UniqueIndex(
             "(target_model_id)"
             " WHERE is_default IS TRUE"
             " AND company_id IS NULL AND target_model_id IS NOT NULL",
-            "Only one default template is allowed for the same company and target model.",
+            "Aynı şirket ve hedef model için yalnızca bir varsayılan şablon olabilir.",
         )
         _default_company_generic_unique = models.UniqueIndex(
             "(company_id)"
             " WHERE is_default IS TRUE"
             " AND company_id IS NOT NULL AND target_model_id IS NULL",
-            "Only one default template is allowed for the same company and target model.",
+            "Aynı şirket ve hedef model için yalnızca bir varsayılan şablon olabilir.",
         )
         _default_global_generic_unique = models.UniqueIndex(
             "(is_default)"
             " WHERE is_default IS TRUE"
             " AND company_id IS NULL AND target_model_id IS NULL",
-            "Only one default template is allowed for the same company and target model.",
+            "Aynı şirket ve hedef model için yalnızca bir varsayılan şablon olabilir.",
         )
 
     @api.model
@@ -273,7 +273,7 @@ class RdsTemplate(models.Model):
     def copy(self, default=None):
         self.ensure_one()
         default = dict(default or {})
-        default.setdefault("name", _("%s (Copy)") % self.name)
+        default.setdefault("name", _("%s (Kopya)") % self.name)
         default.setdefault("code", self._generate_unique_code("%s_COPY" % self.code, self.company_id.id))
         default.setdefault("is_default", False)
         return super().copy(default)
@@ -310,8 +310,8 @@ class RdsTemplate(models.Model):
         for record in self:
             if record.preview_path and record._is_safe_preview_path(record.preview_path):
                 record.preview_html = Markup(
-                    '<div class="rds-template-static-preview" style="text-align:center;padding:8px;">'
-                    '<img class="rds-template-static-preview__image" src="%s" alt="%s" style="max-width:100%%;max-height:640px;border:1px solid #dde3e8;border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.08);"/>'
+                    '<div style="text-align:center;padding:8px;">'
+                    '<img src="%s" alt="%s" style="max-width:100%%;max-height:640px;border:1px solid #dde3e8;border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.08);"/>'
                     "</div>"
                 ) % (escape(record.preview_path), escape(record.name or "Template"))
             else:
@@ -329,10 +329,6 @@ class RdsTemplate(models.Model):
         localized = self.with_context(lang=resolved_lang)
         code = lang_code(resolved_lang)
         currency = company.currency_id
-        logo_bytes = localized.logo_bytes(company)
-        logo_data_uri = (
-            image_data_uri(base64.b64encode(logo_bytes)) if logo_bytes else ""
-        )
         subtotal = formatLang(
             localized.env,
             1250.0,
@@ -366,8 +362,7 @@ class RdsTemplate(models.Model):
                 "website": "",
                 "vat": "TR1234567890",
             },
-            "logo_bytes": logo_bytes,
-            "logo_data_uri": logo_data_uri,
+            "logo_bytes": localized.logo_bytes(company),
             "logo_height_mm": self.logo_height_mm,
             "layout_style": self.layout_style,
             "tagline": self.tagline or tr_label("thank_you", code),
@@ -379,10 +374,6 @@ class RdsTemplate(models.Model):
                 "document_no": tr_label("document_no", code),
                 "notes": tr_label("notes", code),
                 "bank_info": tr_label("bank_info", code),
-                "phone": tr_label("phone", code),
-                "email": tr_label("email", code),
-                "website": tr_label("website", code),
-                "tax_no": tr_label("tax_no", code),
             },
             "theme": localized.get_theme(),
             "direction": "rtl" if code == "ar" else "ltr",
@@ -492,7 +483,7 @@ class RdsTemplate(models.Model):
         for record in self.filtered("preview_path"):
             if not record._is_safe_preview_path(record.preview_path):
                 raise ValidationError(
-                    _("The preview image must come from an Odoo add-on's /static/ directory.")
+                    _("Önizleme görseli yalnızca bir Odoo eklentisinin /static/ dizininden seçilebilir.")
                 )
 
     @api.constrains("code")
@@ -500,7 +491,7 @@ class RdsTemplate(models.Model):
         for record in self:
             if not re.fullmatch(r"[A-Za-z0-9_]{1,72}", record.code or ""):
                 raise ValidationError(
-                    _("The template code must contain 1-72 letters, numbers, or underscores.")
+                    _("Şablon kodu 1-72 karakter olmalı; yalnızca harf, rakam ve alt çizgi içermelidir.")
                 )
 
     @api.constrains("code", "company_id")
@@ -514,7 +505,7 @@ class RdsTemplate(models.Model):
                 ("company_id", "=", record.company_id.id or False),
             ])
             if duplicate:
-                raise ValidationError(_("Template codes must be unique per company."))
+                raise ValidationError(_("Şablon kodu şirket bazında benzersiz olmalıdır."))
 
     @api.constrains("primary_color", "secondary_color", "accent_color", "text_color")
     def _check_colors(self):
@@ -522,13 +513,13 @@ class RdsTemplate(models.Model):
             for field_name in ("primary_color", "secondary_color", "accent_color", "text_color"):
                 value = record[field_name]
                 if value and not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
-                    raise ValidationError(_("%s must use #RRGGBB format.") % record._fields[field_name].string)
+                    raise ValidationError(_("%s alanı #RRGGBB biçiminde olmalıdır.") % record._fields[field_name].string)
 
     @api.constrains("logo_height_mm")
     def _check_logo_height(self):
         for record in self:
             if record.logo_height_mm < 8 or record.logo_height_mm > 40:
-                raise ValidationError(_("Logo height must be between 8 and 40 mm."))
+                raise ValidationError(_("Logo yüksekliği 8 ile 40 mm arasında olmalıdır."))
 
     @api.constrains("is_default", "target_model_id", "company_id")
     def _check_default_uniqueness(self):
@@ -540,7 +531,7 @@ class RdsTemplate(models.Model):
                 ("target_model_id", "=", record.target_model_id.id or False),
             ]
             if self.search_count(domain):
-                raise ValidationError(_("Only one default template is allowed for the same company and target model."))
+                raise ValidationError(_("Aynı şirket ve hedef model için yalnızca bir varsayılan şablon olabilir."))
 
     @api.constrains("target_model_id")
     def _check_metadata_field_scope(self):
@@ -551,7 +542,7 @@ class RdsTemplate(models.Model):
             )
             if invalid:
                 raise ValidationError(
-                    _("Metadata field source models must match the template target model.")
+                    _("Bilgi kartı alanlarının kaynak modeli şablonun hedef modeliyle aynı olmalıdır.")
                 )
 
     @api.model
@@ -609,7 +600,7 @@ class RdsTemplate(models.Model):
         self.ensure_one()
         return {
             "type": "ir.actions.act_window",
-            "name": _("Add Field"),
+            "name": _("Alan Ekle"),
             "res_model": "rds.field.add.wizard",
             "view_mode": "form",
             "target": "new",
@@ -765,7 +756,7 @@ class RdsTemplate(models.Model):
         if value is None or (isinstance(value, str) and value == ""):
             return ""
         if field and getattr(field, "type", None) == "boolean":
-            return _("Yes") if value else _("No")
+            return _("Evet") if value else _("Hayır")
         if value is False:
             return ""
         if hasattr(value, "_name"):
@@ -1319,9 +1310,9 @@ class RdsTemplate(models.Model):
         self.ensure_one()
         record.ensure_one()
         if not isinstance(specs, (list, tuple)):
-            raise UserError(_("The document field selection must be a valid list."))
+            raise UserError(_("Belge alanı seçimi geçerli bir liste olmalıdır."))
         if len(specs) > MAX_EXPORT_METADATA_FIELDS + MAX_EXPORT_LINE_FIELDS:
-            raise UserError(_("Too many fields were selected for one document."))
+            raise UserError(_("Tek belgede çok fazla alan seçildi."))
         catalog = {
             item["key"]: item
             for item in self.get_export_field_catalog(record, lang=lang)
@@ -1331,14 +1322,14 @@ class RdsTemplate(models.Model):
         section_counts = {"metadata": 0, "line": 0}
         for raw in specs:
             if not isinstance(raw, dict):
-                raise UserError(_("The document field selection is invalid."))
+                raise UserError(_("Belge alanı seçimi geçersiz."))
             key = raw.get("key")
             definition = catalog.get(key)
             if not definition or key in seen:
-                raise UserError(_("The selected document field is no longer available."))
+                raise UserError(_("Seçilen belge alanı artık kullanılamıyor."))
             label = raw.get("label")
             if not isinstance(label, str) or not label.strip() or len(label.strip()) > 200:
-                raise UserError(_("The document field label must contain between 1 and 200 characters."))
+                raise UserError(_("Belge alanı başlığı 1 ile 200 karakter arasında olmalıdır."))
             section = definition["section"]
             section_counts[section] += 1
             limit = (
@@ -1348,9 +1339,9 @@ class RdsTemplate(models.Model):
             )
             if section_counts[section] > limit:
                 raise UserError(
-                    _("A maximum of %(limit)s fields can be selected in %(section)s.")
+                    _("%(section)s bölümünde en fazla %(limit)s alan seçilebilir.")
                     % {
-                        "section": _("Document Information") if section == "metadata" else _("Line Columns"),
+                        "section": _("Belge Bilgileri") if section == "metadata" else _("Satır Sütunları"),
                         "limit": limit,
                     }
                 )
@@ -1558,7 +1549,7 @@ class RdsTemplate(models.Model):
             return {}
         company.ensure_one()
         if not self.env.su and company.id not in self.env.companies.ids:
-            raise AccessError(_("You do not have permission to access this company's bank information."))
+            raise AccessError(_("Bu şirketin banka bilgilerine erişim izniniz bulunmuyor."))
         partner = company.partner_id
         # Company payment coordinates are intentionally printable on its own
         # commercial documents.  Keep the elevation limited to that company's
@@ -1584,14 +1575,9 @@ class RdsTemplate(models.Model):
         self.ensure_one()
         # ``logo_web`` and resized image fields are intentionally avoided:
         # Word needs the original partner image to remain sharp at 300 DPI.
-        # Form-view RPCs may carry ``bin_size=True``; force the real payload so
-        # the designer preview never turns a display value such as "1.10 Mb"
-        # into a broken data URI.
-        full_company = company.with_context(bin_size=False)
-        full_partner = full_company.partner_id.with_context(bin_size=False)
         candidates = (
-            getattr(full_partner, "image_1920", False),
-            full_company.logo,
+            getattr(company.partner_id, "image_1920", False),
+            company.logo,
         )
         for candidate in candidates:
             if not candidate:
@@ -1618,7 +1604,6 @@ class RdsTemplate(models.Model):
             or self.env.user.lang
         )
         code = lang_code(resolved_lang)
-        logo_bytes = self.logo_bytes(company)
         labels = {
             "company_info": tr_label("company_info", code),
             "partner_info": tr_label("customer_info", code),
@@ -1626,10 +1611,6 @@ class RdsTemplate(models.Model):
             "document_no": tr_label("document_no", code),
             "notes": tr_label("notes", code),
             "bank_info": tr_label("bank_info", code),
-            "phone": tr_label("phone", code),
-            "email": tr_label("email", code),
-            "website": tr_label("website", code),
-            "tax_no": tr_label("tax_no", code),
         }
         return {
             "record": record,
@@ -1637,10 +1618,7 @@ class RdsTemplate(models.Model):
             "partner": partner,
             "company_info": self.company_info(company),
             "partner_info": self.partner_info(partner),
-            "logo_bytes": logo_bytes,
-            "logo_data_uri": (
-                image_data_uri(base64.b64encode(logo_bytes)) if logo_bytes else ""
-            ),
+            "logo_bytes": self.logo_bytes(company),
             "logo_height_mm": self.logo_height_mm,
             "layout_style": self.layout_style,
             "tagline": self.tagline or getattr(company, "report_header", False) or "",

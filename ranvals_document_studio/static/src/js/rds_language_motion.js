@@ -30,13 +30,13 @@ export class RdsLanguageButton extends Component {
             if (!this.alive) return;
             await this.action.doAction("ranvals_document_studio.action_rds_language_wizard");
         } catch (error) {
-            if (this.alive) this.notification.add(error.data?.message || error.message || _t("Could not open language settings."), { type: "danger" });
+            if (this.alive) this.notification.add(error.data?.message || error.message || _t("Dil ayarları açılamadı."), { type: "danger" });
         } finally { if (this.alive) this.state.busy = false; }
     }
 }
 RdsSidebar.components = { ...RdsSidebar.components, RdsLanguageButton };
 patch(RdsSidebar.prototype, {
-    get rdsCollapseTitle() { return this.isCollapsed ? _t("Expand menu") : _t("Collapse menu"); },
+    get rdsCollapseTitle() { return this.isCollapsed ? _t("Menüyü genişlet") : _t("Menüyü daralt"); },
     setup() {
         super.setup(...arguments);
         let stopAnimation = () => {};

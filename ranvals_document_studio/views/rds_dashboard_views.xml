@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="action_rds_connectors_dashboard" model="ir.actions.client">
-        <field name="name">Connectors</field>
+        <field name="name">Bağlayıcılar</field>
         <field name="tag">ranvals_document_studio.connectors_dashboard</field>
         <field name="path">rds-connectors</field>
     </record>
 
     <record id="action_rds_export_dashboard" model="ir.actions.client">
-        <field name="name">Export History</field>
+        <field name="name">Dışa Aktarım Geçmişi</field>
         <field name="tag">ranvals_document_studio.export_dashboard</field>
         <field name="path">rds-export-history</field>
     </record>
