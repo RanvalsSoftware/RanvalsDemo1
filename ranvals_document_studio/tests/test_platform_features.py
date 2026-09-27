@@ -231,6 +231,47 @@ class TestPlatformFeatures(TransactionCase):
                 self.assertEqual(decoded["template"]["heading_font"], font_key)
                 self.assertEqual(decoded["template"]["body_font"], font_key)
 
+    def test_05e_template_search_exposes_inactive_records(self):
+        archived = self.template.copy({
+            "name": "Archived Platform Template",
+            "code": "ARCHIVED_PLATFORM_TEMPLATE",
+            "active": False,
+            "is_default": False,
+        })
+
+        self.assertNotIn(archived, self.env["rds.template"].search([]))
+        self.assertIn(
+            archived,
+            self.env["rds.template"].search([("active", "=", False)]),
+        )
+
+        search_view = self.env.ref(
+            "ranvals_document_studio.view_rds_template_search"
+        )
+        search_arch = etree.fromstring(search_view.arch_db.encode())
+        inactive_filter = search_arch.xpath(
+            ".//filter[@name='filter_inactive']"
+        )
+        self.assertEqual(len(inactive_filter), 1)
+        self.assertEqual(
+            inactive_filter[0].get("domain"), "[('active', '=', False)]"
+        )
+        all_filter = search_arch.xpath(".//filter[@name='filter_all']")
+        self.assertEqual(len(all_filter), 1)
+        self.assertEqual(
+            all_filter[0].get("domain"),
+            "[('active', 'in', [True, False])]",
+        )
+        self.assertIn(
+            archived,
+            self.env["rds.template"].search([
+                ("active", "in", [True, False]),
+            ]),
+        )
+
+        action = self.env.ref("ranvals_document_studio.action_rds_template")
+        self.assertNotIn("search_default_filter_active", action.context)
+
     def test_06_real_record_preview_delegates_without_audit_blob(self):
         language = self.env["res.lang"].search([("active", "=", True)], limit=1)
         wizard = self.env["rds.template.preview.wizard"].create({

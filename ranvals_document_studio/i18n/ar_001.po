@@ -1,9 +1,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0+e DocuCraft 19.0.3.3.0\n"
+"Project-Id-Version: Odoo Server 19.0+e DocuCraft 19.0.3.3.1\n"
 "POT-Creation-Date: 2026-09-26 23:35+0000\n"
-"PO-Revision-Date: 2026-09-27 03:40+0300\n"
+"PO-Revision-Date: 2026-09-27 04:35+0300\n"
 "Language: ar_001\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -407,6 +407,8 @@ msgstr "نشط"
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_list
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form
 msgid "Aktif"
 msgstr "نشط"
 
@@ -4249,6 +4251,7 @@ msgstr ""
 #. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/xml/rds_dashboards.xml:0
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
 msgid "Tümü"
 msgstr "الكل"
 
@@ -5367,8 +5370,8 @@ msgstr "اختيار اللغة يدويًا"
 #. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_language.xml:0
-msgid "DocuCraft · 19.0.3.3.0"
-msgstr "DocuCraft · 19.0.3.3.0"
+msgid "DocuCraft · 19.0.3.3.1"
+msgstr "DocuCraft · 19.0.3.3.1"
 
 #. module: ranvals_document_studio
 #: model:ir.model.fields.selection,name:ranvals_document_studio.selection__rds_template__body_font__fira_mono
@@ -5548,3 +5551,19 @@ msgstr "إنشاءات • عمارة • هندسة"
 #: model:rds.template,footer_text:ranvals_document_studio.template_technology_blue
 msgid "Thank you for choosing a smarter document experience."
 msgstr "شكرًا لثقتكم بنا في عملياتكم الرقمية."
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+msgid "Pasif"
+msgstr "غير نشط"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+msgid "Pasife alınmış şablonları göster"
+msgstr "إظهار القوالب غير النشطة"
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+msgid "Aktif ve pasif bütün şablonları göster"
+msgstr "إظهار جميع القوالب النشطة وغير النشطة"

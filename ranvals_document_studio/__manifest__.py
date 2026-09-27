@@ -9,7 +9,7 @@
         "rapor seçicisini tek kurulumda sunar. "
         "Bu birleşik sürüm Odoo Enterprise Studio ile birlikte kurulur."
     ),
-    "version": "19.0.3.3.0",
+    "version": "19.0.3.3.1",
     "category": "Productivity/Documents",
     "author": "Ranvals Software",
     "website": "https://odooranvals.com",

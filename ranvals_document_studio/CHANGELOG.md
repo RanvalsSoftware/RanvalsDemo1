@@ -1,5 +1,14 @@
 # DocuCraft Changelog
 
+## 19.0.3.3.1 — 2026-09-27
+
+- Added Active, Inactive and All filters so archived DocuCraft templates can
+  always be found without changing the normal active-only opening view.
+- Added a clear inactive ribbon and kept the status toggle available in both
+  list and form views for one-click reactivation.
+- Removed the redundant default Active search chip and separated status from
+  default-template filtering for predictable search combinations.
+
 ## 19.0.3.3.0 — 2026-09-27
 
 - Split the export dialog into focused Preview and Fields pages while keeping

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 00:40+0000\n"
-"PO-Revision-Date: 2026-09-27 00:40+0000\n"
+"POT-Creation-Date: 2026-09-27 01:35+0000\n"
+"PO-Revision-Date: 2026-09-27 01:35+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -500,6 +500,8 @@ msgstr ""
 
 #. module: ranvals_document_studio
 #: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_list
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form
 msgid "Aktif"
 msgstr ""
 
@@ -2062,7 +2064,7 @@ msgstr ""
 #. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_language.xml:0
-msgid "DocuCraft · 19.0.3.3.0"
+msgid "DocuCraft · 19.0.3.3.1"
 msgstr ""
 
 #. module: ranvals_document_studio
@@ -4535,6 +4537,7 @@ msgstr ""
 #. module: ranvals_document_studio
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/xml/rds_dashboards.xml:0
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
 msgid "Tümü"
 msgstr ""
 
@@ -5505,4 +5508,20 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/ranvals_document_studio/static/src/studio/xml/report_language.xml:0
 msgid "— etkin değil"
+msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_form
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+msgid "Pasif"
+msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+msgid "Pasife alınmış şablonları göster"
+msgstr ""
+
+#. module: ranvals_document_studio
+#: model_terms:ir.ui.view,arch_db:ranvals_document_studio.view_rds_template_search
+msgid "Aktif ve pasif bütün şablonları göster"
 msgstr ""

@@ -84,3 +84,8 @@ değiştirilemez alan seçimi anlık görüntüsünü otomatik oluşturur. Ardı
 böylece yeni dil kaynağı, iki sayfalı yazdırma penceresi, font seçenekleri ve
 güncel çeviriler yüklenir. Odoo çalışanlarını yeniden başlatın ve yeni web
 varlıklarının gelmesi için tarayıcıda sert yenileme yapın.
+
+19.0.3.3.0 sürümünden 19.0.3.3.1'e yükseltirken modülü yükseltin; böylece
+pasif şablonları bulmayı sağlayan **Pasif**/**Tümü** filtreleri ve tek tıkla
+yeniden etkinleştirme görünümü yüklenir. Odoo çalışanlarını yeniden başlatıp
+tarayıcıda sert yenileme yapın.
