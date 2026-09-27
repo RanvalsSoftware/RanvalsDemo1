@@ -1,0 +1,74 @@
+EMPLOYEE QR ATTENDANCE — DOĞRULAMA RAPORU
+Sürüm: 19.0.3.0.0
+Tarih: 2026-09-27
+
+DOĞRULAMA ORTAMI
+- Odoo Community 19.0, git 4e7b84db9455086754164db5e404987c34d48eb7
+- Python 3.12.10
+- PostgreSQL 17.9
+- Windows 11 test ortamı
+- Yeni/atılabilir veritabanı ve gerçek Odoo registry
+
+PAKET VE YÜKLEME
+- Modülün boş Odoo 19 veritabanına temiz kurulumu: PASS
+- Aynı veritabanında 19.0.3.0.0 upgrade işlemi: PASS
+- Python compileall: PASS
+- Altı XML dosyasının lxml parse kontrolü: PASS
+- Manifest adı/sürümü/bağımlılıkları ve görsel dosyası kontrolü: PASS
+- Custom CSS bundle'ın Odoo asset compiler üretimi: PASS
+- Eski klinik/Shape Store referans taraması: yalnız migration belgesi ve negatif test
+
+ODOO TEST SONUCU
+- 36/36 post-install test metodu: PASS
+- Odoo runner nihai sayacı: 44 test, 0 failed, 0 error
+- Mevcut QR/güvenlik/HTTP/eşzamanlılık senaryoları: 23/23 PASS
+- Yeni puantaj/raporlama/bordro hazırlık senaryoları: 13/13 PASS
+- Bağımsız security_utils testleri: 11/11 PASS
+
+QR VE GÜVENLİK KAPSAMI
+- giriş/çıkış, idempotent replay ve eski form reddi
+- cooldown, uzun açık ve gelecekteki kayıt kontrolü
+- ağın ve telefon oturumunun submit anında yeniden doğrulanması
+- PIN, istasyon politikası, çalışan arşivleme ve idle/expiry iptali
+- kişi/istasyon/şirket ayrımı ve provenance sahteciliği reddi
+- public/portal ACL reddi ve gizli alan erişimi
+- QR-only standart kanal engeli
+- sınırlı rate-limit satırları ve şirket transfer davranışı
+- iki bağımsız PostgreSQL cursor ile eşzamanlı yarış: tek kayıt
+- gerçek HTTP/QWeb/custom CSS asset render ve güvenlik başlıkları
+
+RAPORLAMA VE BORDRO HAZIRLIK KAPSAMI
+- haftalık, aylık ve özel tarih aralığı
+- tüm-kanal ve yalnız-QR rapor kapsamlarının ayrılması
+- sabit, bölünmüş, gece yarısını aşan ve esnek takvim hesapları
+- planlanan/çalışılan/plan içi/plan dışı/eksik süre uzlaştırması
+- geç kalma, erken çıkış, eksik gün, açık kayıt ve anomali kontrolleri
+- oranı 0 olan ücretsiz fazla mesainin korunması ve negatif sürenin OVERTIME dışı kalması
+- dönem öncesinde başlayıp dönem içinde açık kalan kaydın engel oluşturması
+- taslak → incelendi → kilitli iş akışı, değişmez snapshot ve yeni revizyon
+- kilit öncesi mesai/fazla mesai/takvim/izin kaynağı değişiklik kontrolü
+- audit alanlarının RPC/import ile sahteleştirilememesi
+- yalnız Attendance Manager yetkisiyle public çalışan kayıtlarının güvenli seçimi
+- şirketler arası ve QR kaydı çalışan yeniden-atama koruması
+- PDF sağlayıcısı, izin/limit kontrolleri ve gerçek QWeb HTML render
+- ayrıntılı CSV ve bordro hazırlık CSV'sinde formül enjeksiyonu koruması
+
+OTOMATİK TESTİN YERİNE GEÇMEYEN CANLI KABULLER
+- Gerçek Odoo.sh/Nginx trusted-proxy ve istemci IP zinciri
+- İşletme Wi-Fi / mobil veri / VPN ayrım testi
+- Kurumun gerçek HTTPS alan adı ve sertifika zinciri
+- Gerçek iOS/Android telefon, kamera, yazıcı ve tarama mesafesi
+- Sunucudaki gerçek wkhtmltopdf ile son PDF görünüm/kırılım kontrolü
+- Kuruma özgü vardiya, bordro eşlemesi, KVKK ve saklama politikası
+- Eski kurulu teknik modülden müşteri verisine özel migration provası
+- Odoo Apps için gerçek İngilizce ekran görüntüleri, destek ve web adresi
+
+SINIR
+Bu çekirdek modül standart Odoo İK/mesai kayıtlarına bağlıdır ve bordro hazırlık
+saatlerini üretir. Maaş, vergi, izin/work-entry kodu veya payslip üretmez. Ülke ve
+müşteri politikasına özel Odoo Enterprise Payroll aktarımı ayrı köprü modülüdür.
+
+SONUÇ
+Kod, registry, veritabanı, güvenlik, raporlama, QWeb HTML, CSV ve asset testleri
+temizdir. Canlıya çıkıştan önce README_TR.md içindeki ağ/proxy, telefon, PDF ve
+kuruma özgü bordro kabul senaryoları staging üzerinde uygulanmalıdır.

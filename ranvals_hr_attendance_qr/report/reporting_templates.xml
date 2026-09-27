@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_attendance_batch" model="report.paperformat">
+        <field name="name">QR Attendance Period — Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">28</field>
+        <field name="margin_bottom">16</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_attendance_batch" model="ir.actions.report">
+        <field name="name">Puantaj Dönem Özeti</field>
+        <field name="model">ranvals.qr.report.batch</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ranvals_hr_attendance_qr.report_attendance_batch</field>
+        <field name="report_file">ranvals_hr_attendance_qr.report_attendance_batch</field>
+        <field name="paperformat_id" ref="paperformat_attendance_batch"/>
+        <field name="print_report_name">'Attendance_%s_%s_R%s' % (object.date_from, object.date_to, object.revision)</field>
+    </record>
+
+    <template id="report_attendance_batch">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="company" t-value="o.company_id"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Puantaj Dönem Özeti</h2>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Dönem:</strong>
+                                <span t-field="o.date_from"/> – <span t-field="o.date_to"/>
+                                <br/>
+                                <strong>Revizyon:</strong> <span t-field="o.revision"/>
+                                <br/>
+                                <strong>Kapsam:</strong> <span t-field="o.attendance_scope"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Durum:</strong> <span t-field="o.state"/>
+                                <br/>
+                                <strong>Hesaplanma:</strong> <span t-field="o.generated_at"/>
+                                <br/>
+                                <strong>Kaynak özeti:</strong>
+                                <span t-esc="(o.source_hash or '')[:16]"/>…
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning" t-if="o.blocker_count">
+                            Bu raporda <strong t-esc="o.blocker_count"/> kilitleme engeli vardır.
+                            Açık kayıt, bekleyen fazla mesai, anormal tarih/süre veya rapor kapsamı kontrol edilmelidir.
+                        </div>
+
+                        <p class="small text-muted" t-if="summary_counts[o.id] &gt; summary_limit">
+                            Personel özetinde ilk <span t-esc="summary_limit"/> satır gösteriliyor;
+                            toplam <span t-esc="summary_counts[o.id]"/> personel için CSV'yi kullanın.
+                        </p>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Personel</th>
+                                    <th>Departman</th>
+                                    <th class="text-end">Plan</th>
+                                    <th class="text-end">Çalışılan</th>
+                                    <th class="text-end">Plan İçinde</th>
+                                    <th class="text-end">Plan Dışı</th>
+                                    <th class="text-end">Eksik</th>
+                                    <th class="text-end">Onaylı FM</th>
+                                    <th class="text-end">Geç (dk)</th>
+                                    <th class="text-end">Erken (dk)</th>
+                                    <th class="text-end">Eksik Gün</th>
+                                    <th class="text-end">Engel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="summaries.get(o.id, [])" t-as="row">
+                                    <td t-esc="row['employee_name']"/>
+                                    <td t-esc="row['department_name']"/>
+                                    <td class="text-end" t-esc="'%.2f' % row['planned']"/>
+                                    <td class="text-end" t-esc="'%.2f' % row['worked']"/>
+                                    <td class="text-end" t-esc="'%.2f' % row['scheduled_worked']"/>
+                                    <td class="text-end" t-esc="'%.2f' % row['outside']"/>
+                                    <td class="text-end" t-esc="'%.2f' % row['shortfall']"/>
+                                    <td class="text-end" t-esc="'%.2f' % row['approved_overtime']"/>
+                                    <td class="text-end" t-esc="'%.0f' % row['late']"/>
+                                    <td class="text-end" t-esc="'%.0f' % row['early']"/>
+                                    <td class="text-end" t-esc="row['missing_days']"/>
+                                    <td class="text-end"
+                                        t-esc="row['open_records'] + row['pending_overtimes'] + row['anomalies']"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2">Genel Toplam</th>
+                                    <th class="text-end" t-esc="'%.2f' % o.planned_hours"/>
+                                    <th class="text-end" t-esc="'%.2f' % o.worked_hours"/>
+                                    <th class="text-end" t-esc="'%.2f' % o.scheduled_worked_hours"/>
+                                    <th class="text-end" t-esc="'%.2f' % o.outside_schedule_hours"/>
+                                    <th class="text-end" t-esc="'%.2f' % o.shortfall_hours"/>
+                                    <th class="text-end" t-esc="'%.2f' % o.approved_overtime_hours"/>
+                                    <th class="text-end" t-esc="'%.0f' % o.late_minutes"/>
+                                    <th class="text-end" t-esc="'%.0f' % o.early_minutes"/>
+                                    <th class="text-end" t-esc="o.missing_day_count"/>
+                                    <th class="text-end" t-esc="o.blocker_count"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <h4 class="mt-4">Kontrol Gerektiren Günler</h4>
+                        <p class="small text-muted" t-if="exception_counts[o.id] &gt; exception_limit">
+                            İlk <span t-esc="exception_limit"/> kayıt gösteriliyor;
+                            toplam <span t-esc="exception_counts[o.id]"/> kayıt için günlük CSV'yi kullanın.
+                        </p>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Personel</th>
+                                    <th>Durum</th>
+                                    <th class="text-end">Plan</th>
+                                    <th class="text-end">Çalışılan</th>
+                                    <th class="text-end">Eksik</th>
+                                    <th class="text-end">Açık</th>
+                                    <th class="text-end">Bekleyen FM</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="exception_lines[o.id]" t-as="line">
+                                    <td><span t-field="line.work_date"/></td>
+                                    <td t-esc="line.employee_name"/>
+                                    <td><span t-field="line.status"/></td>
+                                    <td class="text-end" t-esc="'%.2f' % line.planned_hours"/>
+                                    <td class="text-end" t-esc="'%.2f' % line.worked_hours"/>
+                                    <td class="text-end" t-esc="'%.2f' % line.shortfall_hours"/>
+                                    <td class="text-end" t-esc="line.open_attendance_count"/>
+                                    <td class="text-end" t-esc="line.pending_overtime_count"/>
+                                </tr>
+                                <tr t-if="not exception_counts[o.id]">
+                                    <td colspan="8" class="text-center">Kontrol gerektiren gün yok.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p class="small text-muted mt-3">
+                            Bu çıktı çalışma saati ve onaylı fazla mesai hazırlığıdır; ücret veya bordro fişi üretmez.
+                            Geç kalma ve erken çıkma değerleri eksik süreye ayrıca eklenmemelidir.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

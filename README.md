@@ -35,3 +35,17 @@ pip install -r requirements.txt
 
 Ardından Odoo uygulama listesini güncelleyip
 **DocuCraft – All-in-One Document Designer for Odoo** uygulamasını kurun.
+
+## Employee QR Attendance
+
+`ranvals_hr_attendance_qr` sürüm `19.0.3.0.0`; standart Odoo Çalışanlar ve
+Giriş/Çıkışlar modellerine bağlı güvenli QR mesai takibi, haftalık/aylık
+puantaj, PDF/CSV raporları ve bordro hazırlık saatleri sağlar.
+
+Modül Odoo 19 Community/Enterprise ile çalışır ve `hr_attendance`, `web` ile
+Odoo 19 requirements içinde bulunan Python `qrcode` paketini kullanır. Uygulama
+listesini güncelledikten sonra **Employee QR Attendance** adıyla kurulabilir.
+
+Ayrıntılı kurulum, ağ/proxy güvenliği ve staging kabul adımları için
+`ranvals_hr_attendance_qr/README_TR.md` belgesine bakın. Modül bordro girdilerini
+hazırlar; maaş veya payslip oluşturmaz.

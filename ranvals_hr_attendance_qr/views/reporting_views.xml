@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_attendance_qr_pivot" model="ir.ui.view">
+        <field name="name">hr.attendance.qr.pivot</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <pivot string="QR Mesai Canlı Analizi" sample="0">
+                <field name="employee_id" type="row"/>
+                <field name="date" type="col" interval="week"/>
+                <field name="worked_hours" type="measure"/>
+                <field name="overtime_hours" type="measure"/>
+                <field name="validated_overtime_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hr_attendance_qr_graph" model="ir.ui.view">
+        <field name="name">hr.attendance.qr.graph</field>
+        <field name="model">hr.attendance</field>
+        <field name="arch" type="xml">
+            <graph string="QR Mesai Eğilimi" type="bar" sample="0">
+                <field name="date" interval="week"/>
+                <field name="worked_hours" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_qr_live_analysis" model="ir.actions.act_window">
+        <field name="name">QR Mesai Canlı Analizi</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">pivot,graph,list,form</field>
+        <field name="domain">['|', ('ranvals_qr_in_station_id', '!=', False), ('ranvals_qr_out_station_id', '!=', False)]</field>
+        <field name="context">{'group_by': ['employee_id']}</field>
+        <field name="group_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_manager'))]"/>
+    </record>
+
+    <record id="action_qr_live_analysis_view_pivot" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_qr_live_analysis"/>
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_hr_attendance_qr_pivot"/>
+    </record>
+
+    <record id="action_qr_live_analysis_view_graph" model="ir.actions.act_window.view">
+        <field name="act_window_id" ref="action_qr_live_analysis"/>
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_hr_attendance_qr_graph"/>
+    </record>
+
+    <record id="view_qr_report_batch_list" model="ir.ui.view">
+        <field name="name">ranvals.qr.report.batch.list</field>
+        <field name="model">ranvals.qr.report.batch</field>
+        <field name="arch" type="xml">
+            <list string="Puantaj Dönemleri"
+                decoration-success="state == 'locked'"
+                decoration-warning="blocker_count &gt; 0 and state != 'locked'">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="attendance_scope"/>
+                <field name="revision"/>
+                <field name="worked_hours" sum="Toplam"/>
+                <field name="shortfall_hours" sum="Toplam"/>
+                <field name="approved_overtime_hours" sum="Toplam"/>
+                <field name="blocker_count"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_qr_report_batch_search" model="ir.ui.view">
+        <field name="name">ranvals.qr.report.batch.search</field>
+        <field name="model">ranvals.qr.report.batch</field>
+        <field name="arch" type="xml">
+            <search string="Puantaj Dönemleri">
+                <field name="name"/>
+                <field name="company_id"/>
+                <filter name="draft" string="Taslak" domain="[('state', '=', 'draft')]"/>
+                <filter name="review" string="İncelendi" domain="[('state', '=', 'review')]"/>
+                <filter name="locked" string="Kilitli" domain="[('state', '=', 'locked')]"/>
+                <filter name="with_blockers" string="Engeli Olan" domain="[('blocker_count', '&gt;', 0)]"/>
+                <group>
+                    <filter string="Şirket" name="group_company" context="{'group_by': 'company_id'}"/>
+                    <filter string="Durum" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Başlangıç Ayı" name="group_month" context="{'group_by': 'date_from:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_qr_report_batch_form" model="ir.ui.view">
+        <field name="name">ranvals.qr.report.batch.form</field>
+        <field name="model">ranvals.qr.report.batch</field>
+        <field name="arch" type="xml">
+            <form string="Puantaj Dönemi" create="0" duplicate="0">
+                <header>
+                    <button name="action_calculate" type="object" string="Yeniden Hesapla"
+                        class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_mark_reviewed" type="object" string="İncelendi Olarak İşaretle"
+                        class="btn-primary" invisible="state != 'draft' or not generated_at"/>
+                    <button name="action_reset_draft" type="object" string="Taslağa Al"
+                        invisible="state != 'review'"/>
+                    <button name="action_lock" type="object" string="Dönemi Kilitle"
+                        class="btn-primary" invisible="state != 'review'"
+                        confirm="Kilitlenen dönem değiştirilemez. Kaynak kayıtlar değişirse yeni revizyon oluşturmanız gerekir. Devam edilsin mi?"/>
+                    <button name="action_new_revision" type="object" string="Yeni Revizyon"/>
+                    <button name="action_print_pdf" type="object" string="PDF Özeti"
+                        invisible="not generated_at"/>
+                    <button name="action_download_detail_csv" type="object" string="Günlük CSV"
+                        invisible="not generated_at"/>
+                    <button name="action_download_payroll_csv" type="object" string="Bordro Hazırlık CSV"
+                        invisible="state != 'locked' or not payroll_ready"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,review,locked"
+                        readonly="1" options="{'clickable': False}"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Kilitli" bg_color="text-bg-success" invisible="state != 'locked'"/>
+                    <div class="alert alert-danger" role="alert" invisible="not blocker_count">
+                        Bu dönemde bordro kilidini engelleyen açık kayıt, bekleyen fazla mesai,
+                        anormal tarih/süre veya yalnız-QR kapsamı bulunuyor.
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        Geç kalma ve erken çıkma analitik göstergedir; eksik süreye ikinci kez eklenmez.
+                        CSV yalnız puantaj girdilerini hazırlar; maaş/bordro fişi, izin kodu veya ülkeye özel ücret hesabı üretmez.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="period_type"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="attendance_scope"/>
+                            <field name="revision"/>
+                        </group>
+                        <group>
+                            <field name="generated_at"/>
+                            <field name="generated_by_id"/>
+                            <field name="reviewed_at" invisible="not reviewed_at"/>
+                            <field name="reviewed_by_id" invisible="not reviewed_by_id"/>
+                            <field name="locked_at" invisible="not locked_at"/>
+                            <field name="locked_by_id" invisible="not locked_by_id"/>
+                            <field name="source_hash" widget="CopyClipboardChar"/>
+                        </group>
+                    </group>
+                    <group string="Politika Anlık Görüntüsü">
+                        <field name="late_grace_minutes"/>
+                        <field name="early_grace_minutes"/>
+                        <field name="shift_merge_minutes"/>
+                    </group>
+                    <group string="Dönem Toplamları" col="4">
+                        <field name="planned_hours"/>
+                        <field name="worked_hours"/>
+                        <field name="scheduled_worked_hours"/>
+                        <field name="outside_schedule_hours"/>
+                        <field name="shortfall_hours"/>
+                        <field name="approved_overtime_hours"/>
+                        <field name="late_minutes"/>
+                        <field name="early_minutes"/>
+                        <field name="missing_day_count"/>
+                        <field name="open_attendance_count"/>
+                        <field name="pending_overtime_count"/>
+                        <field name="anomaly_count"/>
+                        <field name="blocker_count"/>
+                        <field name="payroll_ready"/>
+                    </group>
+                    <notebook>
+                        <page string="Günlük Puantaj">
+                            <field name="day_line_ids" nolabel="1">
+                                <list create="0" edit="0" delete="0"
+                                    decoration-success="status == 'ok'"
+                                    decoration-danger="status in ('missing', 'incomplete', 'anomaly')"
+                                    decoration-warning="status in ('shortfall', 'overtime')">
+                                    <field name="work_date"/>
+                                    <field name="employee_name"/>
+                                    <field name="department_name" optional="show"/>
+                                    <field name="planned_hours" sum="Toplam"/>
+                                    <field name="worked_hours" sum="Toplam"/>
+                                    <field name="scheduled_worked_hours" optional="show" sum="Toplam"/>
+                                    <field name="outside_schedule_hours" optional="show" sum="Toplam"/>
+                                    <field name="shortfall_hours" sum="Toplam"/>
+                                    <field name="overtime_approved_hours" sum="Toplam"/>
+                                    <field name="late_minutes"/>
+                                    <field name="early_minutes"/>
+                                    <field name="open_attendance_count"/>
+                                    <field name="pending_overtime_count" optional="show"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="timezone" optional="hide"/>
+                                    <field name="calendar_name" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Bordro Hazırlık Satırları">
+                            <field name="payroll_line_ids" nolabel="1">
+                                <list create="0" edit="0" delete="0">
+                                    <field name="employee_name"/>
+                                    <field name="department_name" optional="show"/>
+                                    <field name="code"/>
+                                    <field name="hours" sum="Toplam"/>
+                                    <field name="rate"/>
+                                    <field name="weighted_hours" sum="Toplam"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Personel Kapsamı">
+                            <field name="employee_ids" widget="many2many_tags" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_qr_report_batches" model="ir.actions.act_window">
+        <field name="name">Puantaj Dönemleri</field>
+        <field name="res_model">ranvals.qr.report.batch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_qr_report_batch_search"/>
+        <field name="group_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_manager'))]"/>
+    </record>
+
+    <record id="view_qr_report_wizard_form" model="ir.ui.view">
+        <field name="name">ranvals.qr.report.wizard.form</field>
+        <field name="model">ranvals.qr.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Puantaj Raporu Oluştur">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Bordro ve toplam çalışma için “Tüm Mesai Kanalları” kapsamını kullanın.
+                        “Yalnız QR” seçimi yalnızca kullanım/istasyon denetimidir ve kilitlenemez.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            <field name="period_type"/>
+                            <field name="anchor_date" invisible="period_type == 'custom'"/>
+                            <field name="date_from" readonly="period_type != 'custom'"/>
+                            <field name="date_to" readonly="period_type != 'custom'"/>
+                            <field name="attendance_scope"/>
+                        </group>
+                        <group>
+                            <field name="department_id" domain="[('company_id', '=', company_id)]"/>
+                            <field name="employee_ids" widget="many2many_tags"
+                                domain="[('company_id', '=', company_id)]"
+                                context="{'active_test': False}"
+                                options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate" type="object" string="Hesapla ve Dönem Oluştur" class="btn-primary"/>
+                    <button string="İptal" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_qr_report_wizard" model="ir.actions.act_window">
+        <field name="name">Puantaj Raporu Oluştur</field>
+        <field name="res_model">ranvals.qr.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="group_ids" eval="[(4, ref('hr_attendance.group_hr_attendance_manager'))]"/>
+    </record>
+
+    <record id="view_qr_report_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.qr.attendance.reports</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="hr_attendance.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='hr_attendance']" position="inside">
+                <block title="QR Puantaj Raporları" name="ranvals_qr_report_settings">
+                    <setting string="Geç Kalma Toleransı" company_dependent="1"
+                        help="Ham gecikme ayrıca korunur; bu dakika yalnız politika sonrası göstergeyi azaltır.">
+                        <field name="ranvals_qr_late_grace_minutes" class="text-center" style="width: 7ch;"/>
+                        <span class="ms-2">dakika</span>
+                    </setting>
+                    <setting string="Erken Çıkma Toleransı" company_dependent="1"
+                        help="Ham erken çıkış ayrıca korunur; bu dakika yalnız politika sonrası göstergeyi azaltır.">
+                        <field name="ranvals_qr_early_grace_minutes" class="text-center" style="width: 7ch;"/>
+                        <span class="ms-2">dakika</span>
+                    </setting>
+                    <setting string="Vardiya Parçalarını Birleştir" company_dependent="1"
+                        help="Bu süreden kısa mola veya gece yarısı ayrımları aynı vardiyada değerlendirilir.">
+                        <field name="ranvals_qr_shift_merge_minutes" class="text-center" style="width: 7ch;"/>
+                        <span class="ms-2">dakika</span>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_qr_report_generate" name="Puantaj Raporu Oluştur"
+        parent="menu_ranvals_qr_root" action="action_qr_report_wizard" sequence="5"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_qr_report_batches" name="Puantaj Dönemleri"
+        parent="menu_ranvals_qr_root" action="action_qr_report_batches" sequence="6"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_qr_live_analysis" name="Canlı QR Analizi"
+        parent="menu_ranvals_qr_root" action="action_qr_live_analysis" sequence="7"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+</odoo>

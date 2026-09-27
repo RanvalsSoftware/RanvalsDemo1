@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_ranvals_qr_station_company" model="ir.rule">
+        <field name="name">Ranvals QR station: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_station"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_credential_company" model="ir.rule">
+        <field name="name">Ranvals QR credential: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_credential"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_device_company" model="ir.rule">
+        <field name="name">Ranvals QR device: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_device"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_rate_company" model="ir.rule">
+        <field name="name">Ranvals QR rate: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_rate"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_operation_company" model="ir.rule">
+        <field name="name">Ranvals QR operation: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_operation"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_report_batch_company" model="ir.rule">
+        <field name="name">QR attendance report batch: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_report_batch"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_report_day_company" model="ir.rule">
+        <field name="name">QR attendance report day: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_report_day"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_ranvals_qr_report_payroll_company" model="ir.rule">
+        <field name="name">QR attendance payroll line: allowed companies</field>
+        <field name="model_id" ref="model_ranvals_qr_report_payroll_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
