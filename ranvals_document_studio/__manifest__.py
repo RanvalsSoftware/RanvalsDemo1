@@ -1,5 +1,5 @@
 {
-    "name": "DocuCraft Word PDF Report Designer",
+    "name": "DocuCraft Word PDF Studio",
     "summary": "Design and export Odoo quotations, invoices and purchase documents as editable Word, visual Word, PDF, PNG or ZIP",
     "description": (
         "DocuCraft Word PDF Report Designer is an Odoo Enterprise document-design and export "
