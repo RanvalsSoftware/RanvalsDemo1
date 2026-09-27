@@ -90,7 +90,8 @@ class IrActionsReportLanguage(models.Model):
 
     def rds_apply_design(self, record_id=False, template_id=False, language_code=None):
         # None preserves the setting for older callers. False explicitly restores
-        # customer language. The base method checks ACLs and locks the report row.
+        # the automatic company language. The base method checks ACLs and locks
+        # the report row.
         result = super().rds_apply_design(record_id, template_id)
         if language_code is None:
             return result
@@ -128,11 +129,12 @@ class IrActionsReportLanguage(models.Model):
             raise ValidationError(_("Geçersiz kayıt veya çıktı biçimi."))
         template = self._rds_default_export_template(record)
         lang = self.env["res.lang"].search([("code", "=", code)], limit=1)
-        wizard = self.env["rds.export.wizard"].create({
+        wizard = self.env["rds.export.wizard"].with_company(company).create({
             "res_model": record._name,
             "res_ids_json": json.dumps(record.ids),
             "template_id": template.id,
             "output_format": output_format,
+            "language_mode": "manual",
             "language_id": lang.id,
             "rds_source_report_id": self.id,
         })

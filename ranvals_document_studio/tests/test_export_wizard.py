@@ -7,6 +7,7 @@ from zipfile import ZipFile
 from lxml import etree
 
 from odoo import fields
+from odoo.addons.ranvals_document_studio.models.rds_template import FONT_CSS
 from odoo.addons.ranvals_document_studio.tools.docx_editable_renderer import (
     EDITABLE_DOCX_FINGERPRINT,
     MAX_ADDRESS_LINES,
@@ -18,6 +19,7 @@ from odoo.addons.ranvals_document_studio.tools.docx_editable_renderer import (
     MAX_TEXT_CHARS,
     MAX_TOTALS,
     EditableDocxError,
+    _font,
     render_editable_docx,
 )
 from odoo.addons.ranvals_document_studio.tools.docx_renderer import (
@@ -377,6 +379,74 @@ class TestRdsExportWizard(TransactionCase):
         ]
         self.assertEqual(len(company_cells), 1)
         self.assertEqual(company_cells[0].paragraphs[1].text, "Ranvals AŞ")
+
+    def test_editable_docx_supports_every_template_font_and_script_slot(self):
+        expected_word_fonts = {
+            "serif": "Georgia",
+            "sans": "Arial",
+            "technical": "Trebuchet MS",
+            "editorial": "Georgia",
+            "lato": "Lato",
+            "roboto": "Roboto",
+            "open_sans": "Open Sans",
+            "montserrat": "Montserrat",
+            "raleway": "Raleway",
+            "oswald": "Oswald",
+            "tajawal": "Tajawal",
+            "fira_mono": "Fira Mono",
+            "humanist": "Calibri",
+            "helvetica": "Arial",
+            "verdana": "Verdana",
+            "tahoma": "Tahoma",
+            "lucida": "Lucida Sans",
+            "times": "Times New Roman",
+            "garamond": "Garamond",
+            "palatino": "Palatino Linotype",
+            "cambria": "Cambria",
+            "bookman": "Bookman Old Style",
+            "monospace": "Courier New",
+        }
+        self.assertEqual(set(expected_word_fonts), set(FONT_CSS))
+        for font_key, word_font in expected_word_fonts.items():
+            with self.subTest(font_key=font_key):
+                self.assertEqual(_font(font_key), word_font)
+                self.assertEqual(_font(FONT_CSS[font_key]), word_font)
+
+        context = self._editable_context()
+        context["theme"].update({
+            "heading_font": FONT_CSS["montserrat"],
+            "body_font": FONT_CSS["open_sans"],
+        })
+        content = render_editable_docx(context, "tr_TR")
+        with ZipFile(BytesIO(content)) as archive:
+            xml_roots = [
+                etree.fromstring(archive.read(part_name))
+                for part_name in (
+                    "word/document.xml",
+                    "word/styles.xml",
+                    "word/footer1.xml",
+                )
+            ]
+
+        namespace = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+        attribute = "{%s}%%s" % namespace["w"]
+        for word_font in ("Montserrat", "Open Sans"):
+            font_nodes = [
+                node
+                for root in xml_roots
+                for node in root.xpath(
+                    "//w:rFonts[@w:ascii=$font]",
+                    namespaces=namespace,
+                    font=word_font,
+                )
+            ]
+            self.assertTrue(font_nodes, word_font)
+            for node in font_nodes:
+                with self.subTest(word_font=word_font, xml=etree.tostring(node)):
+                    self.assertEqual(
+                        [node.get(attribute % slot) for slot in ("ascii", "hAnsi", "eastAsia", "cs")],
+                        [word_font] * 4,
+                    )
 
     def test_editable_docx_rejects_every_bounded_list_overflow(self):
         cases = {

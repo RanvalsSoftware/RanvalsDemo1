@@ -222,9 +222,21 @@ LABELS = {
 }
 
 
+DOCUMENT_LANGUAGE_PREFIXES = tuple(LABELS)
+
+
+def document_language_prefix(lang):
+    """Return the normalized language part used by the document labels."""
+    value = (lang or "").lower().replace("-", "_")
+    return value.split("_", 1)[0]
+
+
+def is_document_language_supported(lang):
+    return document_language_prefix(lang) in LABELS
+
+
 def lang_code(lang):
-    value = (lang or "tr_TR").lower().replace("-", "_")
-    code = value.split("_")[0]
+    code = document_language_prefix(lang or "tr_TR")
     return code if code in LABELS else "en"
 
 

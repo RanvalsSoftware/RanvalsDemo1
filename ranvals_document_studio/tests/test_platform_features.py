@@ -7,6 +7,7 @@ from unittest.mock import patch
 from lxml import etree
 
 from odoo import Command, fields
+from odoo.addons.ranvals_document_studio.models.rds_template import FONT_CSS
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import TransactionCase, tagged
 from odoo.tests.common import new_test_user
@@ -210,6 +211,25 @@ class TestPlatformFeatures(TransactionCase):
                 self.assertEqual(
                     decoded["template"]["layout_style"], layout_style
                 )
+
+    def test_05d_json_accepts_every_model_font_selection(self):
+        font_keys = {
+            key
+            for key, _label in self.env["rds.template"]._fields[
+                "heading_font"
+            ].selection
+        }
+        self.assertEqual(font_keys, set(FONT_CSS))
+        for font_key in font_keys:
+            with self.subTest(font_key=font_key):
+                payload = self.template._rds_portable_payload()
+                payload["template"]["heading_font"] = font_key
+                payload["template"]["body_font"] = font_key
+                decoded = self.env["rds.template"]._rds_decode_payload(
+                    json.dumps(payload)
+                )
+                self.assertEqual(decoded["template"]["heading_font"], font_key)
+                self.assertEqual(decoded["template"]["body_font"], font_key)
 
     def test_06_real_record_preview_delegates_without_audit_blob(self):
         language = self.env["res.lang"].search([("active", "=", True)], limit=1)

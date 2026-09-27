@@ -152,6 +152,11 @@
         </t>
     </template>
 
+    <template id="rds_document_number_label">
+        <t t-set="number_metadata" t-value="[item for item in ctx.get('metadata', []) if item.get('key') == 'builtin:metadata:name' or item.get('field_path') == 'name']"/>
+        <t t-out="ctx.get('labels', {}).get('document_no') or (number_metadata[0].get('label') if number_metadata else ctx.get('labels', {}).get('document_info', ''))"/>
+    </template>
+
     <template id="rds_metadata_strip">
         <div t-if="ctx.get('show_metadata') and ctx.get('metadata')" class="rds-meta-wrap" t-att-style="'background:%s;' % ctx['theme']['secondary']">
             <table class="rds-meta-table">
@@ -264,7 +269,7 @@
                     <td style="width:27%;border-right:1px solid #d8cdca;">
                         <div class="rds-title" t-att-style="'color:%s;font-family:%s;' % (ctx['theme']['primary'], ctx['theme']['heading_font'])" t-out="ctx['title']"/>
                         <div t-att-style="'width:38px;border-top:3px solid %s;margin:9px 0;' % ctx['theme']['accent']"/>
-                        <div class="rds-number">No: <strong t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['number']"/></div>
+                        <div class="rds-number"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<strong t-att-style="'color:%s;' % ctx['theme']['primary']" t-out="ctx['number']"/></div>
                     </td>
                     <td style="width:36.5%;border-right:1px solid #d8cdca;">
                         <t t-set="block_title" t-value="ctx['labels']['company_info']"/>
@@ -377,7 +382,7 @@
                         <td><t t-call="ranvals_document_studio.rds_logo"/></td>
                         <td>
                             <div style="font-size:24px;font-weight:900;" t-out="ctx['title']"/>
-                            <div class="rds-document-chip" t-att-style="'background:#fff;color:%s;margin-top:7px;' % ctx['theme']['accent']">No: <span t-out="ctx['number']"/></div>
+                            <div class="rds-document-chip" t-att-style="'background:#fff;color:%s;margin-top:7px;' % ctx['theme']['accent']"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<span t-out="ctx['number']"/></div>
                         </td>
                     </tr>
                 </table>
@@ -456,7 +461,7 @@
             <div style="margin:5mm 5px 4mm 5px;">
                 <div class="rds-title" t-att-style="'font-family:%s;color:%s;' % (ctx['theme']['heading_font'], ctx['theme']['text'])" t-out="ctx['title']"/>
                 <div t-att-style="'width:38px;border-top:3px solid %s;margin:8px 0;' % ctx['theme']['accent']"/>
-                <div class="rds-number">No: <strong t-att-style="'color:%s;' % ctx['theme']['accent']" t-out="ctx['number']"/></div>
+                <div class="rds-number"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<strong t-att-style="'color:%s;' % ctx['theme']['accent']" t-out="ctx['number']"/></div>
             </div>
             <table class="rds-two-columns">
                 <tr>
@@ -488,7 +493,7 @@
                     <td t-att-style="'width:64%;padding:16px 18px;text-align:right;background:' + ctx['theme']['primary'] + ';color:#fff;'">
                         <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
                         <div style="font-size:27px;font-weight:800;margin-top:7px;" t-out="ctx['title']"/>
-                        <div t-att-style="'font-size:11px;color:%s;margin-top:5px;' % ctx['theme']['accent']">No: <strong t-out="ctx['number']"/></div>
+                        <div t-att-style="'font-size:11px;color:%s;margin-top:5px;' % ctx['theme']['accent']"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<strong t-out="ctx['number']"/></div>
                     </td>
                 </tr>
             </table>
@@ -564,7 +569,7 @@
                         <div style="font-size:34px;font-weight:900;line-height:.95;letter-spacing:-1px;" t-out="ctx['title']"/>
                     </td>
                     <td t-att-style="'width:32%;padding:0 0 0 12px;border-left:6px solid ' + ctx['theme']['accent'] + ';'">
-                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:1px;">Document No.</div>
+                        <div style="font-size:8px;text-transform:uppercase;letter-spacing:1px;"><t t-call="ranvals_document_studio.rds_document_number_label"/></div>
                         <div style="font-size:20px;font-weight:900;margin-top:4px;" t-out="ctx['number']"/>
                     </td>
                 </tr>
@@ -651,7 +656,7 @@
             </table>
             <div t-att-style="'background:%s;color:#fff;text-align:center;padding:17px;border-bottom:4px solid %s;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
                 <div style="font-size:27px;font-weight:700;" t-out="ctx['title']"/>
-                <div style="font-size:11px;margin-top:5px;">No: <strong t-out="ctx['number']"/></div>
+                <div style="font-size:11px;margin-top:5px;"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<strong t-out="ctx['number']"/></div>
             </div>
             <table class="rds-three-columns" style="background:#fff;border:1px solid #d8e2dc;margin-top:0;">
                 <tr>
@@ -672,7 +677,7 @@
             <div t-att-style="'border-top:1px solid %s;border-bottom:3px double %s;text-align:center;padding:13px 8px;' % (ctx['theme']['primary'], ctx['theme']['accent'])">
                 <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;" t-out="ctx.get('tagline')"/>
                 <div style="font-size:29px;font-weight:700;margin-top:6px;" t-out="ctx['title']"/>
-                <div t-att-style="'font-size:11px;color:%s;margin-top:6px;' % ctx['theme']['accent']">No. <strong t-out="ctx['number']"/></div>
+                <div t-att-style="'font-size:11px;color:%s;margin-top:6px;' % ctx['theme']['accent']"><t t-call="ranvals_document_studio.rds_document_number_label"/>&#160;<strong t-out="ctx['number']"/></div>
             </div>
             <table class="rds-two-columns" style="margin-top:7mm;">
                 <tr>

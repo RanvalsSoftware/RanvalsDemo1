@@ -99,31 +99,14 @@ class RdsQuickExportMixin(models.AbstractModel):
                 return Template.browse()
         return selected
 
-    def _rds_quick_export_language(self, records):
-        """Prefer a common partner language; otherwise use the user's language."""
-        partner_codes = {
-            partner.lang
-            for partner in records.mapped("partner_id")
-            if partner and partner.lang
-        }
-        language_code = (
-            next(iter(partner_codes))
-            if len(partner_codes) == 1
-            else self.env.user.lang
+    def _rds_quick_export_language(self, records, mode="company"):
+        """Use the export wizard's single source of truth for automatic languages."""
+        company = getattr(records[:1], "company_id", False) or self.env.company
+        return (
+            self.env["rds.export.wizard"]
+            .with_company(company)
+            ._automatic_language(records, mode)
         )
-        Language = self.env["res.lang"]
-        language = Language.search(
-            [("code", "=", language_code), ("active", "=", True)], limit=1
-        )
-        if not language and language_code != self.env.user.lang:
-            language = Language.search(
-                [
-                    ("code", "=", self.env.user.lang),
-                    ("active", "=", True),
-                ],
-                limit=1,
-            )
-        return language
 
     def _rds_open_quick_export_selector(self, records, output_format):
         action = self.env["rds.export.wizard"].open_for_records(records)
@@ -142,13 +125,15 @@ class RdsQuickExportMixin(models.AbstractModel):
         if not template:
             return self._rds_open_quick_export_selector(records, output_format)
 
-        language = self._rds_quick_export_language(records)
+        language_mode = "company"
+        language = self._rds_quick_export_language(records, language_mode)
         wizard = self.env["rds.export.wizard"].with_company(company).create(
             {
                 "res_model": records._name,
                 "res_ids_json": json.dumps(records.ids),
                 "template_id": template.id,
                 "output_format": output_format,
+                "language_mode": language_mode,
                 "language_id": language.id or False,
             }
         )

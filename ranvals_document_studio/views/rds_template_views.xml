@@ -68,37 +68,44 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Önizleme" name="preview" class="rds-template-preview-page">
-                            <div class="rds-preview-stage">
-                                <field name="preview_html" widget="html" nolabel="1" readonly="1"/>
+                        <page string="Önizleme" name="preview">
+                            <div class="rds-template-preview-page">
+                                <div class="rds-preview-stage"
+                                     role="region"
+                                     aria-label="Belge şablonu önizlemesi"
+                                     tabindex="0">
+                                    <field name="preview_html" widget="html" nolabel="1" readonly="1"/>
+                                </div>
                             </div>
                         </page>
-                        <page string="Tasarım" name="design" class="rds-template-design-page">
-                            <div class="rds-template-settings-grid">
-                                <section class="rds-template-settings-card">
-                                    <div class="rds-template-settings-card__header">
-                                        <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Renkler"/></span>
-                                        <span><strong>Renkler</strong><small>Şablonunuzda kullanılan renk paletini özelleştirin.</small></span>
-                                    </div>
-                                    <group col="1" class="rds-template-settings-card__fields">
-                                    <field name="primary_color"/>
-                                    <field name="secondary_color"/>
-                                    <field name="accent_color"/>
-                                    <field name="text_color"/>
-                                    </group>
-                                </section>
-                                <section class="rds-template-settings-card">
-                                    <div class="rds-template-settings-card__header">
-                                        <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Tipografi"/></span>
-                                        <span><strong>Tipografi</strong><small>Yazı tiplerini ve metin ayarlarını yönetin.</small></span>
-                                    </div>
-                                    <group col="1" class="rds-template-settings-card__fields">
-                                    <field name="heading_font"/>
-                                    <field name="body_font"/>
-                                    <field name="tagline"/>
-                                    <field name="footer_text"/>
-                                    </group>
-                                </section>
+                        <page string="Tasarım" name="design">
+                            <div class="rds-template-design-page">
+                                <div class="rds-template-settings-grid">
+                                    <section class="rds-template-settings-card">
+                                        <div class="rds-template-settings-card__header">
+                                            <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Renkler"/></span>
+                                            <span><strong>Renkler</strong><small>Şablonunuzda kullanılan renk paletini özelleştirin.</small></span>
+                                        </div>
+                                        <group col="1" class="rds-template-settings-card__fields">
+                                        <field name="primary_color"/>
+                                        <field name="secondary_color"/>
+                                        <field name="accent_color"/>
+                                        <field name="text_color"/>
+                                        </group>
+                                    </section>
+                                    <section class="rds-template-settings-card">
+                                        <div class="rds-template-settings-card__header">
+                                            <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Tipografi"/></span>
+                                            <span><strong>Tipografi</strong><small>Yazı tiplerini ve metin ayarlarını yönetin.</small></span>
+                                        </div>
+                                        <group col="1" class="rds-template-settings-card__fields">
+                                        <field name="heading_font"/>
+                                        <field name="body_font"/>
+                                        <field name="tagline"/>
+                                        <field name="footer_text"/>
+                                        </group>
+                                    </section>
+                                </div>
                             </div>
                         </page>
                         <page string="Bloklar" name="blocks" class="rds-template-blocks-page">

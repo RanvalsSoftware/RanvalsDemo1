@@ -20,8 +20,33 @@ class RdsLanguageWizard(models.TransientModel):
     _name = "rds.language.wizard"
     _description = "Document Studio Language"
 
+    @api.model
+    def _default_language_code(self):
+        """Prefer the active company language without returning an inactive code."""
+        active_codes = set(
+            self.env["res.lang"].search(
+                [
+                    ("code", "in", RDS_LANGUAGE_CODES),
+                    ("active", "=", True),
+                ]
+            ).mapped("code")
+        )
+        candidates = (
+            self.env.company.partner_id.lang,
+            self.env.user.lang,
+            "en_US",
+            "en_GB",
+        )
+        for code in candidates:
+            if code in active_codes:
+                return code
+        return next(
+            (code for code, _label in RDS_LANGUAGES if code in active_codes),
+            "en_US",
+        )
+
     language_code = fields.Selection(RDS_LANGUAGES, string="Arayüz dili", required=True,
-        default=lambda self: self.env.user.lang if self.env.user.lang in RDS_LANGUAGE_CODES else "en_GB")
+        default=lambda self: self._default_language_code())
     language_active = fields.Boolean(compute="_compute_language_active")
     missing_language_count = fields.Integer(compute="_compute_language_active")
 
@@ -96,15 +121,27 @@ class RdsTemplateLocalization(models.Model):
     @api.depends(
         "preview_path",
         "name",
+        "layout_style",
         "primary_color",
         "secondary_color",
         "accent_color",
         "text_color",
         "heading_font",
         "body_font",
+        "logo_height_mm",
         "tagline",
+        "footer_text",
+        "show_company",
+        "show_partner",
+        "show_metadata",
+        "show_notes",
+        "show_bank",
+        "show_footer",
+        "company_id",
+        "company_id.partner_id.lang",
+        "target_model_id",
     )
-    @api.depends_context("lang")
+    @api.depends_context("lang", "company")
     def _compute_preview_html(self):
         # The base model renders a safe palette-driven preview whenever a
         # static screenshot is unavailable.  Keep language invalidation but

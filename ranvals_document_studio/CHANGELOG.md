@@ -1,5 +1,26 @@
 # DocuCraft Changelog
 
+## 19.0.3.3.0 — 2026-09-27
+
+- Split the export dialog into focused Preview and Fields pages while keeping
+  the download actions fixed and easy to reach.
+- Fixed the first field toggle dropping hidden technical values, breaking the
+  live preview and preventing the transient export form from being saved.
+- Removed smart-button counters, warning payloads, widget JSON and standard
+  line-form implementation fields from automatic field discovery while
+  retaining real list columns and customer-created Studio fields.
+- Normalized copied field labels and samples so tabs, line breaks and blank
+  widget headings cannot appear as `&#x9;`, `&#x20;` or raw JSON in the chooser.
+- Added automatic company-language documents, optional customer/vendor
+  language and a manual language override; automatic labels follow the
+  resolved, supported active Odoo language without overwriting user-edited
+  headings.
+- Replaced the small generic template thumbnail with the selected real QWeb
+  layout rendered on a safe, localized A4-style sample.
+- Expanded heading and body typography from four to twenty-three choices,
+  including Odoo-bundled Lato, Roboto, Open Sans, Montserrat, Raleway, Oswald,
+  Tajawal and Fira Mono, with matching PDF, live-preview, JSON and DOCX rules.
+
 ## 19.0.3.2.0 — 2026-09-27
 
 - Replaced the generic placeholder thumbnail with a live preview of the

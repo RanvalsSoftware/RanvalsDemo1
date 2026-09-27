@@ -139,6 +139,43 @@ class TestStudioReportDesign(TransactionCase):
             self.assertIn(self.order.name.encode(), content)
             self.assertIn(template.primary_color.lower().encode(), content.lower())
 
+    def test_numbered_design_headers_use_localized_context_label(self):
+        turkish = self.env["res.lang"].with_context(active_test=False).search(
+            [("code", "=", "tr_TR")], limit=1
+        )
+        self.assertTrue(turkish)
+        turkish.active = True
+        for suffix, layout_xmlid in (
+            ("beauty_premium", "rds_layout_beauty"),
+            ("industrial_red", "rds_layout_industrial"),
+            ("furniture_terracotta", "rds_layout_furniture"),
+            ("noir_executive", "rds_layout_noir_executive"),
+            ("swiss_grid", "rds_layout_swiss_grid"),
+            ("emerald_ledger", "rds_layout_emerald_ledger"),
+            ("sandstone_classic", "rds_layout_sandstone_classic"),
+        ):
+            with self.subTest(layout=suffix):
+                template = self.env.ref(
+                    "ranvals_document_studio.template_%s" % suffix
+                )
+                context = self.order._rds_document_context(template, "tr_TR")
+                context["show_metadata"] = False
+                context["company"] = False
+                content = str(
+                    self.env["ir.qweb"].with_context(lang="tr_TR")._render(
+                        "ranvals_document_studio.%s" % layout_xmlid,
+                        {
+                            "ctx": context,
+                            "rds_template": template,
+                            "report_type": "html",
+                        },
+                    )
+                )
+                self.assertEqual(content.upper().count("BELGE NO"), 1)
+                self.assertNotIn("Document No.", content)
+                self.assertNotIn(">No:", content)
+                self.assertNotIn(">No.", content)
+
     def test_proforma_title_survives_design_selection(self):
         self.proforma.rds_apply_design(self.order.id, self.beauty.id)
         content, _kind = self.env["ir.actions.report"].with_context(lang="en_US")._render_qweb_html(
@@ -220,6 +257,35 @@ class TestStudioReportDesign(TransactionCase):
         )
         self.assertEqual(wizard.output_format, "docx_editable")
 
+    def test_studio_selector_uses_company_language_by_default(self):
+        self.env["rds.report.language"].search([
+            ("report_id", "=", self.report.id),
+            ("company_id", "=", self.order.company_id.id),
+        ]).unlink()
+        company_language = self.env["res.lang"].with_context(
+            active_test=False
+        ).search([("code", "=", "tr_TR")], limit=1)
+        self.assertTrue(company_language)
+        company_language.active = True
+        self.order.company_id.partner_id.lang = company_language.code
+        self.assertNotEqual(self.order.partner_id.lang, company_language.code)
+        expected = {"type": "ir.actions.client", "tag": "test.download"}
+        export_model = type(self.env["rds.export.wizard"])
+        with patch.object(
+            export_model,
+            "action_export",
+            autospec=True,
+            return_value=expected,
+        ):
+            result = self.report.rds_export_design(self.order.id, "pdf")
+
+        self.assertEqual(result, expected)
+        wizard = self.env["rds.export.wizard"].search(
+            [("res_model", "=", "sale.order")], order="id desc", limit=1
+        )
+        self.assertEqual(wizard.language_mode, "company")
+        self.assertEqual(wizard.language_id, company_language)
+
     def test_report_data_requires_a_mapping(self):
         immutable = MappingProxyType({"lang": "en_US"})
         self.assertEqual(self.report._rds_report_data(immutable), {"lang": "en_US"})
@@ -265,6 +331,7 @@ class TestStudioReportDesign(TransactionCase):
             [("res_model", "=", "sale.order")], order="id desc", limit=1
         )
         self.assertEqual(wizard.output_format, "zip")
+        self.assertEqual(wizard.language_mode, "manual")
         self.assertEqual(wizard.language_id.code, "en_US")
 
     def test_language_setting_is_independent_and_clearable(self):
@@ -285,7 +352,7 @@ class TestStudioReportDesign(TransactionCase):
         self.assertEqual(options["language_code"], "en_US")
         self.assertTrue(options["has_saved_configuration"])
 
-        # Explicit false restores automatic customer language and deletes the
+        # Explicit false restores automatic company language and deletes the
         # now-empty configuration.
         self.report.rds_apply_design(self.order.id, False, False)
         options = self.report.rds_get_design_options(self.order.id)

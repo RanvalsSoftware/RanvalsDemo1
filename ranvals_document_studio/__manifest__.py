@@ -9,7 +9,7 @@
         "rapor seçicisini tek kurulumda sunar. "
         "Bu birleşik sürüm Odoo Enterprise Studio ile birlikte kurulur."
     ),
-    "version": "19.0.3.2.0",
+    "version": "19.0.3.3.0",
     "category": "Productivity/Documents",
     "author": "Ranvals Software",
     "website": "https://odooranvals.com",
@@ -69,6 +69,9 @@
     ],
     "assets": {
         "web.assets_backend": [
+            # Load Odoo's bundled report faces in the designer as well, so
+            # the font picker sample matches the PDF/QWeb output.
+            "web/static/fonts/fonts.scss",
             "ranvals_document_studio/static/src/scss/rds_sidebar.scss",
             "ranvals_document_studio/static/src/scss/rds_views.scss",
             "ranvals_document_studio/static/src/js/rds_download.js",

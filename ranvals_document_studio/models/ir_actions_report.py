@@ -172,21 +172,21 @@ class IrActionsReport(models.Model):
         return template
 
     def rds_export_design(self, record_id, output_format="pdf"):
-        record, _company = self._rds_sidebar_scope(record_id)
+        record, company = self._rds_sidebar_scope(record_id)
         if not record:
             raise UserError(_("İndirmek için sağ üstten gerçek bir belge kaydı seçin."))
         if output_format not in ("pdf", "docx", "docx_editable", "png", "zip"):
             raise ValidationError(_("Desteklenmeyen çıktı biçimi."))
         template = self._rds_default_export_template(record)
-        language = self.env["res.lang"].search([
-            ("code", "=", record.partner_id.lang or self.env.user.lang or "en_US"),
-            ("active", "=", True),
-        ], limit=1)
-        wizard = self.env["rds.export.wizard"].create({
+        language_mode = "company"
+        Wizard = self.env["rds.export.wizard"].with_company(company)
+        language = Wizard._automatic_language(record, language_mode)
+        wizard = Wizard.create({
             "res_model": record._name,
             "res_ids_json": json.dumps(record.ids),
             "template_id": template.id,
             "output_format": output_format,
+            "language_mode": language_mode,
             "language_id": language.id or False,
             "rds_source_report_id": self.id,
         })

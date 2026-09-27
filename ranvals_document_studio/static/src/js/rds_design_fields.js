@@ -5,21 +5,7 @@ import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 const HEX_RE = /^#[0-9A-F]{6}$/;
-
-const FONT_OPTIONS = [
-    ["serif", "Kurumsal Serif"],
-    ["sans", "Modern Sans Serif"],
-    ["technical", "Teknik Sans Serif"],
-    ["editorial", "Editoryal"],
-];
-const FONT_VALUES = new Set(FONT_OPTIONS.map(([value]) => value));
-
-const FONT_CSS = {
-    serif: "Georgia, 'Times New Roman', serif",
-    sans: "Arial, Helvetica, sans-serif",
-    technical: "'Trebuchet MS', Arial, sans-serif",
-    editorial: "Georgia, 'Times New Roman', serif",
-};
+const FALLBACK_FONT_CSS = "Arial, sans-serif";
 
 function normalizeHex(value) {
     let normalized = String(value || "").trim().toUpperCase();
@@ -76,15 +62,24 @@ export class RdsFontPicker extends Component {
     }
 
     get options() {
-        return FONT_OPTIONS;
+        const selection = this.props.record.fields[this.props.name]?.selection;
+        return Array.isArray(selection) ? selection.filter((option) => option[1] !== "") : [];
+    }
+
+    get fontCss() {
+        const cssFieldName = `${this.props.name}_css`;
+        const cssValue = this.props.record.data[cssFieldName];
+        return typeof cssValue === "string" && cssValue.trim()
+            ? cssValue
+            : FALLBACK_FONT_CSS;
     }
 
     get sampleStyle() {
-        return `font-family:${FONT_CSS[this.value] || FONT_CSS.sans};`;
+        return `font-family:${this.fontCss};`;
     }
 
     get currentLabel() {
-        const option = FONT_OPTIONS.find(([value]) => value === this.value);
+        const option = this.options.find(([value]) => value === this.value);
         return option ? option[1] : this.value;
     }
 
@@ -93,7 +88,8 @@ export class RdsFontPicker extends Component {
             return;
         }
         const value = event.target.value;
-        if (!FONT_VALUES.has(value) || value === this.value) {
+        const isSupported = this.options.some(([optionValue]) => optionValue === value);
+        if (!isSupported || value === this.value) {
             event.target.value = this.value;
             return;
         }

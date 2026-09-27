@@ -11,7 +11,13 @@ from odoo.exceptions import AccessError, MissingError, UserError, ValidationErro
 from odoo.tools.image import image_data_uri
 
 from ..tools.archive import build_zip_archive
-from ..tools.common import check_record_access, safe_filename
+from ..tools.common import (
+    DOCUMENT_LANGUAGE_PREFIXES,
+    check_record_access,
+    document_language_prefix,
+    is_document_language_supported,
+    safe_filename,
+)
 from ..tools.docx_editable_renderer import EditableDocxError, render_editable_docx
 from ..tools.docx_renderer import DocxDependencyError, render_docx
 from ..tools.png_renderer import PngDependencyError, render_png_pages
@@ -29,6 +35,14 @@ EXPORT_MIMETYPES = {
     "application/zip",
     "image/png",
 }
+DOCUMENT_LANGUAGE_DOMAIN = [
+    ("active", "=", True),
+    *(["|"] * (len(DOCUMENT_LANGUAGE_PREFIXES) - 1)),
+    *[
+        ("code", "=ilike", "%s_%%" % prefix)
+        for prefix in DOCUMENT_LANGUAGE_PREFIXES
+    ],
+]
 
 
 _logger = logging.getLogger(__name__)
@@ -68,7 +82,7 @@ class RdsExportFieldLine(models.TransientModel):
     @api.constrains("label", "field_key", "field_path")
     def _check_safe_values(self):
         for line in self:
-            if not line.label or len(line.label.strip()) > 200:
+            if not line.label or not line.label.strip() or len(line.label.strip()) > 200:
                 raise ValidationError(
                     _("Belge alanı başlığı 1 ile 200 karakter arasında olmalıdır.")
                 )
@@ -168,7 +182,21 @@ class RdsExportWizard(models.TransientModel):
         default="150",
         required=True,
     )
-    language_id = fields.Many2one("res.lang", string="Belge Dili", domain="[('active', '=', True)]")
+    language_mode = fields.Selection(
+        [
+            ("company", "Firma dili (otomatik)"),
+            ("partner", "Müşteri / tedarikçi dili"),
+            ("manual", "Dili elle seç"),
+        ],
+        string="Dil Kaynağı",
+        required=True,
+        default="company",
+    )
+    language_id = fields.Many2one(
+        "res.lang",
+        string="Belge Dili",
+        domain=DOCUMENT_LANGUAGE_DOMAIN,
+    )
     attach_to_record = fields.Boolean(string="Kayda Ekle", default=False)
     file_name_prefix = fields.Char(string="Dosya Adı Öneki")
     file_data = fields.Binary(
@@ -178,6 +206,46 @@ class RdsExportWizard(models.TransientModel):
     )
     file_name = fields.Char(readonly=True)
     file_mimetype = fields.Char(readonly=True)
+
+    @api.model
+    def _active_language(self, preferred_code=None):
+        Language = self.env["res.lang"]
+        active_supported = Language.search(DOCUMENT_LANGUAGE_DOMAIN, order="code")
+        by_code = {language.code: language for language in active_supported}
+
+        # Preserve every active locale variant for which the renderer has a
+        # LABELS entry (for example de_DE, es_MX or pt_BR).  An unsupported
+        # preferred language must not silently inherit an unrelated user
+        # language: English is the deterministic document fallback.
+        candidate_codes = []
+        if preferred_code and is_document_language_supported(preferred_code):
+            candidate_codes.append(preferred_code)
+            preferred_prefix = document_language_prefix(preferred_code)
+            same_language = active_supported.filtered(
+                lambda language: document_language_prefix(language.code)
+                == preferred_prefix
+            )[:1]
+            if same_language:
+                candidate_codes.append(same_language.code)
+        elif not preferred_code and is_document_language_supported(self.env.user.lang):
+            candidate_codes.append(self.env.user.lang)
+        candidate_codes.extend(("en_US", "en_GB"))
+
+        for code in dict.fromkeys(candidate_codes):
+            if code in by_code:
+                return by_code[code]
+        return active_supported[:1]
+
+    @api.model
+    def _automatic_language(self, records, mode="company"):
+        record = records[:1]
+        company = getattr(record, "company_id", False) or self.env.company
+        partner = getattr(record, "partner_id", False)
+        if mode == "partner" and partner:
+            preferred_code = partner.lang
+        else:
+            preferred_code = company.partner_id.lang
+        return self._active_language(preferred_code)
 
     @api.model
     def _parse_record_ids(self, value, silent=False):
@@ -309,7 +377,6 @@ class RdsExportWizard(models.TransientModel):
     def default_get(self, fields_list):
         values = super().default_get(fields_list)
         template = self.env["rds.template"]
-        language = self.env["res.lang"]
         model_name = values.get("res_model") or self.env.context.get("active_model")
         context_ids = self.env.context.get("active_ids") or (
             [self.env.context.get("active_id")] if self.env.context.get("active_id") else []
@@ -334,9 +401,8 @@ class RdsExportWizard(models.TransientModel):
             )
             if template:
                 values.setdefault("template_id", template.id)
-            partner = getattr(records[:1], "partner_id", False)
-            lang_code = (partner.lang if partner else self.env.user.lang) or self.env.user.lang
-            language = self.env["res.lang"].search([("code", "=", lang_code), ("active", "=", True)], limit=1)
+            language_mode = values.get("language_mode") or "company"
+            language = self._automatic_language(records, language_mode)
             if language:
                 values.setdefault("language_id", language.id)
             selected_template = self.env["rds.template"].browse(
@@ -354,6 +420,12 @@ class RdsExportWizard(models.TransientModel):
                 values["field_line_ids"] = commands
                 values["field_selection_mode"] = "custom"
         return values
+
+    @api.model
+    def _field_display_text(self, value, fallback=""):
+        text = re.sub(r"[\t\r\n\f\v]+", " ", str(value or ""))
+        text = re.sub(r" {2,}", " ", text).strip()
+        return text or fallback
 
     @api.model
     def _prepare_field_line_commands(self, record, template, language_code):
@@ -435,7 +507,9 @@ class RdsExportWizard(models.TransientModel):
                     definition.get("key"),
                 )
                 sample_value = ""
-            label = str(definition.get("label") or definition["field_path"])
+            label = self._field_display_text(
+                definition.get("label"), definition["field_path"]
+            )
             commands.append(
                 (
                     0,
@@ -449,7 +523,9 @@ class RdsExportWizard(models.TransientModel):
                         "field_path": definition["field_path"],
                         "label": label,
                         "auto_label": label,
-                        "sample_value": str(sample_value or "-")[:500],
+                        "sample_value": self._field_display_text(
+                            sample_value, "-"
+                        )[:500],
                         "origin": definition.get("origin") or "screen",
                         "is_custom": bool(definition.get("is_custom")),
                     },
@@ -612,6 +688,10 @@ class RdsExportWizard(models.TransientModel):
 
     @api.onchange("language_id")
     def _onchange_field_language(self):
+        self._refresh_field_language()
+
+    def _refresh_field_language(self):
+        """Refresh automatic copy without replacing user-edited headings."""
         for wizard in self:
             records = wizard._get_records(silent=True)
             if not records or not wizard.template_id or not wizard.field_line_ids:
@@ -637,6 +717,17 @@ class RdsExportWizard(models.TransientModel):
                 if label_was_automatic:
                     line.label = values["label"]
                 line.sample_value = values["sample_value"]
+
+    @api.onchange("language_mode")
+    def _onchange_language_mode(self):
+        for wizard in self:
+            if wizard.language_mode == "manual":
+                continue
+            records = wizard._get_records(silent=True)
+            language = wizard._automatic_language(records, wizard.language_mode)
+            if language and wizard.language_id != language:
+                wizard.language_id = language
+                wizard._refresh_field_language()
 
     def _get_records(self, silent=False):
         self.ensure_one()

@@ -26,13 +26,20 @@ Satış siparişi, fatura/iade veya satın alma siparişi formunda:
   seçeneklerini açar.
 - Aynı pencereden PDF, düzenlenebilir native Word, PDF görünümünü birebir
   koruyan Word, PNG veya tümünü içeren ZIP oluşturulur.
-- Ön izlemenin üstündeki **Belgede Gösterilecek Alanlar** tablosu, açık satış,
-  fatura veya satın alma ekranındaki standart ve Studio alanlarını otomatik
+- **Önizleme** ve **Alanlar** sayfaları, gerçek belge görünümü ile alan
+  yönetimini birbirinden ayırır. Alanlar sayfası açık satış, fatura veya satın
+  alma ekranındaki yazdırılabilir standart ve Studio alanlarını otomatik
   getirir. Yeşil alanlar çıktıya girer, gri alanlar dışarıda kalır; başlıklar
   düzenlenebilir ve alanlar sürüklenerek sıralanabilir.
 - Canlı ön izleme örnek kutular yerine seçili gerçek belgenin değerlerini ve
   seçilen kurumsal tasarımı gösterir. Aynı alan seçimi PDF, iki Word türü,
   PNG, ZIP ve arka plan işlerinde korunur.
+- Belge dili varsayılan olarak firma dilini izler; istenirse müşteri/tedarikçi
+  dili veya elle seçilen, DocuCraft etiket sözlüğü tarafından desteklenen etkin
+  bir Odoo dili kullanılabilir.
+- Başlık ve gövde için 23 yazı tipi bulunur. Odoo ile paketlenen fontların ve
+  güvenli sistem fontlarının karşılıkları PDF, canlı ön izleme ve
+  düzenlenebilir Word çıktısında birlikte uygulanır.
 - Altı yenilenmiş imza tasarımı ve sekiz yeni kurumsal tasarımla toplam 14
   yerleşim kullanılabilir.
 
@@ -72,3 +79,8 @@ filestore yedeği alın, kodu değiştirin ve `ranvals_document_studio` modülü
 yükseltin. Yükseltme; geçici alan seçici modelini ve arka plan işleri için
 değiştirilemez alan seçimi anlık görüntüsünü otomatik oluşturur. Ardından Odoo
 çalışanlarını yeniden başlatıp tarayıcıda sert yenileme yapın.
+
+19.0.3.2.0 sürümünden 19.0.3.3.0'a yükseltirken modülü mutlaka yükseltin;
+böylece yeni dil kaynağı, iki sayfalı yazdırma penceresi, font seçenekleri ve
+güncel çeviriler yüklenir. Odoo çalışanlarını yeniden başlatın ve yeni web
+varlıklarının gelmesi için tarayıcıda sert yenileme yapın.

@@ -225,6 +225,29 @@ class TestRdsStudioSaleReports(TransactionCase):
             report_view.arch_db,
         )
 
+    def test_legacy_studio_report_headers_use_requested_document_language(self):
+        order = self.env["sale.order"].create({"partner_id": self.partner.id})
+        turkish = self.env["res.lang"].with_context(active_test=False).search(
+            [("code", "=", "tr_TR")], limit=1
+        )
+        self.assertTrue(turkish)
+        turkish.active = True
+        for layout_style in ("beauty", "industrial", "furniture"):
+            with self.subTest(layout=layout_style):
+                action = self.env.ref(
+                    "ranvals_document_studio.%s"
+                    % self.REPORT_ACTION_XMLIDS[layout_style]
+                )
+                content, kind = self.env["ir.actions.report"]._render_qweb_html(
+                    action.id,
+                    order.ids,
+                    {"lang": "tr_TR", "rds_export_field_specs": []},
+                )
+                self.assertEqual(kind, "html")
+                upper_content = content.upper()
+                self.assertIn("BELGE NO".encode(), upper_content)
+                self.assertNotIn(b">NO:", upper_content)
+
     def test_report_provider_rejects_malformed_template_and_language_values(self):
         provider = self.env[
             "report.ranvals_document_studio.report_sale_document"

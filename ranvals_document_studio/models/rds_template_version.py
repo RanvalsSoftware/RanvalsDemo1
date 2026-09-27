@@ -8,6 +8,7 @@ from odoo.tools import SQL
 from psycopg2.extras import Json
 
 from ..tools.common import check_record_access
+from .rds_template import FONT_CSS
 
 TEMPLATE_SCHEMA = "docucraft.template"
 TEMPLATE_SCHEMA_VERSION = 1
@@ -17,6 +18,7 @@ MAX_INTERNAL_TEMPLATE_FIELDS = 1000
 MAX_INTERNAL_SNAPSHOT_BYTES = 4 * 1024 * 1024
 MAX_TRANSLATION_LANGUAGES = 128
 _VERSIONING_TOKEN = object()
+SUPPORTED_FONT_KEYS = frozenset(FONT_CSS)
 
 TEMPLATE_VALUE_FIELDS = (
     "name",
@@ -306,9 +308,10 @@ class RdsTemplateVersioning(models.Model):
             color = template_values[color_name]
             if not isinstance(color, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
                 raise ValidationError(_("Şablon renklerinden biri #RRGGBB biçiminde değil."))
-        if template_values["heading_font"] not in {"serif", "sans", "technical", "editorial"} or template_values[
-            "body_font"
-        ] not in {"serif", "sans", "technical", "editorial"}:
+        if (
+            template_values["heading_font"] not in SUPPORTED_FONT_KEYS
+            or template_values["body_font"] not in SUPPORTED_FONT_KEYS
+        ):
             raise ValidationError(_("Şablon yazı tipi desteklenmiyor."))
         logo_height = template_values["logo_height_mm"]
         if isinstance(logo_height, bool) or not isinstance(logo_height, int) or not 8 <= logo_height <= 40:

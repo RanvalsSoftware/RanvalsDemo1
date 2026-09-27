@@ -63,6 +63,58 @@ _PAGE_LABELS = {
     "ar": "صفحة",
 }
 
+_DOCX_FONT_KEYS = {
+    "serif": "Georgia",
+    "sans": "Arial",
+    "technical": "Trebuchet MS",
+    "editorial": "Georgia",
+    "lato": "Lato",
+    "roboto": "Roboto",
+    "open_sans": "Open Sans",
+    "montserrat": "Montserrat",
+    "raleway": "Raleway",
+    "oswald": "Oswald",
+    "tajawal": "Tajawal",
+    "fira_mono": "Fira Mono",
+    "humanist": "Calibri",
+    "helvetica": "Arial",
+    "verdana": "Verdana",
+    "tahoma": "Tahoma",
+    "lucida": "Lucida Sans",
+    "times": "Times New Roman",
+    "garamond": "Garamond",
+    "palatino": "Palatino Linotype",
+    "cambria": "Cambria",
+    "bookman": "Bookman Old Style",
+    "monospace": "Courier New",
+}
+_DOCX_CSS_FAMILIES = {
+    "georgia": "Georgia",
+    "arial": "Arial",
+    "trebuchet ms": "Trebuchet MS",
+    "lato": "Lato",
+    "roboto": "Roboto",
+    "open_sans": "Open Sans",
+    "open sans": "Open Sans",
+    "montserrat": "Montserrat",
+    "raleway": "Raleway",
+    "oswald": "Oswald",
+    "tajawal": "Tajawal",
+    "fira_mono": "Fira Mono",
+    "fira mono": "Fira Mono",
+    "calibri": "Calibri",
+    "helvetica": "Arial",
+    "verdana": "Verdana",
+    "tahoma": "Tahoma",
+    "lucida sans": "Lucida Sans",
+    "times new roman": "Times New Roman",
+    "garamond": "Garamond",
+    "palatino linotype": "Palatino Linotype",
+    "cambria": "Cambria",
+    "bookman old style": "Bookman Old Style",
+    "courier new": "Courier New",
+}
+
 # Native Word keeps one robust, editable document structure while each QWeb
 # layout supplies a deliberate colour hierarchy.  Values refer to keys in the
 # resolved template theme; keeping the profile declarative makes new styles
@@ -141,20 +193,14 @@ def _color(value, fallback):
 
 
 def _font(value, fallback="Arial"):
-    """Map CSS font stacks from the template to fonts commonly available in Word."""
+    """Resolve an allow-listed template key or CSS stack to a Word font name."""
     if not isinstance(value, str):
         return fallback
-    lowered = value.lower()
-    for marker, name in (
-        ("trebuchet", "Trebuchet MS"),
-        ("georgia", "Georgia"),
-        ("times", "Times New Roman"),
-        ("arial", "Arial"),
-        ("helvetica", "Arial"),
-    ):
-        if marker in lowered:
-            return name
-    return fallback
+    normalized = value.strip().casefold()
+    if normalized in _DOCX_FONT_KEYS:
+        return _DOCX_FONT_KEYS[normalized]
+    first_family = value.split(",", 1)[0].strip().strip("'\"").casefold()
+    return _DOCX_CSS_FAMILIES.get(first_family, fallback)
 
 
 def _positive_number(value, fallback=0.0):
@@ -249,6 +295,25 @@ def _set_paragraph_direction(paragraph, rtl, alignment=None):
         bidi.set(qn("w:val"), "1")
 
 
+def _set_ooxml_font_slots(properties, font):
+    """Set the same family for every Word script slot."""
+    from docx.oxml.ns import qn
+
+    fonts = properties.get_or_add_rFonts()
+    for slot in ("ascii", "hAnsi", "eastAsia", "cs"):
+        fonts.set(qn("w:%s" % slot), font)
+
+
+def _set_run_font(run, font):
+    run.font.name = font
+    _set_ooxml_font_slots(run._r.get_or_add_rPr(), font)
+
+
+def _set_style_font(style, font):
+    style.font.name = font
+    _set_ooxml_font_slots(style._element.get_or_add_rPr(), font)
+
+
 def _set_run_language(run, locale, rtl=False, explicit_direction=False):
     from docx.oxml import OxmlElement
     from docx.oxml.ns import qn
@@ -288,7 +353,7 @@ def _add_text(
     run = paragraph.add_run(text)
     run.bold = bool(bold)
     run.italic = bool(italic)
-    run.font.name = font
+    _set_run_font(run, font)
     run.font.size = Pt(size)
     run.font.color.rgb = RGBColor.from_string(color)
     run_rtl = rtl and _text_prefers_rtl(text)
@@ -460,21 +525,21 @@ def _configure_document(
     section.footer_distance = Cm(0.65)
 
     normal = document.styles["Normal"]
-    normal.font.name = body_font
+    _set_style_font(normal, body_font)
     normal.font.size = Pt(9)
-    normal._element.rPr.rFonts.set(qn("w:eastAsia"), body_font)
     normal.paragraph_format.space_after = Pt(3)
 
     for style_name, size in (("Title", 24), ("Heading 1", 15), ("Heading 2", 11)):
         style = document.styles[style_name]
-        style.font.name = heading_font
+        _set_style_font(style, heading_font)
         style.font.size = Pt(size)
-        style._element.rPr.rFonts.set(qn("w:eastAsia"), heading_font)
 
     if "DocuCraft Small" not in document.styles:
         small = document.styles.add_style("DocuCraft Small", WD_STYLE_TYPE.PARAGRAPH)
-        small.font.name = body_font
-        small.font.size = Pt(8)
+    else:
+        small = document.styles["DocuCraft Small"]
+    _set_style_font(small, body_font)
+    small.font.size = Pt(8)
     document.core_properties.comments = EDITABLE_DOCX_FINGERPRINT
     document.core_properties.keywords = "native-editable, tables, text"
     document.core_properties.subject = "Editable business document"
@@ -487,11 +552,13 @@ def _configure_document(
     return section
 
 
-def _add_page_field(paragraph, instruction):
+def _add_page_field(paragraph, instruction, *, font, locale, rtl):
     from docx.oxml import OxmlElement
     from docx.oxml.ns import qn
 
     run = paragraph.add_run()
+    _set_run_font(run, font)
+    _set_run_language(run, locale, rtl=rtl)
     begin = OxmlElement("w:fldChar")
     begin.set(qn("w:fldCharType"), "begin")
     text = OxmlElement("w:instrText")
@@ -629,16 +696,32 @@ def _render_footer(section, context, budget, style):
             rtl=style["rtl"],
             alignment="center",
         )
-        paragraph.add_run("  •  ")
+        separator = paragraph.add_run("  •  ")
+        _set_run_font(separator, style["body_font"])
+        _set_run_language(separator, style["locale"], rtl=style["rtl"])
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     page_label = paragraph.add_run(
         "%s " % _PAGE_LABELS.get(style["language_prefix"], "Page")
     )
-    page_label.font.name = style["body_font"]
+    _set_run_font(page_label, style["body_font"])
     _set_run_language(page_label, style["locale"], rtl=style["rtl"])
-    _add_page_field(paragraph, "PAGE")
-    paragraph.add_run(" / ")
-    _add_page_field(paragraph, "NUMPAGES")
+    _add_page_field(
+        paragraph,
+        "PAGE",
+        font=style["body_font"],
+        locale=style["locale"],
+        rtl=style["rtl"],
+    )
+    separator = paragraph.add_run(" / ")
+    _set_run_font(separator, style["body_font"])
+    _set_run_language(separator, style["locale"], rtl=style["rtl"])
+    _add_page_field(
+        paragraph,
+        "NUMPAGES",
+        font=style["body_font"],
+        locale=style["locale"],
+        rtl=style["rtl"],
+    )
     _set_paragraph_direction(paragraph, style["rtl"], "center")
 
 

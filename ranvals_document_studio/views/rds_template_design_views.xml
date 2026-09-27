@@ -14,7 +14,10 @@
             </xpath>
 
             <xpath expr="//page[@name='design']" position="replace">
-                <page string="Tasarım" name="design" class="rds-template-design-page">
+                <page string="Tasarım" name="design">
+                    <div class="rds-template-design-page">
+                    <field name="heading_font_css" invisible="1"/>
+                    <field name="body_font_css" invisible="1"/>
                     <div class="rds-design-toolbar">
                         <div class="rds-design-toolbar__copy">
                             <span class="rds-design-toolbar__icon"><i class="fa fa-magic" title="Tasarım araçları"/></span>
@@ -142,6 +145,7 @@
                         </div>
                         <field name="design_preview_html" widget="html" nolabel="1" readonly="1"/>
                     </section>
+                    </div>
                 </page>
             </xpath>
         </field>

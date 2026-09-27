@@ -16,7 +16,7 @@
                 <footer>
                     <button name="action_apply" type="object" string="Dili Uygula" class="btn-primary" invisible="not language_active"/>
                     <button name="action_activate_language" type="object" string="Seçilen Dili Etkinleştir" class="btn-secondary" groups="base.group_system" invisible="language_active"/>
-                    <button name="action_activate_supported_languages" type="object" string="Altı Dili Etkinleştir" class="btn-secondary" groups="base.group_system" invisible="not missing_language_count"/>
+                    <button name="action_activate_supported_languages" type="object" string="Desteklenen Dilleri Etkinleştir" class="btn-secondary" groups="base.group_system" invisible="not missing_language_count"/>
                     <button string="İptal" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>

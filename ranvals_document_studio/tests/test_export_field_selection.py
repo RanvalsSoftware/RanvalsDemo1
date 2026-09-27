@@ -5,8 +5,12 @@ from lxml import etree
 
 from odoo import fields
 from odoo.exceptions import UserError
+from odoo.tests import Form
 from odoo.tests.common import TransactionCase, new_test_user, tagged
 
+from odoo.addons.ranvals_document_studio.tools.common import (
+    is_document_language_supported,
+)
 from odoo.addons.ranvals_document_studio.wizard.rds_export_wizard import (
     RdsExportWizard,
 )
@@ -22,6 +26,7 @@ class TestRdsExportFieldSelection(TransactionCase):
             "ranvals_document_studio.template_technology_blue"
         )
         cls.sale_model = cls.env["ir.model"]._get("sale.order")
+        cls.sale_line_model = cls.env["ir.model"]._get("sale.order.line")
 
         # Reproduce fields created by Studio rather than relying on Studio's
         # optional demo data.  The inherited form proves that discovery is
@@ -54,17 +59,76 @@ class TestRdsExportFieldSelection(TransactionCase):
                 "ttype": "char",
             }
         )
+        cls.blank_widget_field = field_model.create(
+            {
+                "name": "x_rds_widget_payload",
+                "field_description": "Studio Widget Payload",
+                "model_id": cls.sale_model.id,
+                "state": "manual",
+                "ttype": "char",
+            }
+        )
+        cls.alert_custom_field = field_model.create(
+            {
+                "name": "x_rds_alert_payload",
+                "field_description": "Studio Alert Payload",
+                "model_id": cls.sale_model.id,
+                "state": "manual",
+                "ttype": "char",
+            }
+        )
+        cls.button_custom_field = field_model.create(
+            {
+                "name": "x_rds_button_count",
+                "field_description": "Studio Button Count",
+                "model_id": cls.sale_model.id,
+                "state": "manual",
+                "ttype": "integer",
+            }
+        )
+        cls.form_only_line_field = field_model.create(
+            {
+                "name": "x_rds_line_form_note",
+                "field_description": "Studio Line Form Note",
+                "model_id": cls.sale_line_model.id,
+                "state": "manual",
+                "ttype": "char",
+            }
+        )
         cls.catalog_view = cls.env["ir.ui.view"].create(
             {
                 "name": "sale.order.rds.field.catalog.test",
                 "model": "sale.order",
                 "inherit_id": cls.env.ref("sale.view_order_form").id,
                 "arch": """
+                    <data>
                     <xpath expr="//field[@name='client_order_ref']" position="after">
                         <field name="x_rds_catalog_note"/>
                         <field name="x_rds_catalog_hidden" invisible="1"/>
                         <field name="x_rds_api_token"/>
+                        <field name="x_rds_widget_payload"
+                               string=" "
+                               widget="stock_rescheduling_popover"/>
                     </xpath>
+                    <xpath expr="//sheet" position="before">
+                        <div class="alert alert-warning" role="status">
+                            <field name="x_rds_alert_payload"/>
+                        </div>
+                    </xpath>
+                    <xpath expr="//div[@name='button_box']" position="inside">
+                        <button name="action_preview_sale_order"
+                                type="object"
+                                class="oe_stat_button">
+                            <field name="x_rds_button_count"
+                                   widget="statinfo"
+                                   string="Technical Counter"/>
+                        </button>
+                    </xpath>
+                    <xpath expr="//field[@name='order_line']/form//field[@name='name']"
+                           position="after">
+                        <field name="x_rds_line_form_note"/>
+                    </xpath>
+                    </data>
                 """,
             }
         )
@@ -85,6 +149,9 @@ class TestRdsExportFieldSelection(TransactionCase):
                 "x_rds_catalog_note": "STUDIO-FIELD-VALUE",
                 "x_rds_catalog_hidden": "HIDDEN-FIELD-VALUE",
                 "x_rds_api_token": "SECRET-FIELD-VALUE",
+                "x_rds_widget_payload": "WIDGET-PAYLOAD",
+                "x_rds_alert_payload": "ALERT-PAYLOAD",
+                "x_rds_button_count": 7,
             }
         )
         cls.order_line = cls.env["sale.order.line"].create(
@@ -93,6 +160,7 @@ class TestRdsExportFieldSelection(TransactionCase):
                 "name": "FIELD-LINE-VALUE",
                 "product_uom_qty": 2.0,
                 "price_unit": 25.0,
+                "x_rds_line_form_note": "STUDIO-LINE-FORM-VALUE",
             }
         )
 
@@ -145,6 +213,62 @@ class TestRdsExportFieldSelection(TransactionCase):
         self.assertFalse(
             any(item["field_path"] == "access_token" for item in catalog)
         )
+
+    def test_catalog_filters_view_utilities_without_optional_sale_stock(self):
+        """Control widgets must not become blank labels or raw payload values."""
+        catalog = self._catalog()
+        metadata_paths = {
+            item["field_path"]
+            for item in catalog
+            if item["section"] == "metadata"
+        }
+
+        self.assertNotIn(self.blank_widget_field.name, metadata_paths)
+        self.assertNotIn(self.alert_custom_field.name, metadata_paths)
+        self.assertNotIn(self.button_custom_field.name, metadata_paths)
+        self.assertNotIn("invoice_count", metadata_paths)
+        self.assertTrue(all(item["label"].strip() for item in catalog))
+
+    def test_line_catalog_uses_list_fields_and_keeps_form_only_studio_fields(self):
+        catalog = self._catalog()
+        line_by_path = {
+            item["field_path"]: item
+            for item in catalog
+            if item["section"] == "line"
+        }
+
+        # product_id is a real sales-line list column.  The following standard
+        # fields are form/kanban implementation details rather than printable
+        # columns and must not leak into the chooser.
+        self.assertIn("product_id", line_by_path)
+        self.assertNotIn("collapse_composition", line_by_path)
+        self.assertNotIn("collapse_prices", line_by_path)
+        self.assertNotIn("invoice_lines", line_by_path)
+        self.assertNotIn("display_type", line_by_path)
+        self.assertNotIn("currency_id", line_by_path)
+        self.assertNotIn("sequence", line_by_path)
+
+        # A customer may add a Studio field only to the line form.  Custom
+        # fields remain discoverable even though standard discovery is driven
+        # by the embedded list.
+        studio = line_by_path[self.form_only_line_field.name]
+        self.assertEqual(studio["origin"], "screen")
+        self.assertTrue(studio["is_custom"])
+
+    def test_field_command_labels_and_samples_are_single_line_text(self):
+        self.order[self.safe_custom_field.name] = "  STUDIO\tFIELD\r\nVALUE  "
+        command_values = {
+            values["field_key"]: values
+            for command, _unused, values in self._field_commands()
+            if command == 0
+        }
+        custom = command_values[
+            "screen:metadata:%s" % self.safe_custom_field.name
+        ]
+
+        self.assertEqual(custom["sample_value"], "STUDIO FIELD VALUE")
+        self.assertNotRegex(custom["label"], r"[\t\r\n]")
+        self.assertNotRegex(custom["sample_value"], r"[\t\r\n]")
 
     def test_column_invisible_fields_are_statically_hidden(self):
         direct = etree.fromstring(
@@ -437,6 +561,166 @@ class TestRdsExportFieldSelection(TransactionCase):
         self.assertIn("FIELD-META-VALUE", preview)
         self.assertIn("FIELD-LINE-VALUE", preview)
         self.assertNotIn("Document item", preview)
+
+    def test_real_form_toggle_keeps_live_preview_and_saves_both_states(self):
+        """Exercise the same x2many toggle/save path used by the web client."""
+        wizard = self._wizard()
+        target = wizard.field_line_ids.filtered(
+            lambda line: line.field_key
+            == "screen:metadata:%s" % self.safe_custom_field.name
+        )
+        self.assertEqual(len(target), 1)
+        self.assertFalse(target.enabled)
+
+        def edit_enabled(record, enabled):
+            line_index = record.field_line_ids.ids.index(target.id)
+            wizard_form = Form(
+                record,
+                view="ranvals_document_studio.view_rds_export_wizard_form",
+            )
+            self.assertIn(
+                "rds-export-live-preview",
+                str(wizard_form.template_preview_html),
+            )
+            with wizard_form.field_line_ids.edit(line_index) as line_form:
+                line_form.enabled = enabled
+            self.assertIn(
+                "rds-export-live-preview",
+                str(wizard_form.template_preview_html),
+            )
+            saved = wizard_form.save()
+            self.assertIn(
+                "rds-export-live-preview",
+                str(saved.template_preview_html),
+            )
+            return saved
+
+        wizard = edit_enabled(wizard, True)
+        self.assertTrue(target.exists().enabled)
+        wizard = edit_enabled(wizard, False)
+        self.assertFalse(target.exists().enabled)
+        self.assertTrue(wizard.exists())
+
+    def test_company_language_is_the_automatic_wizard_default(self):
+        turkish = self.env["res.lang"]._activate_lang("tr_TR")
+        self.order.company_id.partner_id.lang = turkish.code
+        self.assertEqual(self.partner.lang, "en_US")
+
+        values = self.env["rds.export.wizard"].with_context(
+            default_res_model="sale.order",
+            default_res_ids_json=json.dumps(self.order.ids),
+            active_model="sale.order",
+            active_id=self.order.id,
+            active_ids=self.order.ids,
+        ).default_get(
+            [
+                "res_model",
+                "res_ids_json",
+                "language_mode",
+                "language_id",
+            ]
+        )
+
+        self.assertEqual(values["language_mode"], "company")
+        self.assertEqual(values["language_id"], turkish.id)
+
+    def test_document_label_languages_are_selectable_and_fallback_is_safe(self):
+        Language = self.env["res.lang"]
+        english = Language._activate_lang("en_US")
+        german = Language._activate_lang("de_DE")
+        spanish = Language._activate_lang("es_ES")
+        portuguese = Language._activate_lang("pt_BR")
+        japanese = Language._activate_lang("ja_JP")
+        self.env.user.lang = japanese.code
+        self.order.company_id.partner_id.lang = german.code
+        self.partner.lang = german.code
+
+        Wizard = self.env["rds.export.wizard"]
+        self.assertEqual(
+            Wizard._automatic_language(self.order, "company"),
+            german,
+        )
+        self.assertEqual(
+            Wizard._automatic_language(self.order, "partner"),
+            german,
+        )
+
+        values = Wizard.with_context(
+            default_res_model="sale.order",
+            default_res_ids_json=json.dumps(self.order.ids),
+            active_model="sale.order",
+            active_id=self.order.id,
+            active_ids=self.order.ids,
+        ).default_get(
+            [
+                "res_model",
+                "res_ids_json",
+                "language_mode",
+                "language_id",
+            ]
+        )
+        self.assertEqual(values["language_mode"], "company")
+        self.assertEqual(values["language_id"], german.id)
+
+        language_domain = Wizard._fields["language_id"].domain
+        selectable_languages = Language.search(language_domain)
+        for supported in (english, german, spanish, portuguese):
+            self.assertIn(supported, selectable_languages)
+        self.assertNotIn(japanese, selectable_languages)
+        self.assertTrue(
+            all(
+                is_document_language_supported(code)
+                for code in selectable_languages.mapped("code")
+            )
+        )
+
+        self.order.company_id.partner_id.lang = japanese.code
+        self.partner.lang = japanese.code
+        self.assertEqual(
+            Wizard._automatic_language(self.order, "company"),
+            english,
+        )
+        self.assertEqual(
+            Wizard._automatic_language(self.order, "partner"),
+            english,
+        )
+
+        fallback_values = Wizard.with_context(
+            default_res_model="sale.order",
+            default_res_ids_json=json.dumps(self.order.ids),
+            active_model="sale.order",
+            active_id=self.order.id,
+            active_ids=self.order.ids,
+        ).default_get(
+            [
+                "res_model",
+                "res_ids_json",
+                "language_mode",
+                "language_id",
+            ]
+        )
+        self.assertEqual(fallback_values["language_id"], english.id)
+
+    def test_export_wizard_notebook_opens_preview_before_fields(self):
+        view = self.env.ref(
+            "ranvals_document_studio.view_rds_export_wizard_form"
+        )
+        arch = etree.fromstring(view.arch_db.encode())
+        pages = arch.xpath(".//notebook/page")
+
+        self.assertEqual([page.get("name") for page in pages], ["preview", "fields"])
+        self.assertEqual(
+            pages[0].xpath("count(.//field[@name='template_preview_html'])"),
+            1.0,
+        )
+        self.assertEqual(
+            pages[1].xpath("count(.//field[@name='field_line_ids'])"),
+            1.0,
+        )
+        self.assertFalse(pages[0].xpath(".//field[@name='field_line_ids']"))
+        self.assertFalse(
+            pages[1].xpath(".//field[@name='template_preview_html']")
+        )
 
     def test_background_job_round_trip_preserves_custom_and_empty_selections(self):
         def round_trip(wizard):

@@ -1,5 +1,6 @@
 import base64
 import binascii
+import logging
 import re
 from datetime import date, datetime
 
@@ -8,23 +9,65 @@ from markupsafe import Markup, escape
 
 from odoo import api, fields, models, _
 from odoo.exceptions import AccessError, MissingError, UserError, ValidationError
+from odoo.tools.image import image_data_uri
 from odoo.tools.misc import formatLang
 
 from ..tools.common import format_date_value, lang_code, normalize_hex, plain_text, tr_label
 
 
+_logger = logging.getLogger(__name__)
+
+
 FONT_SELECTION = [
-    ("serif", "Kurumsal Serif"),
+    ("serif", "Corporate Serif"),
     ("sans", "Modern Sans Serif"),
-    ("technical", "Teknik Sans Serif"),
-    ("editorial", "Editoryal"),
+    ("technical", "Technical Sans Serif"),
+    ("editorial", "Editorial"),
+    ("lato", "Lato"),
+    ("roboto", "Roboto"),
+    ("open_sans", "Open Sans"),
+    ("montserrat", "Montserrat"),
+    ("raleway", "Raleway"),
+    ("oswald", "Oswald"),
+    ("tajawal", "Tajawal"),
+    ("fira_mono", "Fira Mono"),
+    ("humanist", "Humanist Sans"),
+    ("helvetica", "Helvetica / Arial"),
+    ("verdana", "Verdana"),
+    ("tahoma", "Tahoma"),
+    ("lucida", "Lucida Sans"),
+    ("times", "Times New Roman"),
+    ("garamond", "Garamond"),
+    ("palatino", "Palatino"),
+    ("cambria", "Cambria"),
+    ("bookman", "Bookman"),
+    ("monospace", "Corporate Monospace"),
 ]
 
 FONT_CSS = {
-    "serif": "Georgia, 'Times New Roman', serif",
-    "sans": "Arial, Helvetica, sans-serif",
-    "technical": "'Trebuchet MS', Arial, sans-serif",
-    "editorial": "Georgia, 'Times New Roman', serif",
+    "serif": "Georgia, 'DejaVu Serif', 'Times New Roman', serif",
+    "sans": "Arial, 'Liberation Sans', Helvetica, sans-serif",
+    "technical": "'Trebuchet MS', 'DejaVu Sans', Arial, sans-serif",
+    "editorial": "Georgia, 'DejaVu Serif', 'Times New Roman', serif",
+    "lato": "Lato, 'Odoo Unicode Support Noto', Arial, sans-serif",
+    "roboto": "Roboto, 'Odoo Unicode Support Noto', Arial, sans-serif",
+    "open_sans": "Open_Sans, 'Open Sans', 'Odoo Unicode Support Noto', Arial, sans-serif",
+    "montserrat": "Montserrat, 'Odoo Unicode Support Noto', Arial, sans-serif",
+    "raleway": "Raleway, 'Odoo Unicode Support Noto', Arial, sans-serif",
+    "oswald": "Oswald, 'Arial Narrow', Arial, sans-serif",
+    "tajawal": "Tajawal, 'Odoo Unicode Support Noto', Arial, sans-serif",
+    "fira_mono": "Fira_Mono, 'Fira Mono', Consolas, 'Courier New', monospace",
+    "humanist": "Calibri, Carlito, 'Segoe UI', Arial, sans-serif",
+    "helvetica": "Helvetica, Arial, 'Liberation Sans', sans-serif",
+    "verdana": "Verdana, 'DejaVu Sans', Arial, sans-serif",
+    "tahoma": "Tahoma, 'DejaVu Sans', Arial, sans-serif",
+    "lucida": "'Lucida Sans', 'Lucida Grande', 'DejaVu Sans', Arial, sans-serif",
+    "times": "'Times New Roman', 'Liberation Serif', 'DejaVu Serif', serif",
+    "garamond": "Garamond, 'EB Garamond', 'Liberation Serif', 'DejaVu Serif', serif",
+    "palatino": "'Palatino Linotype', 'Book Antiqua', Palatino, 'Liberation Serif', serif",
+    "cambria": "Cambria, Caladea, 'Liberation Serif', 'DejaVu Serif', serif",
+    "bookman": "'Bookman Old Style', 'URW Bookman', 'DejaVu Serif', serif",
+    "monospace": "'Courier New', 'Liberation Mono', 'DejaVu Sans Mono', monospace",
 }
 
 MAX_FIELD_PATH_DEPTH = 4
@@ -69,6 +112,13 @@ EXPORT_FIELD_EXCLUDED_PREFIXES = (
     "message_",
     "website_message_",
 )
+EXPORT_FIELD_UTILITY_WIDGETS = {
+    "account-tax-totals-field",
+    "handle",
+    "statinfo",
+    "stock_rescheduling_popover",
+    "x2many_buttons",
+}
 EXPORT_FIELD_SECRET_PARTS = (
     "api_key",
     "credential",
@@ -237,6 +287,7 @@ class RdsTemplate(models.Model):
     @api.depends(
         "preview_path",
         "name",
+        "layout_style",
         "primary_color",
         "secondary_color",
         "accent_color",
@@ -244,6 +295,16 @@ class RdsTemplate(models.Model):
         "heading_font",
         "body_font",
         "tagline",
+        "footer_text",
+        "logo_height_mm",
+        "show_company",
+        "show_partner",
+        "show_metadata",
+        "show_notes",
+        "show_bank",
+        "show_footer",
+        "company_id",
+        "target_model_id",
     )
     def _compute_preview_html(self):
         for record in self:
@@ -257,56 +318,158 @@ class RdsTemplate(models.Model):
                 record.preview_html = record._rds_dynamic_preview_html()
 
     def _rds_dynamic_preview_html(self):
-        """Return a safe, useful preview when a static screenshot is absent."""
+        """Render the real QWeb layout with safe, localized representative data."""
         self.ensure_one()
-        theme = self.get_theme()
-        return Markup(
-            """
-            <div style="max-width:520px;margin:8px auto;background:#fff;color:{text};border:1px solid #dce2e7;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.08);font-family:{body_font};">
-                <div style="height:9px;background:{accent};"></div>
-                <div style="padding:22px 24px;background:{secondary};border-bottom:1px solid #dce2e7;">
-                    <div style="font-family:{heading_font};font-size:23px;line-height:1.1;font-weight:800;color:{primary};">{name}</div>
-                    <div style="margin-top:7px;font-size:11px;color:{text};">{tagline}</div>
-                </div>
-                <div style="padding:18px 24px;">
-                    <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
-                        <tr>
-                            <td style="width:48%;height:52px;padding:10px 12px;border:1px solid #dce2e7;background:{secondary};">
-                                <div style="font-size:8px;font-weight:800;text-transform:uppercase;color:{primary};">{company_label}</div>
-                                <div style="margin-top:7px;font-size:10px;">{company_value}</div>
-                            </td>
-                            <td style="width:4%;"></td>
-                            <td style="width:48%;height:52px;padding:10px 12px;border:1px solid #dce2e7;">
-                                <div style="font-size:8px;font-weight:800;text-transform:uppercase;color:{primary};">{customer_label}</div>
-                                <div style="margin-top:7px;font-size:10px;">{customer_value}</div>
-                            </td>
-                        </tr>
-                    </table>
-                    <table style="width:100%;border-collapse:collapse;margin-top:16px;">
-                        <tr style="background:{primary};color:#fff;"><td style="padding:7px 9px;">01</td><td style="padding:7px 9px;">{document_item}</td><td style="padding:7px 9px;text-align:right;">1,000.00</td></tr>
-                        <tr><td colspan="3" style="height:34px;border:1px solid #e4e8ec;"></td></tr>
-                        <tr><td colspan="3" style="height:34px;border:1px solid #e4e8ec;background:{secondary};"></td></tr>
-                    </table>
-                    <div style="width:42%;margin:16px 0 0 auto;padding:9px 12px;background:{accent};color:#fff;text-align:right;font-weight:800;">{total_label}&nbsp;&nbsp;1,000.00</div>
-                </div>
-            </div>
-            """
-        ).format(
-            primary=theme["primary"],
-            secondary=theme["secondary"],
-            accent=theme["accent"],
-            text=theme["text"],
-            heading_font=theme["heading_font"],
-            body_font=theme["body_font"],
-            name=self.name or "DocuCraft",
-            tagline=self.tagline or _("Kurumsal belge tasarımı"),
-            company_label=_("Şirket Bilgileri"),
-            company_value=_("Şirketiniz"),
-            customer_label=_("Müşteri Bilgileri"),
-            customer_value=_("Müşteri"),
-            document_item=_("Belge kalemi"),
-            total_label=_("Toplam"),
+        company = self.company_id or self.env.company
+        preferred_lang = company.partner_id.lang or self.env.user.lang or "en_US"
+        language = self.env["res.lang"].search(
+            [("code", "=", preferred_lang), ("active", "=", True)], limit=1
         )
+        resolved_lang = language.code if language else self.env.user.lang or "en_US"
+        localized = self.with_context(lang=resolved_lang)
+        code = lang_code(resolved_lang)
+        currency = company.currency_id
+        subtotal = formatLang(
+            localized.env,
+            1250.0,
+            currency_obj=currency,
+        )
+        taxes = formatLang(
+            localized.env,
+            250.0,
+            currency_obj=currency,
+        )
+        total = formatLang(
+            localized.env,
+            1500.0,
+            currency_obj=currency,
+        )
+        today = fields.Date.context_today(localized)
+        target_model = self.target_model_id.model if self.target_model_id else False
+        title_key = "invoice" if target_model == "account.move" else (
+            "purchase_order" if target_model == "purchase.order" else "quote"
+        )
+        context = {
+            "record": False,
+            "company": company,
+            "partner": False,
+            "company_info": localized.company_info(company),
+            "partner_info": {
+                "name": tr_label("customer_info", code).title(),
+                "lines": ["DocuCraft", "Istanbul"],
+                "phone": "+90 212 000 00 00",
+                "email": "customer@example.com",
+                "website": "",
+                "vat": "TR1234567890",
+            },
+            "logo_bytes": localized.logo_bytes(company),
+            "logo_height_mm": self.logo_height_mm,
+            "layout_style": self.layout_style,
+            "tagline": self.tagline or tr_label("thank_you", code),
+            "footer_text": self.footer_text or tr_label("thank_you", code),
+            "labels": {
+                "company_info": tr_label("company_info", code),
+                "partner_info": tr_label("customer_info", code),
+                "document_info": tr_label("document_info", code),
+                "document_no": tr_label("document_no", code),
+                "notes": tr_label("notes", code),
+                "bank_info": tr_label("bank_info", code),
+            },
+            "theme": localized.get_theme(),
+            "direction": "rtl" if code == "ar" else "ltr",
+            "lang_code": code,
+            "title": tr_label(title_key, code),
+            "number": "DOC-2026-001",
+            "tax_label": company.country_id.vat_label or tr_label("tax_no", code),
+            "metadata": [
+                {
+                    "label": tr_label("document_no", code),
+                    "value": "DOC-2026-001",
+                    "icon": "fa-file-text-o",
+                },
+                {
+                    "label": tr_label("date", code),
+                    "value": format_date_value(today, resolved_lang, env=localized.env),
+                    "icon": "fa-calendar",
+                },
+                {
+                    "label": tr_label("reference", code),
+                    "value": "REF-1001",
+                    "icon": "fa-bookmark-o",
+                },
+                {
+                    "label": tr_label("payment_terms", code),
+                    "value": "30",
+                    "icon": "fa-credit-card",
+                },
+            ],
+            "columns": [
+                {"label": tr_label("description", code), "align": "left", "width": 46},
+                {"label": tr_label("quantity", code), "align": "right", "width": 14},
+                {"label": tr_label("unit_price", code), "align": "right", "width": 20},
+                {"label": tr_label("amount", code), "align": "right", "width": 20},
+            ],
+            "lines": [
+                {
+                    "values": [
+                        {"text": tr_label("description", code).title(), "align": "left"},
+                        {"text": "1", "align": "right"},
+                        {"text": subtotal, "align": "right"},
+                        {"text": subtotal, "align": "right", "bold": True},
+                    ]
+                }
+            ],
+            "totals": [
+                {"label": tr_label("subtotal", code), "value": subtotal},
+                {"label": tr_label("tax_total", code), "value": taxes},
+                {"label": tr_label("grand_total", code), "value": total, "is_total": True},
+            ],
+            "notes": [tr_label("thank_you", code)],
+            "bank": {
+                "bank_name": "DocuCraft Bank",
+                "branch": "Istanbul",
+                "account_name": company.name or "DocuCraft",
+                "iban": "TR00 0000 0000 0000 0000 0000 00",
+                "swift": "DEMOXX",
+            },
+            "bank_labels": {
+                key: tr_label(key, code)
+                for key in ("bank", "branch", "account_name", "iban", "swift")
+            },
+            "show_company": self.show_company,
+            "show_partner": self.show_partner,
+            "show_metadata": self.show_metadata,
+            "show_lines": True,
+            "show_notes": self.show_notes,
+            "show_bank": self.show_bank,
+            "show_footer": self.show_footer,
+        }
+        try:
+            rendered = self.env["ir.ui.view"].with_context(
+                inherit_branding=False,
+                lang=resolved_lang,
+            )._render_template(
+                "ranvals_document_studio.rds_layout_router",
+                {
+                    "ctx": context,
+                    "rds_template": localized,
+                    "image_data_uri": image_data_uri,
+                    "report_type": "html",
+                },
+            )
+            return Markup(
+                '<div class="rds-template-layout-preview">'
+                '<div class="rds-template-layout-preview__label">{}</div>{}'
+                "</div>"
+            ).format(escape(self.name or "DocuCraft"), Markup(rendered))
+        except Exception:
+            _logger.exception("Could not render the DocuCraft template preview")
+            return Markup(
+                '<div class="rds-template-preview-fallback"><strong>{}</strong><span>{}</span></div>'
+            ).format(
+                escape(self.name or "DocuCraft"),
+                escape(self.tagline or tr_label("thank_you", code)),
+            )
 
     @api.model
     def _is_safe_preview_path(self, value):
@@ -814,6 +977,23 @@ class RdsTemplate(models.Model):
         return False
 
     @api.model
+    def _node_is_export_utility(self, node):
+        """Reject view helpers that display controls rather than printable data."""
+        widget = (node.get("widget") or "").strip()
+        if widget in EXPORT_FIELD_UTILITY_WIDGETS:
+            return True
+        explicit_label = node.get("string")
+        if explicit_label is not None and not explicit_label.strip():
+            return True
+        for ancestor in node.iterancestors():
+            if ancestor.tag == "button":
+                return True
+            classes = set((ancestor.get("class") or "").split())
+            if "alert" in classes or "oe_button_box" in classes or "button_box" in classes:
+                return True
+        return False
+
+    @api.model
     def _view_field_nodes(self, document_model, section, config):
         """Return access-filtered form nodes for a document or its line view."""
         view_id = config.get("view_id")
@@ -839,11 +1019,19 @@ class RdsTemplate(models.Model):
             ".//field[@name=$field_name]", field_name=relation_field
         )
         nodes = []
+        custom_nodes = []
         for container in containers:
             for node in container.xpath(".//field[@name]"):
                 ancestors = node.xpath("ancestor::field")
-                if ancestors and ancestors[-1] is container:
+                if not ancestors or ancestors[-1] is not container:
+                    continue
+                field_name = node.get("name") or ""
+                if field_name.startswith(("x_", "x_studio_")):
+                    custom_nodes.append(node)
+                    continue
+                if node.xpath("ancestor::list"):
                     nodes.append(node)
+        nodes.extend(custom_nodes)
         if nodes:
             return nodes
         # Some installations keep the x2many list in a separate inherited
@@ -1087,12 +1275,19 @@ class RdsTemplate(models.Model):
                     not description
                     or not field
                     or self._node_is_statically_hidden(node)
+                    or self._node_is_export_utility(node)
                     or not self._is_export_field_name_safe(field_name)
                     or description.get("type") not in EXPORT_FIELD_TYPES
                     or getattr(field, "exportable", True) is False
                 ):
                     continue
-                label = node.get("string") or description.get("string") or field_name
+                label = re.sub(
+                    r"\s+",
+                    " ",
+                    (node.get("string") or description.get("string") or field_name).strip(),
+                )
+                if not label:
+                    continue
                 add(
                     {
                         "key": "screen:%s:%s" % (section, field_name),
@@ -1413,6 +1608,7 @@ class RdsTemplate(models.Model):
             "company_info": tr_label("company_info", code),
             "partner_info": tr_label("customer_info", code),
             "document_info": tr_label("document_info", code),
+            "document_no": tr_label("document_no", code),
             "notes": tr_label("notes", code),
             "bank_info": tr_label("bank_info", code),
         }

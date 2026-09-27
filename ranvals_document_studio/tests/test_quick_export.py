@@ -61,8 +61,15 @@ class TestRdsQuickExport(TransactionCase):
             [("res_model", "=", model_name)], order="id desc", limit=1
         )
 
-    def test_one_click_pdf_uses_effective_template_and_partner_language(self):
+    def test_one_click_pdf_uses_effective_template_and_company_language(self):
         order = self.orders[0]
+        company_language = self.env["res.lang"].with_context(
+            active_test=False
+        ).search([("code", "=", "tr_TR")], limit=1)
+        self.assertTrue(company_language)
+        company_language.active = True
+        order.company_id.partner_id.lang = company_language.code
+        self.assertNotEqual(order.partner_id.lang, company_language.code)
         expected = self.env["rds.template"].get_default_for(
             "sale.order", company=order.company_id, record=order
         )
@@ -77,7 +84,8 @@ class TestRdsQuickExport(TransactionCase):
         self.assertEqual(action["tag"], "test.download")
         self.assertEqual(wizard.template_id, expected)
         self.assertEqual(wizard.output_format, "pdf")
-        self.assertEqual(wizard.language_id.code, "en_US")
+        self.assertEqual(wizard.language_mode, "company")
+        self.assertEqual(wizard.language_id, company_language)
         self.assertEqual(json.loads(wizard.res_ids_json), order.ids)
 
     def test_one_click_editable_word_is_available_on_all_business_models(self):
