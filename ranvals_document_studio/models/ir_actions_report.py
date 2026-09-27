@@ -36,7 +36,7 @@ class IrActionsReport(models.Model):
             or value <= 0
             or value > RDS_MAX_ID
         ):
-            raise ValidationError(_("Geçersiz kayıt kimliği."))
+            raise ValidationError(_("Invalid record ID."))
         return value
 
     @api.model
@@ -45,7 +45,7 @@ class IrActionsReport(models.Model):
         if data is None or data is False:
             return {}
         if not isinstance(data, Mapping):
-            raise UserError(_("Rapor verisi bir anahtar/değer eşlemesi olmalıdır."))
+            raise UserError(_("Report data must be a key/value mapping."))
         return dict(data)
 
     def _rds_check_report_access(self):
@@ -53,22 +53,22 @@ class IrActionsReport(models.Model):
         check_record_access(self)
         group_ids = set(self.sudo().group_ids.ids)
         if not self.env.is_superuser() and group_ids and not group_ids.intersection(self.env.user._get_group_ids()):
-            raise AccessError(_("Bu raporu kullanma yetkiniz yok."))
+            raise AccessError(_("You do not have permission to use this report."))
 
     def _rds_sidebar_scope(self, record_id=False):
         self._rds_check_report_access()
         if not self.env.user.has_group("base.group_user"):
-            raise AccessError(_("Bu işlem yalnız iç kullanıcılar içindir."))
+            raise AccessError(_("This action is for internal users only."))
         if self.model not in RDS_STUDIO_MODELS or self.report_type not in ("qweb-pdf", "qweb-html"):
-            raise UserError(_("Bu panel yalnız desteklenen satış, fatura ve satın alma QWeb raporlarında kullanılabilir."))
+            raise UserError(_("This panel is available only for supported sales, invoice, and purchase QWeb reports."))
         record_id = self._rds_positive_id(record_id, allow_empty=True)
         record = self.env[self.model].browse(record_id).exists()
         if record_id and not record:
-            raise UserError(_("Önizleme kaydı bulunamadı."))
+            raise UserError(_("The preview record was not found."))
         check_record_access(record)
         company = record.company_id if record else self.env.company
         if company not in self.env.companies:
-            raise AccessError(_("Belgenin şirketi etkin ve izinli şirketler arasında değil."))
+            raise AccessError(_("The document company is not among the active permitted companies."))
         return record, company
 
     def _rds_design_domain(self, company):
@@ -125,7 +125,7 @@ class IrActionsReport(models.Model):
     def rds_apply_design(self, record_id=False, template_id=False):
         record, company = self._rds_sidebar_scope(record_id)
         if not self._rds_can_manage_design():
-            raise AccessError(_("Tasarım seçimini kaydetmek için DocuCraft yöneticisi olmalısınız."))
+            raise AccessError(_("You must be a DocuCraft manager to save the design selection."))
         template_id = self._rds_positive_id(template_id, allow_empty=True)
         template = self.env["rds.template"]
         if template_id:
@@ -133,7 +133,7 @@ class IrActionsReport(models.Model):
                 self._rds_design_domain(company) + [("id", "=", template_id)], limit=1
             )
             if not template:
-                raise ValidationError(_("Şablon etkin değil veya bu şirket/belge modeli için kullanılamaz."))
+                raise ValidationError(_("The template is inactive or unavailable for this company and document model."))
         # Serialize concurrent choices for the same report; no manual commits.
         self.env.cr.execute("SELECT id FROM ir_act_report_xml WHERE id = %s FOR UPDATE", [self.id])
         bindings = self.env["rds.report.design"].search([
@@ -168,15 +168,15 @@ class IrActionsReport(models.Model):
                 record=record,
             )
         if not template or template not in self.env["rds.template"].search(self._rds_design_domain(record.company_id)):
-            raise UserError(_("Bu belge için kullanılabilir şablon bulunamadı."))
+            raise UserError(_("No template is available for this document."))
         return template
 
     def rds_export_design(self, record_id, output_format="pdf"):
         record, company = self._rds_sidebar_scope(record_id)
         if not record:
-            raise UserError(_("İndirmek için sağ üstten gerçek bir belge kaydı seçin."))
+            raise UserError(_("Select a real document record in the upper-right corner to download."))
         if output_format not in ("pdf", "docx", "docx_editable", "png", "zip"):
-            raise ValidationError(_("Desteklenmeyen çıktı biçimi."))
+            raise ValidationError(_("Unsupported output format."))
         template = self._rds_default_export_template(record)
         language_mode = "company"
         Wizard = self.env["rds.export.wizard"].with_company(company)
@@ -215,16 +215,16 @@ class IrActionsReport(models.Model):
             explicit = self.env["rds.template"].browse(explicit_id).exists()
             check_record_access(explicit)
             if not explicit:
-                raise ValidationError(_("Seçilen şablon bulunamadı."))
+                raise ValidationError(_("The selected template was not found."))
         plan = []
         for record in records:
             selected = explicit or report._rds_saved_design(record.company_id)
             if selected:
                 check_record_access(selected)
                 if not selected.active or (selected.company_id and selected.company_id != record.company_id):
-                    raise ValidationError(_("Şablon etkin değil veya belgenin şirketiyle uyumsuz."))
+                    raise ValidationError(_("The template is inactive or incompatible with the document company."))
                 if selected.target_model_id and selected.target_model_id.model != report.model:
-                    raise ValidationError(_("Seçilen şablon bu belge modeli için uygun değil."))
+                    raise ValidationError(_("The selected template is not suitable for this document model."))
             plan.append((record, selected))
         return report, plan
 
@@ -232,28 +232,28 @@ class IrActionsReport(models.Model):
     def _rds_merge_rendered_html(self, documents):
         """Combine per-company renderings into one valid report HTML document."""
         if not documents:
-            raise UserError(_("Birleştirilecek rapor içeriği bulunamadı."))
+            raise UserError(_("No report content is available to merge."))
         if len(documents) == 1:
             return documents[0]
 
         try:
             root = html.document_fromstring(documents[0])
         except (etree.ParserError, TypeError, ValueError) as exc:
-            raise UserError(_("Rapor HTML içeriği okunamadı.")) from exc
+            raise UserError(_("The report HTML content could not be read.")) from exc
         destination = root.xpath("//main")
         destination = destination[0] if destination else root.find("body")
         if destination is None:
-            raise UserError(_("Rapor HTML içeriğinde belge gövdesi bulunamadı."))
+            raise UserError(_("No document body was found in the report HTML content."))
 
         for content in documents[1:]:
             try:
                 other = html.document_fromstring(content)
             except (etree.ParserError, TypeError, ValueError) as exc:
-                raise UserError(_("Rapor HTML içeriği okunamadı.")) from exc
+                raise UserError(_("The report HTML content could not be read.")) from exc
             source = other.xpath("//main")
             source = source[0] if source else other.find("body")
             if source is None:
-                raise UserError(_("Rapor HTML içeriğinde belge gövdesi bulunamadı."))
+                raise UserError(_("No document body was found in the report HTML content."))
             for node in list(source):
                 destination.append(node)
         return etree.tostring(root, encoding="utf-8", method="html")
@@ -274,7 +274,7 @@ class IrActionsReport(models.Model):
             or target.model != report.model
             or target.report_type not in ("qweb-pdf", "qweb-html")
         ):
-            raise UserError(_("Seçilen tasarımın belge raporu bulunamadı veya geçersiz."))
+            raise UserError(_("The selected design document report was not found or is invalid."))
         return target
 
     @api.model

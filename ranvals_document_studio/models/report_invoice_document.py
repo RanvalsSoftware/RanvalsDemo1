@@ -9,19 +9,19 @@ from odoo.addons.ranvals_document_studio.tools.common import check_record_access
 class ReportRdsInvoiceDocument(models.AbstractModel):
     _name = "report.ranvals_document_studio.report_invoice_document"
     _table = "rds_report_invoice"
-    _description = "DocuCraft Fatura Raporu"
+    _description = "DocuCraft Invoice Report"
 
     @api.model
     def _rds_validate_report_data(self, data):
         if data is None:
             return {}
         if not isinstance(data, Mapping):
-            raise UserError(_("DocuCraft rapor verisi geçerli bir nesne olmalıdır."))
+            raise UserError(_("DocuCraft report data must be a valid object."))
         values = dict(data)
         if "rds_template_id" in values:
             template_id = values["rds_template_id"]
             if type(template_id) is not int or template_id <= 0:
-                raise UserError(_("DocuCraft şablon kimliği pozitif bir tam sayı olmalıdır."))
+                raise UserError(_("The DocuCraft template ID must be a positive integer."))
         if "lang" in values:
             language_code = values["lang"]
             is_active_language = (
@@ -33,11 +33,11 @@ class ReportRdsInvoiceDocument(models.AbstractModel):
                 )
             )
             if not is_active_language:
-                raise UserError(_("Seçilen belge dili etkin veya geçerli değildir."))
+                raise UserError(_("The selected document language is not active or valid."))
         if "rds_export_field_specs" in values and not isinstance(
             values["rds_export_field_specs"], (list, tuple)
         ):
-            raise UserError(_("Belge alanı seçimi geçerli bir liste olmalıdır."))
+            raise UserError(_("The document field selection must be a valid list."))
         return values
 
     @api.model
@@ -50,7 +50,7 @@ class ReportRdsInvoiceDocument(models.AbstractModel):
             not in ("out_invoice", "out_refund", "in_invoice", "in_refund")
         )
         if invalid_docs:
-            raise UserError(_("DocuCraft raporu yalnız fatura ve iade faturalarında kullanılabilir."))
+            raise UserError(_("The DocuCraft report can only be used for invoices and credit notes."))
         if data.get("lang"):
             docs = docs.with_context(
                 lang=data["lang"], rds_requested_lang=data["lang"]
@@ -60,7 +60,7 @@ class ReportRdsInvoiceDocument(models.AbstractModel):
         requested_template_id = data.get("rds_template_id")
         template = self.env["rds.template"].browse(requested_template_id).exists()
         if requested_template_id and not template:
-            raise UserError(_("Seçilen DocuCraft şablonu bulunamadı."))
+            raise UserError(_("The selected DocuCraft template was not found."))
         if not template and docs:
             template = self.env["rds.template"].get_default_for(
                 "account.move",
@@ -68,15 +68,15 @@ class ReportRdsInvoiceDocument(models.AbstractModel):
                 record=docs if len(docs) == 1 else None,
             )
         if docs and not template:
-            raise UserError(_("Kullanılabilir DocuCraft şablonu bulunamadı."))
+            raise UserError(_("No available DocuCraft template was found."))
         if template:
             check_record_access(template, "read")
             if not template.active:
-                raise UserError(_("Seçilen DocuCraft şablonu etkin değildir."))
+                raise UserError(_("The selected DocuCraft template is not active."))
             if template.target_model_id and template.target_model_id.model != "account.move":
-                raise UserError(_("Seçilen şablon bu belge modeli için tanımlı değildir."))
+                raise UserError(_("The selected template is not defined for this document model."))
             if template.company_id and docs.filtered(lambda record: record.company_id != template.company_id):
-                raise UserError(_("Şirkete özel şablon başka bir şirketin belgesinde kullanılamaz."))
+                raise UserError(_("A company-specific template cannot be used for another company’s document."))
         if docs and template and "rds_export_field_specs" in data:
             normalized_specs = template.normalize_export_field_specs(
                 docs[:1],

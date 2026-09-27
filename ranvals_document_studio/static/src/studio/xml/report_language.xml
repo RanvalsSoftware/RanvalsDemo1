@@ -2,13 +2,13 @@
 <templates xml:space="preserve">
     <t t-name="ranvals_document_studio.ReportLanguages" t-inherit="ranvals_document_studio.ReportDesignSelector" t-inherit-mode="extension">
         <xpath expr="//select[@t-model='state.templateId']/ancestor::label" position="after">
-            <label class="rds-design-label mt-3">Belge dili
-                <select class="form-select mt-1" t-model="state.languageCode" aria-label="Belge dili" t-att-disabled="state.busy or !state.canManage">
-                    <option value="">Firma dili (otomatik)</option>
-                    <option t-foreach="state.languages" t-as="lang" t-key="lang.code" t-att-value="lang.code" t-att-disabled="!lang.active"><t t-esc="lang.name"/><t t-if="!lang.active"> — etkin değil</t></option>
+            <label class="rds-design-label mt-3">Document language
+                <select class="form-select mt-1" t-model="state.languageCode" aria-label="Document language" t-att-disabled="state.busy or !state.canManage">
+                    <option value="">Company language (automatic)</option>
+                    <option t-foreach="state.languages" t-as="lang" t-key="lang.code" t-att-value="lang.code" t-att-disabled="!lang.active"><t t-esc="lang.name"/><t t-if="!lang.active"> — not active</t></option>
                 </select>
             </label>
-            <p class="rds-design-hint">Belge dili önizleme ve çıktıya uygulanır; arayüz dilini değiştirmez.</p>
+            <p class="rds-design-hint">The document language applies to previews and exports; it does not change the interface language.</p>
         </xpath>
         <xpath expr="//div[hasclass('rds-design-version')]" position="before"><div class="mt-3"><RdsLanguageButton beforeOpen.bind="prepareLanguageChange"/></div></xpath>
         <xpath expr="//div[hasclass('rds-design-version')]" position="replace"><div class="rds-design-version">DocuCraft · 19.0.3.3.1</div></xpath>

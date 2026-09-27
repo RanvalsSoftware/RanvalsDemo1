@@ -142,7 +142,7 @@ class TestRdsDashboards(TransactionCase):
         dashboard = self.env["rds.dashboard"].with_user(self.history_user)
         values = dashboard.get_export_dashboard("restricted-source")
         self.assertEqual(values["records"][0]["status_key"], "denied")
-        self.assertEqual(values["records"][0]["status_label"], "Erişim Yok")
+        self.assertEqual(values["records"][0]["status_label"], "Access Denied")
         self.assertFalse(values["records"][0]["can_open_record"])
         self.assertFalse(values["records"][0]["can_download"])
         with self.assertRaises(AccessError):

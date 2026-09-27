@@ -16,7 +16,7 @@
     </template>
 
     <record id="action_report_rds_purchase_document" model="ir.actions.report">
-        <field name="name">DocuCraft Belgesi – Satın Alma</field>
+        <field name="name">DocuCraft Document – Purchase</field>
         <field name="model">purchase.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_purchase_document</field>

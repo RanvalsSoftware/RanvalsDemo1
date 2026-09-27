@@ -9,11 +9,11 @@
                   decoration-muted="not active">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="layout_style" string="Yerleşim Stili"/>
+                <field name="layout_style" string="Layout Style"/>
                 <field name="is_default" widget="boolean_toggle"/>
                 <field name="target_model_id" optional="show"/>
                 <field name="company_id" optional="show"/>
-                <field name="active" string="Aktif" widget="boolean_toggle"/>
+                <field name="active" string="Active" widget="boolean_toggle"/>
             </list>
         </field>
     </record>
@@ -28,15 +28,15 @@
                 <field name="target_model_id"/>
                 <field name="company_id"/>
                 <separator/>
-                <filter name="filter_active" string="Aktif" domain="[('active', '=', True)]"/>
-                <filter name="filter_inactive" string="Pasif" domain="[('active', '=', False)]" help="Pasife alınmış şablonları göster"/>
-                <filter name="filter_all" string="Tümü" domain="[('active', 'in', [True, False])]" help="Aktif ve pasif bütün şablonları göster"/>
+                <filter name="filter_active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]" help="Show archived templates"/>
+                <filter name="filter_all" string="All" domain="[('active', 'in', [True, False])]" help="Show all active and archived templates"/>
                 <separator/>
-                <filter name="filter_default" string="Varsayılan" domain="[('is_default', '=', True)]"/>
+                <filter name="filter_default" string="Default" domain="[('is_default', '=', True)]"/>
                 <separator/>
-                <filter string="Tasarım" name="group_layout" context="{'group_by': 'layout_style'}"/>
+                <filter string="Design" name="group_layout" context="{'group_by': 'layout_style'}"/>
                 <filter string="Model" name="group_model" context="{'group_by': 'target_model_id'}"/>
-                <filter string="Şirket" name="group_company" context="{'group_by': 'company_id'}"/>
+                <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
             </search>
         </field>
     </record>
@@ -45,18 +45,18 @@
         <field name="name">rds.template.form</field>
         <field name="model">rds.template</field>
         <field name="arch" type="xml">
-            <form string="Belge Şablonu"
+            <form string="Document Template"
                   js_class="rds_sidebar_form"
                   class="rds-template-form">
                 <header>
-                    <button name="action_open_add_field" type="object" string="Alan Ekle" icon="fa-plus" class="btn-primary" groups="ranvals_document_studio.group_rds_manager"/>
-                    <field name="active" string="Aktif" widget="boolean_toggle"/>
+                    <button name="action_open_add_field" type="object" string="Add Field" icon="fa-plus" class="btn-primary" groups="ranvals_document_studio.group_rds_manager"/>
+                    <field name="active" string="Active" widget="boolean_toggle"/>
                 </header>
                 <sheet class="rds-template-sheet">
-                    <widget name="web_ribbon" title="Pasif" bg_color="text-bg-secondary" invisible="active"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-secondary" invisible="active"/>
                     <div class="oe_title">
-                        <label for="name" string="Şablon Adı"/>
-                        <h1><field name="name" placeholder="Örn. Kurumsal Teklif"/></h1>
+                        <label for="name" string="Template Name"/>
+                        <h1><field name="name" placeholder="e.g. Corporate Quotation"/></h1>
                     </div>
                     <group>
                         <group>
@@ -72,23 +72,23 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Önizleme" name="preview">
+                        <page string="Preview" name="preview">
                             <div class="rds-template-preview-page">
                                 <div class="rds-preview-stage"
                                      role="region"
-                                     aria-label="Belge şablonu önizlemesi"
+                                     aria-label="Document template preview"
                                      tabindex="0">
                                     <field name="preview_html" widget="html" nolabel="1" readonly="1"/>
                                 </div>
                             </div>
                         </page>
-                        <page string="Tasarım" name="design">
+                        <page string="Design" name="design">
                             <div class="rds-template-design-page">
                                 <div class="rds-template-settings-grid">
                                     <section class="rds-template-settings-card">
                                         <div class="rds-template-settings-card__header">
-                                            <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Renkler"/></span>
-                                            <span><strong>Renkler</strong><small>Şablonunuzda kullanılan renk paletini özelleştirin.</small></span>
+                                            <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Colors"/></span>
+                                            <span><strong>Colors</strong><small>Customize the color palette used by your template.</small></span>
                                         </div>
                                         <group col="1" class="rds-template-settings-card__fields">
                                         <field name="primary_color"/>
@@ -99,8 +99,8 @@
                                     </section>
                                     <section class="rds-template-settings-card">
                                         <div class="rds-template-settings-card__header">
-                                            <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Tipografi"/></span>
-                                            <span><strong>Tipografi</strong><small>Yazı tiplerini ve metin ayarlarını yönetin.</small></span>
+                                            <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Typography"/></span>
+                                            <span><strong>Typography</strong><small>Manage fonts and text settings.</small></span>
                                         </div>
                                         <group col="1" class="rds-template-settings-card__fields">
                                         <field name="heading_font"/>
@@ -112,11 +112,11 @@
                                 </div>
                             </div>
                         </page>
-                        <page string="Bloklar" name="blocks" class="rds-template-blocks-page">
+                        <page string="Blocks" name="blocks" class="rds-template-blocks-page">
                             <div class="rds-template-settings-card rds-template-settings-card--wide">
                                 <div class="rds-template-settings-card__header">
-                                    <span class="rds-template-settings-card__icon"><i class="fa fa-th-large" title="Belge Blokları"/></span>
-                                    <span><strong>Belge Blokları</strong><small>Çıktıda gösterilecek içerik bölümlerini seçin.</small></span>
+                                    <span class="rds-template-settings-card__icon"><i class="fa fa-th-large" title="Document Blocks"/></span>
+                                    <span><strong>Document Blocks</strong><small>Select the content sections to include in the export.</small></span>
                                 </div>
                                 <group>
                                     <group>
@@ -133,15 +133,15 @@
                                 <field name="notes_text" widget="html"/>
                             </div>
                         </page>
-                        <page string="Alanlar" name="fields" class="rds-template-fields-page">
+                        <page string="Fields" name="fields" class="rds-template-fields-page">
                             <div class="rds-fields-toolbar">
                                 <div>
-                                    <strong>Çıktı Alanları</strong>
-                                    <small>Belgede gösterilecek alanları, sıralarını ve biçimlerini yönetin.</small>
+                                    <strong>Export Fields</strong>
+                                    <small>Manage which fields appear in the document, their order, and formatting.</small>
                                 </div>
                                 <button name="action_open_add_field"
                                         type="object"
-                                        string="Alan Ekle"
+                                        string="Add Field"
                                         icon="fa-plus"
                                         class="btn-primary"
                                         groups="ranvals_document_studio.group_rds_manager"/>
@@ -175,7 +175,7 @@
     </record>
 
     <record id="action_rds_template" model="ir.actions.act_window">
-        <field name="name">DocuCraft Şablonları</field>
+        <field name="name">DocuCraft Templates</field>
         <field name="res_model">rds.template</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_rds_template_search"/>

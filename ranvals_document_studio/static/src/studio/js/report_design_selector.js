@@ -58,7 +58,7 @@ export class RdsReportDesignSelector extends Component {
 
     get selectedName() {
         const item = this.state.templates.find((template) => String(template.id) === this.state.templateId);
-        return item?.name || _t("Mevcut / varsayılan tasarım");
+        return item?.name || _t("Current / default design");
     }
 
     get changed() {
@@ -112,7 +112,7 @@ export class RdsReportDesignSelector extends Component {
             }
         } catch (error) {
             if (this.alive && generation === this.generation && key === this.key) {
-                this.state.error = error.data?.message || error.message || _t("Tasarım seçenekleri yüklenemedi.");
+                this.state.error = error.data?.message || error.message || _t("Could not load design options.");
                 this.state.ready = true;
             }
         }
@@ -148,15 +148,15 @@ export class RdsReportDesignSelector extends Component {
             });
             if (!result.ok) {
                 if (result.reason === "unsaved") {
-                    this.notification.add(_t("Rapor kaydedilemedi. Önce Studio hatasını düzeltin; tasarım değiştirilmedi."), { type: "warning" });
+                    this.notification.add(_t("The report could not be saved. Fix the Studio error first; the design was not changed."), { type: "warning" });
                 } else if (result.reason === "preview") {
-                    this.notification.add(_t("Tasarım kaydedildi ancak önizleme oluşturulamadı. Studio hata ayrıntılarını kontrol edin."), { type: "warning" });
+                    this.notification.add(_t("The design was saved, but the preview could not be generated. Check the Studio error details."), { type: "warning" });
                 }
                 return;
             }
-            this.notification.add(_t("Bu rapor ve şirket için tasarım kaydedildi."), { type: "success" });
+            this.notification.add(_t("The design was saved for this report and company."), { type: "success" });
         } catch (error) {
-            if (this.alive) this.notification.add(error.data?.message || error.message || _t("İşlem tamamlanamadı."), { type: "danger" });
+            if (this.alive) this.notification.add(error.data?.message || error.message || _t("The operation could not be completed."), { type: "danger" });
         } finally {
             if (this.alive) this.state.busy = false;
         }

@@ -27,17 +27,17 @@ ALLOWED_OUTPUT_FORMATS = {
 
 class RdsExportJob(models.Model):
     _name = "rds.export.job"
-    _description = "DocuCraft Arka Plan Dışa Aktarım İşi"
+    _description = "DocuCraft Background Export Job"
     _order = "create_date desc, id desc"
 
-    name = fields.Char(required=True, readonly=True, copy=False, default=lambda self: _("Yeni"))
+    name = fields.Char(required=True, readonly=True, copy=False, default=lambda self: _("New"))
     state = fields.Selection(
         [
-            ("queued", "Kuyrukta"),
-            ("running", "Hazırlanıyor"),
-            ("done", "Tamamlandı"),
-            ("failed", "Hata"),
-            ("cancelled", "İptal"),
+            ("queued", "Queued"),
+            ("running", "Preparing"),
+            ("done", "Completed"),
+            ("failed", "Error"),
+            ("cancelled", "Cancelled"),
         ],
         required=True,
         readonly=True,
@@ -67,24 +67,20 @@ class RdsExportJob(models.Model):
     )
     rds_source_report_id = fields.Many2one(
         "ir.actions.report",
-        string="Kaynak Studio Raporu",
+        string="Source Studio Report",
         readonly=True,
         copy=False,
         ondelete="set null",
         help=(
-            "Studio'dan başlatılan dışa aktarımda kullanılan özgün rapor "
-            "aksiyonu. Arka plan çalışanı aynı rapor kimliği ve bağlamıyla "
-            "çıktı üretir."
+            "The original report action used by an export started from Studio. The background worker generates output with the same report identity and context."
         ),
     )
     source_report_expected = fields.Boolean(
-        string="Studio Kaynak Raporu Bekleniyor",
+        string="Source Studio Report Expected",
         readonly=True,
         copy=False,
         help=(
-            "İşin bir Studio raporundan başlatıldığını kalıcı olarak işaretler. "
-            "Kaynak rapor sonradan silinirse başka bir rapora sessizce dönmek "
-            "yerine iş güvenli biçimde başarısız olur."
+            "Permanently marks that the job was started from a Studio report. If the source report is later deleted, the job fails safely instead of silently falling back to another report."
         ),
     )
     res_model = fields.Char(required=True, readonly=True, index=True)
@@ -94,10 +90,10 @@ class RdsExportJob(models.Model):
     output_format = fields.Selection(
         [
             ("pdf", "PDF"),
-            ("docx_editable", "Word / DOCX – Düzenlenebilir"),
-            ("docx", "Word / DOCX – Tasarımı Birebir Korur"),
+            ("docx_editable", "Word / DOCX – Editable"),
+            ("docx", "Word / DOCX – Preserve the Design Exactly"),
             ("png", "PNG"),
-            ("zip", "Tüm Formatlar / ZIP"),
+            ("zip", "All Formats / ZIP"),
         ],
         required=True,
         readonly=True,
@@ -113,12 +109,11 @@ class RdsExportJob(models.Model):
     attach_to_record = fields.Boolean(readonly=True)
     file_name_prefix = fields.Char(readonly=True)
     field_selection_json = fields.Text(
-        string="Belge Alanı Seçimi",
+        string="Document Field Selection",
         readonly=True,
         copy=False,
         help=(
-            "İş oluşturulurken doğrulanan alan seçiminin değiştirilemez kopyası. "
-            "Boş değer eski işler için şablon varsayılanlarını kullanır."
+            "An immutable copy of the field selection validated when the job was created. An empty value uses template defaults for legacy jobs."
         ),
     )
     attempts = fields.Integer(readonly=True, default=0)
@@ -173,7 +168,7 @@ class RdsExportJob(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         if not self.env.su:
-            raise AccessError(_("Arka plan işleri yalnız güvenli dışa aktarım akışından oluşturulabilir."))
+            raise AccessError(_("Background jobs can only be created through the secure export flow."))
         for values in vals_list:
             # ``ondelete=set null`` lets administrators remove obsolete report
             # actions without jobs becoming permanent blockers.  This durable
@@ -181,10 +176,10 @@ class RdsExportJob(models.Model):
             # connector export which never had a Studio source report.
             if values.get("rds_source_report_id"):
                 values["source_report_expected"] = True
-            if not values.get("name") or values.get("name") == _("Yeni"):
+            if not values.get("name") or values.get("name") == _("New"):
                 values["name"] = (
                     self.env["ir.sequence"].next_by_code("rds.export.job")
-                    or _("DocuCraft İşi")
+                    or _("DocuCraft Job")
                 )
         return super().create(vals_list)
 
@@ -207,9 +202,9 @@ class RdsExportJob(models.Model):
             for record in records:
                 wizard._rds_source_report(record)
         if wizard.output_format not in ALLOWED_OUTPUT_FORMATS:
-            raise ValidationError(_("Desteklenmeyen arka plan çıktı formatı."))
+            raise ValidationError(_("Unsupported background output format."))
         if wizard.template_id not in wizard.available_template_ids:
-            raise ValidationError(_("Seçilen şablon bu kayıtlar için kullanılamaz."))
+            raise ValidationError(_("The selected template cannot be used for these records."))
         companies = (
             records.mapped("company_id")
             if "company_id" in records._fields
@@ -217,11 +212,11 @@ class RdsExportJob(models.Model):
         )
         if len(companies) > 1:
             raise ValidationError(
-                _("Bir arka plan işi yalnız aynı şirkete ait kayıtları içerebilir.")
+                _("A background job can contain records from only one company.")
             )
         company = companies or caller_env.company
         if not caller_env.su and company not in caller_env.companies:
-            raise AccessError(_("Kaynak belgelerin şirketine erişim izniniz bulunmuyor."))
+            raise AccessError(_("You do not have access to the source documents' company."))
         pending_count = Job.sudo().search_count(
             [
                 ("user_id", "=", caller_env.user.id),
@@ -230,7 +225,7 @@ class RdsExportJob(models.Model):
         )
         if pending_count >= MAX_PENDING_JOBS_PER_USER:
             raise UserError(
-                _("Aynı anda en fazla %s bekleyen dışa aktarım işi olabilir.")
+                _("At most %s pending export jobs can exist at the same time.")
                 % MAX_PENDING_JOBS_PER_USER
             )
         names = ", ".join(records.mapped("display_name"))
@@ -252,7 +247,7 @@ class RdsExportJob(models.Model):
             field_selection_json
             and len(field_selection_json) > MAX_FIELD_SELECTION_JSON_CHARS
         ):
-            raise ValidationError(_("Belge alanı seçimi izin verilen sınırı aşıyor."))
+            raise ValidationError(_("The document field selection exceeds the allowed limit."))
         job = Job.sudo().create(
             {
                 "user_id": caller_env.user.id,
@@ -281,7 +276,7 @@ class RdsExportJob(models.Model):
         source_model = wizard_model._source_model(self.res_model)
         records = source_model.browse(record_ids).exists()
         if len(records) != len(record_ids):
-            raise AccessError(_("Kaynak belgelerden biri artık kullanılamıyor."))
+            raise AccessError(_("One of the source documents is no longer available."))
         check_record_access(records)
         if "company_id" in records._fields:
             # Company-neutral records are valid sources (the synchronous
@@ -292,16 +287,16 @@ class RdsExportJob(models.Model):
                 and record.company_id != self.company_id
             )
             if foreign:
-                raise AccessError(_("Kaynak belge artık bu işin şirketine ait değil."))
+                raise AccessError(_("The source document no longer belongs to this job's company."))
         return records
 
     def _as_requesting_user(self):
         self.ensure_one()
         user = self.user_id.exists()
         if not user or not user.active or user.share:
-            raise AccessError(_("İşi isteyen kullanıcı artık etkin bir iç kullanıcı değil."))
+            raise AccessError(_("The requesting user is no longer an active internal user."))
         if self.company_id not in user.company_ids:
-            raise AccessError(_("İşi isteyen kullanıcının şirket erişimi artık bulunmuyor."))
+            raise AccessError(_("The requesting user no longer has access to the company."))
         return self.with_user(user).with_company(self.company_id).with_context(
             allowed_company_ids=[self.company_id.id]
         )
@@ -314,23 +309,22 @@ class RdsExportJob(models.Model):
         if job.source_report_expected and not source_report:
             raise AccessError(
                 _(
-                    "Bu işin kaynak Studio raporu artık mevcut değil; "
-                    "güvenli bir çıktı üretilemedi."
+                    "The source Studio report for this job no longer exists; a safe output could not be generated."
                 )
             )
         if source_report and not job.source_report_expected:
             # Defensive fail-closed handling for an inconsistent legacy or
             # manually altered row.  Legitimate jobs always set both values in
             # ``create``/``_enqueue_from_wizard``.
-            raise AccessError(_("Arka plan işinin kaynak rapor bilgisi tutarsız."))
+            raise AccessError(_("The background job's source report information is inconsistent."))
         field_specs = None
         if job.field_selection_json:
             if len(job.field_selection_json) > MAX_FIELD_SELECTION_JSON_CHARS:
-                raise ValidationError(_("Belge alanı seçimi izin verilen sınırı aşıyor."))
+                raise ValidationError(_("The document field selection exceeds the allowed limit."))
             try:
                 field_specs = json.loads(job.field_selection_json)
             except (TypeError, ValueError) as error:
-                raise ValidationError(_("Belge alanı seçimi okunamadı.")) from error
+                raise ValidationError(_("The document field selection could not be read.")) from error
             field_specs = job.template_id.normalize_export_field_specs(
                 records[:1],
                 field_specs,
@@ -389,9 +383,9 @@ class RdsExportJob(models.Model):
         try:
             content = base64.b64decode(encoded or b"", validate=True)
         except (binascii.Error, TypeError, ValueError) as error:
-            raise UserError(_("Arka plan çıktısı geçerli dosya verisi üretmedi.")) from error
+            raise UserError(_("The background export did not produce valid file data.")) from error
         if not content or len(content) > MAX_JOB_BYTES:
-            raise UserError(_("Arka plan çıktısı boş veya 100 MB sınırını aşıyor."))
+            raise UserError(_("The background output is empty or exceeds the 100 MB limit."))
         values = {
             "file_name": wizard.file_name,
             "file_mimetype": wizard.file_mimetype,
@@ -406,7 +400,7 @@ class RdsExportJob(models.Model):
         if isinstance(error, (AccessError, UserError, ValidationError)):
             message = str(error)
         else:
-            message = _("Beklenmeyen bir sunucu hatası oluştu. Sistem yöneticisi logları incelemelidir.")
+            message = _("An unexpected server error occurred. The system administrator should review the logs.")
         return " ".join(message.split())[:MAX_ERROR_MESSAGE]
 
     def _notify_requester(self, *, success):
@@ -417,12 +411,12 @@ class RdsExportJob(models.Model):
             self.user_id.sudo()._bus_send(
                 "simple_notification",
                 {
-                    "title": _("DocuCraft dışa aktarımı"),
+                    "title": _("DocuCraft export"),
                     "message": (
-                        _("%s hazır. Arka Plan İşlerim ekranından indirebilirsiniz.")
+                        _("%s is ready. You can download it from My Background Jobs.")
                         % self.name
                         if success
-                        else _("%s tamamlanamadı: %s")
+                        else _("%s could not be completed: %s")
                         % (self.name, self.error_message)
                     ),
                     "type": "success" if success else "danger",
@@ -454,7 +448,7 @@ class RdsExportJob(models.Model):
                     "state": "failed",
                     "progress": 100,
                     "finished_at": fields.Datetime.now(),
-                    "error_message": _("Bu iş izin verilen yeniden deneme sayısını aştı."),
+                    "error_message": _("This job has exceeded the allowed retry count."),
                 }
             )
             return False
@@ -521,12 +515,12 @@ class RdsExportJob(models.Model):
             if requested_job.user_id != self.env.user and not self.env.user.has_group(
                 "ranvals_document_studio.group_rds_manager"
             ):
-                raise AccessError(_("Yalnız kendi işinizi iptal edebilirsiniz."))
+                raise AccessError(_("You can cancel only your own jobs."))
             job = requested_job.try_lock_for_update().filtered_domain(
                 [("state", "=", "queued")]
             )
             if not job:
-                raise UserError(_("Yalnız kuyruktaki işler iptal edilebilir."))
+                raise UserError(_("Only queued jobs can be cancelled."))
             locked_jobs |= job
         locked_jobs.sudo().write(
             {
@@ -543,14 +537,14 @@ class RdsExportJob(models.Model):
         if self.user_id != self.env.user and not self.env.user.has_group(
             "ranvals_document_studio.group_rds_manager"
         ):
-            raise AccessError(_("Yalnız kendi işinizi yeniden deneyebilirsiniz."))
+            raise AccessError(_("You can retry only your own jobs."))
         job = self.try_lock_for_update().filtered_domain(
             [("state", "in", ("failed", "cancelled"))]
         )
         if not job:
-            raise UserError(_("Yalnız başarısız veya iptal edilmiş işler yeniden denenebilir."))
+            raise UserError(_("Only failed or cancelled jobs can be retried."))
         if job.attempts >= MAX_JOB_ATTEMPTS:
-            raise UserError(_("Bu iş izin verilen yeniden deneme sayısını aştı."))
+            raise UserError(_("This job has exceeded the allowed retry count."))
         # Validate both the actor requesting the retry and the original
         # requester whose privileges the worker will actually use.
         job._source_records()
@@ -576,14 +570,14 @@ class RdsExportJob(models.Model):
         check_record_access(self)
         self._source_records()
         if self.state != "done":
-            raise UserError(_("Bu arka plan işi henüz indirilmeye hazır değil."))
+            raise UserError(_("This background job is not ready to download yet."))
         encoded = self.sudo().file_data
         try:
             content = base64.b64decode(encoded or b"", validate=True)
         except (binascii.Error, TypeError, ValueError) as error:
-            raise UserError(_("Arka plan işi dosyası bozuk.")) from error
+            raise UserError(_("The background job file is corrupt.")) from error
         if not content or len(content) > MAX_JOB_BYTES:
-            raise UserError(_("Arka plan işi dosyası bulunamadı veya boyut sınırını aşıyor."))
+            raise UserError(_("The background job file is missing or exceeds the size limit."))
         return (
             self.file_name,
             content,
@@ -603,5 +597,5 @@ class RdsExportJob(models.Model):
 
     def unlink(self):
         if self.filtered(lambda job: job.state == "running"):
-            raise UserError(_("Çalışan bir dışa aktarım işi silinemez."))
+            raise UserError(_("A running export job cannot be deleted."))
         return super().unlink()

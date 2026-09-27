@@ -21,16 +21,16 @@ class RdsQuickExportMixin(models.AbstractModel):
     """
 
     _name = "rds.quick.export.mixin"
-    _description = "DocuCraft Hızlı Dışa Aktarım Mixin"
+    _description = "DocuCraft Quick Export Mixin"
 
     _rds_quick_export_group = False
 
     def _rds_check_quick_export_scope(self):
         if not self:
-            raise UserError(_("İndirmek için en az bir belge seçin."))
+            raise UserError(_("Select at least one document to download."))
         if len(self) > MAX_QUICK_EXPORT_RECORDS:
             raise UserError(
-                _("Tek işlemde en fazla %s belge indirilebilir.")
+                _("You can download at most %s documents in one operation.")
                 % MAX_QUICK_EXPORT_RECORDS
             )
         if any(
@@ -40,27 +40,26 @@ class RdsQuickExportMixin(models.AbstractModel):
             or record_id > MAX_DATABASE_ID
             for record_id in self.ids
         ):
-            raise UserError(_("Seçilen belgelerden birinin kimliği geçersiz."))
+            raise UserError(_("One of the selected documents has an invalid ID."))
         if self._rds_quick_export_group and not (
             self.env.su or self.env.user.has_group(self._rds_quick_export_group)
         ):
-            raise AccessError(_("Bu belgeleri dışa aktarma yetkiniz bulunmuyor."))
+            raise AccessError(_("You do not have permission to export these documents."))
 
         records = self.exists()
         if len(records) != len(self):
-            raise UserError(_("Seçilen belgelerden biri artık mevcut değil."))
+            raise UserError(_("One of the selected documents no longer exists."))
         check_record_access(records)
 
         companies = records.mapped("company_id")
         if len(companies) != 1:
             raise UserError(
                 _(
-                    "Toplu indirme için aynı şirkete ait belgeleri seçin. "
-                    "Farklı şirketleri ayrı işlemlerde indirebilirsiniz."
+                    "Select documents from the same company for a bulk download. Download documents from different companies in separate operations."
                 )
             )
         if not self.env.su and companies not in self.env.companies:
-            raise AccessError(_("Bu şirketin belgelerine erişim izniniz bulunmuyor."))
+            raise AccessError(_("You do not have access to documents from this company."))
         return records, companies
 
     def _rds_validate_quick_export_records(self):
@@ -118,7 +117,7 @@ class RdsQuickExportMixin(models.AbstractModel):
 
     def _rds_quick_export(self, output_format):
         if output_format not in QUICK_EXPORT_FORMATS:
-            raise ValidationError(_("Desteklenmeyen hızlı indirme biçimi."))
+            raise ValidationError(_("Unsupported quick-download format."))
         records, company = self._rds_check_quick_export_scope()
         records._rds_validate_quick_export_records()
         template = self._rds_quick_export_template(records, company)
@@ -168,8 +167,7 @@ class AccountMoveQuickExport(models.Model):
         if any(move.move_type not in supported_types for move in self):
             raise UserError(
                 _(
-                    "Hızlı indirme yalnız müşteri/tedarikçi faturaları ve "
-                    "iade faturaları için kullanılabilir."
+                    "Quick download is available only for customer/vendor invoices and refunds."
                 )
             )
 

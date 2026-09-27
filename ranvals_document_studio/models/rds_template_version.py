@@ -89,7 +89,7 @@ class RdsTemplateVersioning(models.Model):
     version_ids = fields.One2many(
         "rds.template.version",
         "template_id",
-        string="Sürümler",
+        string="Versions",
         readonly=True,
     )
     version_count = fields.Integer(compute="_compute_version_count")
@@ -187,7 +187,7 @@ class RdsTemplateVersioning(models.Model):
     @api.model
     def _rds_validate_translation_map(self, translations, *, value_limit):
         if not isinstance(translations, dict) or len(translations) > MAX_TRANSLATION_LANGUAGES:
-            raise ValidationError(_("Şablon sürümünün dil çevirileri geçersiz."))
+            raise ValidationError(_("The template version language translations are invalid."))
         language_codes = set(translations)
         if any(
             not isinstance(code, str)
@@ -195,10 +195,10 @@ class RdsTemplateVersioning(models.Model):
             or not re.fullmatch(r"[A-Za-z0-9_@-]+", code)
             for code in language_codes
         ):
-            raise ValidationError(_("Şablon sürümünde geçersiz bir dil kodu var."))
+            raise ValidationError(_("The template version contains an invalid language code."))
         for value in translations.values():
             if not isinstance(value, str) or len(value) > value_limit:
-                raise ValidationError(_("Şablon sürümündeki çeviri metni geçersiz veya çok uzun."))
+                raise ValidationError(_("A translation in the template version is invalid or too long."))
         return language_codes
 
     @api.model
@@ -214,20 +214,20 @@ class RdsTemplateVersioning(models.Model):
                 Language.sudo().search([("code", "in", list(missing))]).mapped("code")
             )
             if known:
-                raise AccessError(_("Şablon sürümündeki dillerden birine erişim izniniz bulunmuyor."))
-            raise ValidationError(_("Şablon sürümünde bu veritabanında bulunmayan bir dil var."))
+                raise AccessError(_("You do not have access to one of the languages in the template version."))
+            raise ValidationError(_("The template version contains a language that is not available in this database."))
 
     @api.model
     def _rds_validate_snapshot_translations(self, translations, field_values):
         if not isinstance(translations, dict) or set(translations) != {
             "template", "field_labels"
         }:
-            raise ValidationError(_("Şablon sürümünün çeviri yapısı geçersiz."))
+            raise ValidationError(_("The template version translation structure is invalid."))
         template_translations = translations["template"]
         if not isinstance(template_translations, dict) or set(template_translations) != set(
             TRANSLATED_TEMPLATE_FIELDS
         ):
-            raise ValidationError(_("Şablon sürümünün alan çevirileri eksik veya geçersiz."))
+            raise ValidationError(_("The template version field translations are missing or invalid."))
         language_codes = set()
         for field_name in TRANSLATED_TEMPLATE_FIELDS:
             language_codes.update(self._rds_validate_translation_map(
@@ -236,7 +236,7 @@ class RdsTemplateVersioning(models.Model):
             ))
         field_labels = translations["field_labels"]
         if not isinstance(field_labels, list) or len(field_labels) != len(field_values):
-            raise ValidationError(_("Şablon sürümünün dinamik alan çevirileri eşleşmiyor."))
+            raise ValidationError(_("The template version dynamic-field translations do not match."))
         for label_translations in field_labels:
             language_codes.update(self._rds_validate_translation_map(
                 label_translations,
@@ -252,9 +252,9 @@ class RdsTemplateVersioning(models.Model):
         if allow_snapshot:
             allowed_key_sets.append(portable_keys | {"snapshot"})
         if not isinstance(payload, dict) or set(payload) not in allowed_key_sets:
-            raise ValidationError(_("Şablon dosyasının üst düzey yapısı geçersiz."))
+            raise ValidationError(_("The top-level structure of the template file is invalid."))
         if payload.get("schema") != TEMPLATE_SCHEMA or payload.get("schema_version") != TEMPLATE_SCHEMA_VERSION:
-            raise ValidationError(_("Şablon dosyası desteklenmeyen bir şema sürümü kullanıyor."))
+            raise ValidationError(_("The template file uses an unsupported schema version."))
 
         internal_snapshot = allow_snapshot and "snapshot" in payload
         template_values = payload.get("template")
@@ -262,31 +262,31 @@ class RdsTemplateVersioning(models.Model):
         allowed_template = set(TEMPLATE_VALUE_FIELDS) | {"target_model"}
         allowed_field = set(FIELD_VALUE_FIELDS) | {"source_model"}
         if not isinstance(template_values, dict) or set(template_values) != allowed_template:
-            raise ValidationError(_("Şablon dosyasında desteklenmeyen veya eksik alanlar var."))
+            raise ValidationError(_("The template file contains unsupported or missing fields."))
         field_limit = MAX_INTERNAL_TEMPLATE_FIELDS if internal_snapshot else MAX_TEMPLATE_FIELDS
         if not isinstance(field_values, list) or len(field_values) > field_limit:
-            raise ValidationError(_("Bir şablon en fazla %s dinamik alan içerebilir.") % field_limit)
+            raise ValidationError(_("A template can contain at most %s dynamic fields.") % field_limit)
         string_limits = INTERNAL_STRING_LIMITS if internal_snapshot else STRING_LIMITS
         for name, limit in string_limits.items():
             if name in template_values:
                 value = template_values[name]
                 if value not in (False, None) and (not isinstance(value, str) or len(value) > limit):
-                    raise ValidationError(_("Şablon dosyasındaki %s alanı geçersiz.") % name)
+                    raise ValidationError(_("Field %s in the template file is invalid.") % name)
 
         if not isinstance(template_values["name"], str) or not template_values["name"].strip():
-            raise ValidationError(_("Şablon adı boş olamaz."))
+            raise ValidationError(_("The template name cannot be empty."))
         boolean_template_fields = {
             "active", "is_default", "show_company", "show_partner",
             "show_metadata", "show_notes", "show_bank", "show_footer",
         }
         if any(not isinstance(template_values[name], bool) for name in boolean_template_fields):
-            raise ValidationError(_("Şablonun açık/kapalı seçeneklerinden biri geçersiz."))
+            raise ValidationError(_("One of the template boolean options is invalid."))
         if (
             isinstance(template_values["sequence"], bool)
             or not isinstance(template_values["sequence"], int)
             or not -(2**31) <= template_values["sequence"] < 2**31
         ):
-            raise ValidationError(_("Şablon sırası geçerli bir tam sayı olmalıdır."))
+            raise ValidationError(_("The template sequence must be a valid integer."))
         if template_values["layout_style"] not in {
             "beauty",
             "construction",
@@ -303,25 +303,25 @@ class RdsTemplateVersioning(models.Model):
             "sandstone_classic",
             "graphite_copper",
         }:
-            raise ValidationError(_("Şablon yerleşim stili desteklenmiyor."))
+            raise ValidationError(_("The template layout style is not supported."))
         for color_name in ("primary_color", "secondary_color", "accent_color", "text_color"):
             color = template_values[color_name]
             if not isinstance(color, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
-                raise ValidationError(_("Şablon renklerinden biri #RRGGBB biçiminde değil."))
+                raise ValidationError(_("One of the template colors is not in #RRGGBB format."))
         if (
             template_values["heading_font"] not in SUPPORTED_FONT_KEYS
             or template_values["body_font"] not in SUPPORTED_FONT_KEYS
         ):
-            raise ValidationError(_("Şablon yazı tipi desteklenmiyor."))
+            raise ValidationError(_("The template font is not supported."))
         logo_height = template_values["logo_height_mm"]
         if isinstance(logo_height, bool) or not isinstance(logo_height, int) or not 8 <= logo_height <= 40:
-            raise ValidationError(_("Logo yüksekliği 8 ile 40 mm arasında bir tam sayı olmalıdır."))
+            raise ValidationError(_("Logo height must be an integer between 8 and 40 mm."))
 
         target_model = template_values.get("target_model")
         if target_model:
             model = self.env["ir.model"]._get(target_model)
             if not model or model.transient:
-                raise ValidationError(_("Hedef model bu Odoo veritabanında kullanılamıyor."))
+                raise ValidationError(_("The target model is not available in this Odoo database."))
 
         snapshot = payload.get("snapshot")
         if snapshot is not None:
@@ -334,20 +334,20 @@ class RdsTemplateVersioning(models.Model):
                 or not isinstance(snapshot, dict)
                 or set(snapshot) not in allowed_snapshot_keys
             ):
-                raise ValidationError(_("Şablon sürüm bilgisi geçersiz."))
+                raise ValidationError(_("The template version information is invalid."))
             if not isinstance(snapshot.get("code"), str) or not re.fullmatch(
                 r"[A-Za-z0-9_]{1,72}", snapshot["code"]
             ):
-                raise ValidationError(_("Şablon sürüm kodu geçersiz."))
+                raise ValidationError(_("The template version code is invalid."))
             company_id = snapshot.get("company_id")
             if company_id is not False and (
                 isinstance(company_id, bool) or not isinstance(company_id, int) or company_id <= 0
             ):
-                raise ValidationError(_("Şablon sürüm şirketi geçersiz."))
+                raise ValidationError(_("The template version company is invalid."))
             if company_id:
                 company = self.env["res.company"].browse(company_id).exists()
                 if not company or (not self.env.su and company not in self.env.companies):
-                    raise AccessError(_("Şablon sürümünün şirketine erişim izniniz bulunmuyor."))
+                    raise AccessError(_("You do not have access to the template version company."))
             if "translations" in snapshot:
                 self._rds_validate_snapshot_translations(
                     snapshot["translations"], field_values
@@ -356,66 +356,66 @@ class RdsTemplateVersioning(models.Model):
         active_layout_groups = {}
         for item in field_values:
             if not isinstance(item, dict) or set(item) != allowed_field:
-                raise ValidationError(_("Dinamik alan yapılandırması geçersiz."))
+                raise ValidationError(_("The dynamic-field configuration is invalid."))
             for name, limit in string_limits.items():
                 if name in item:
                     value = item[name]
                     if value not in (False, None) and (not isinstance(value, str) or len(value) > limit):
-                        raise ValidationError(_("Dinamik alanın %s değeri geçersiz.") % name)
+                        raise ValidationError(_("Dynamic field value %s is invalid.") % name)
             source_model = item.get("source_model")
             model = self.env["ir.model"]._get(source_model) if isinstance(source_model, str) else False
             if not model or model.transient:
-                raise ValidationError(_("Dinamik alanın kaynak modeli kullanılamıyor."))
+                raise ValidationError(_("The dynamic field source model is unavailable."))
             if not isinstance(item["label"], str) or not item["label"].strip():
-                raise ValidationError(_("Dinamik alan etiketi boş olamaz."))
+                raise ValidationError(_("The dynamic field label cannot be empty."))
             if item["section"] not in {"metadata", "line"}:
-                raise ValidationError(_("Dinamik alan bölümü desteklenmiyor."))
+                raise ValidationError(_("The dynamic field section is not supported."))
             if item["value_type"] not in {
                 "auto", "text", "date", "monetary", "percentage", "integer", "float"
             }:
-                raise ValidationError(_("Dinamik alan değer türü desteklenmiyor."))
+                raise ValidationError(_("The dynamic field value type is not supported."))
             if item["alignment"] not in {"left", "center", "right"}:
-                raise ValidationError(_("Dinamik alan hizalaması desteklenmiyor."))
+                raise ValidationError(_("The dynamic field alignment is not supported."))
             if any(
                 not isinstance(item[name], bool)
                 for name in ("active", "hide_if_empty", "bold", "highlight")
             ):
-                raise ValidationError(_("Dinamik alanın açık/kapalı seçeneklerinden biri geçersiz."))
+                raise ValidationError(_("One of the dynamic field boolean options is invalid."))
             for name in ("sequence", "width_percent"):
                 value = item[name]
                 if isinstance(value, bool) or not isinstance(value, int):
-                    raise ValidationError(_("Dinamik alan sayısal değeri geçersiz."))
+                    raise ValidationError(_("The dynamic field numeric value is invalid."))
             if not -(2**31) <= item["sequence"] < 2**31:
-                raise ValidationError(_("Dinamik alan sırası izin verilen aralığın dışında."))
+                raise ValidationError(_("The dynamic field sequence is outside the allowed range."))
             if not 5 <= item["width_percent"] <= 100:
-                raise ValidationError(_("Dinamik alan genişliği yüzde 5 ile 100 arasında olmalıdır."))
+                raise ValidationError(_("Dynamic field width must be between 5 and 100 percent."))
             icon = item["icon_class"]
             if icon not in (False, None) and (
                 not isinstance(icon, str) or not re.fullmatch(r"fa-[a-z0-9-]+", icon)
             ):
-                raise ValidationError(_("Dinamik alan ikon sınıfı geçersiz."))
+                raise ValidationError(_("The dynamic field icon class is invalid."))
 
             parts = item["field_path"].split(".") if isinstance(item["field_path"], str) else []
             if not 1 <= len(parts) <= 4 or any(
                 part.startswith("_") or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", part)
                 for part in parts
             ):
-                raise ValidationError(_("Dinamik alan yolu geçersiz."))
+                raise ValidationError(_("The dynamic field path is invalid."))
             current_model = self.env[source_model]
             for index, part in enumerate(parts):
                 field = current_model._fields.get(part)
                 if not field:
-                    raise ValidationError(_("Dinamik alan yolu kaynak modelde bulunamadı."))
+                    raise ValidationError(_("The dynamic field path was not found on the source model."))
                 if index < len(parts) - 1:
                     if field.type != "many2one" or not field.comodel_name:
-                        raise ValidationError(_("Dinamik alan yolunun ara bölümleri Many2one olmalıdır."))
+                        raise ValidationError(_("Intermediate parts of the dynamic field path must be Many2one fields."))
                     current_model = self.env[field.comodel_name]
                 elif field.type == "binary" or getattr(field, "exportable", True) is False:
-                    raise ValidationError(_("Dinamik alan belge metni olarak dışa aktarılamaz."))
+                    raise ValidationError(_("The dynamic field cannot be exported as document text."))
 
             target_model = template_values.get("target_model")
             if item["section"] == "metadata" and target_model and source_model != target_model:
-                raise ValidationError(_("Bilgi kartı alanının kaynak modeli hedef modelle aynı olmalıdır."))
+                raise ValidationError(_("The detail-card field source model must match the target model."))
             if item["active"]:
                 key = (item["section"], source_model)
                 group = active_layout_groups.setdefault(key, [])
@@ -424,25 +424,25 @@ class RdsTemplateVersioning(models.Model):
         if not internal_snapshot:
             for (section, _source_model), items in active_layout_groups.items():
                 if section == "metadata" and len(items) > 8:
-                    raise ValidationError(_("Bir model için en fazla 8 aktif bilgi kartı kullanılabilir."))
+                    raise ValidationError(_("A model can use at most 8 active detail cards."))
                 if section == "line" and sum(item["width_percent"] for item in items) > 100:
-                    raise ValidationError(_("Aktif tablo kolonlarının toplam genişliği yüzde 100'ü aşamaz."))
+                    raise ValidationError(_("The total width of active table columns cannot exceed 100 percent."))
         return payload
 
     @api.model
     def _rds_decode_payload(self, raw_json, *, allow_snapshot=False):
         if not isinstance(raw_json, (str, bytes, bytearray)):
-            raise ValidationError(_("Şablon dosyası JSON metni olmalıdır."))
+            raise ValidationError(_("The template file must be JSON text."))
         raw_bytes = raw_json.encode("utf-8") if isinstance(raw_json, str) else bytes(raw_json)
         max_bytes = MAX_INTERNAL_SNAPSHOT_BYTES if allow_snapshot else MAX_TEMPLATE_JSON_BYTES
         if not raw_bytes or len(raw_bytes) > max_bytes:
             if allow_snapshot:
-                raise ValidationError(_("Şablon sürümü boş veya 4 MB sınırını aşıyor."))
-            raise ValidationError(_("Şablon dosyası boş veya 512 KB sınırını aşıyor."))
+                raise ValidationError(_("The template version is empty or exceeds the 4 MB limit."))
+            raise ValidationError(_("The template file is empty or exceeds the 512 KB limit."))
         try:
             payload = json.loads(raw_bytes.decode("utf-8"))
         except (UnicodeDecodeError, ValueError, TypeError) as error:
-            raise ValidationError(_("Şablon dosyası geçerli UTF-8 JSON değil.")) from error
+            raise ValidationError(_("The template file is not valid UTF-8 JSON.")) from error
         return self._rds_validate_payload(payload, allow_snapshot=allow_snapshot)
 
     @api.model
@@ -483,7 +483,7 @@ class RdsTemplateVersioning(models.Model):
         field = record._fields[field_name]
         record._check_field_access(field, "write")
         if not field.translate or not field.store:
-            raise ValidationError(_("Şablon sürümü çevrilemeyen bir alan içeriyor."))
+            raise ValidationError(_("The template version contains a non-translatable field."))
         record.flush_recordset([field_name])
         record.env.cr.execute(SQL(
             "UPDATE %s SET %s = %s WHERE id = %s",
@@ -523,18 +523,18 @@ class RdsTemplateVersioning(models.Model):
         after_template = after.get("template", {})
         for name in TEMPLATE_VALUE_FIELDS + ("target_model",):
             if before_template.get(name) != after_template.get(name):
-                changed.append(self._fields.get(name).string if name in self._fields else _("Hedef Model"))
+                changed.append(self._fields.get(name).string if name in self._fields else _("Target Model"))
         if before.get("fields") != after.get("fields"):
-            changed.append(_("Dinamik Alanlar"))
+            changed.append(_("Dynamic Fields"))
         before_snapshot = before.get("snapshot", {})
         after_snapshot = after.get("snapshot", {})
         if before_snapshot.get("code") != after_snapshot.get("code"):
-            changed.append(_("Şablon Kodu"))
+            changed.append(_("Template Code"))
         if before_snapshot.get("company_id") != after_snapshot.get("company_id"):
-            changed.append(_("Şirket"))
+            changed.append(_("Company"))
         if before_snapshot.get("translations") != after_snapshot.get("translations"):
-            changed.append(_("Çeviriler"))
-        return ", ".join(changed[:12]) or _("Yapılandırma")
+            changed.append(_("Translations"))
+        return ", ".join(changed[:12]) or _("Configuration")
 
     def _rds_create_version(self, payload, note=None, diff_summary=None):
         self.ensure_one()
@@ -549,7 +549,7 @@ class RdsTemplateVersioning(models.Model):
             else MAX_TEMPLATE_JSON_BYTES
         )
         if len(raw.encode("utf-8")) > max_bytes:
-            raise ValidationError(_("Şablon sürümü 4 MB sınırını aşıyor."))
+            raise ValidationError(_("The template version exceeds the 4 MB limit."))
         checksum = hashlib.sha256(raw.encode("utf-8")).hexdigest()
         Version = self.env["rds.template.version"].sudo()
         latest = Version.search(
@@ -563,8 +563,8 @@ class RdsTemplateVersioning(models.Model):
             "version_user_id": self.env.user.id,
             "snapshot_json": raw,
             "checksum": checksum,
-            "note": note or _("Otomatik sürüm"),
-            "diff_summary": diff_summary or _("İlk sürüm"),
+            "note": note or _("Automatic Version"),
+            "diff_summary": diff_summary or _("Initial Version"),
         })
 
     def _rds_ensure_baseline(self, payload=None):
@@ -578,8 +578,8 @@ class RdsTemplateVersioning(models.Model):
             return existing
         return self._rds_create_version(
             payload or self._rds_snapshot_payload(),
-            note=_("Başlangıç sürümü"),
-            diff_summary=_("Sürümleme öncesi başlangıç durumu"),
+            note=_("Baseline Version"),
+            diff_summary=_("Initial state before versioning"),
         )
 
     @api.model_create_multi
@@ -587,7 +587,7 @@ class RdsTemplateVersioning(models.Model):
         records = super().create(vals_list)
         if self.env.context.get("rds_versioning_token") is not _VERSIONING_TOKEN:
             for record in records:
-                record._rds_create_version(record._rds_snapshot_payload(), note=_("İlk sürüm"))
+                record._rds_create_version(record._rds_snapshot_payload(), note=_("Initial Version"))
         return records
 
     def write(self, vals):
@@ -639,7 +639,7 @@ class RdsTemplateVersioning(models.Model):
         check_record_access(self)
         return {
             "type": "ir.actions.act_window",
-            "name": _("%s Sürümleri") % self.display_name,
+            "name": _("%s Versions") % self.display_name,
             "res_model": "rds.template.version",
             "view_mode": "list,form",
             "domain": [("template_id", "=", self.id)],
@@ -731,14 +731,14 @@ class RdsTemplateFieldVersioning(models.Model):
 
 class RdsTemplateVersion(models.Model):
     _name = "rds.template.version"
-    _description = "DocuCraft Şablon Sürümü"
+    _description = "DocuCraft Template Version"
     _order = "create_date desc, id desc"
 
     template_id = fields.Many2one("rds.template", required=True, ondelete="cascade", index=True)
     company_id = fields.Many2one("res.company", index=True, ondelete="cascade")
     version_user_id = fields.Many2one(
         "res.users",
-        string="Değiştiren Kullanıcı",
+        string="Changed By",
         required=True,
         readonly=True,
         default=lambda self: self.env.user,
@@ -746,19 +746,19 @@ class RdsTemplateVersion(models.Model):
     )
     snapshot_json = fields.Text(required=True, readonly=True, groups="ranvals_document_studio.group_rds_manager")
     checksum = fields.Char(required=True, readonly=True, index=True)
-    note = fields.Char(required=True, default=lambda self: _("Otomatik sürüm"))
+    note = fields.Char(required=True, default=lambda self: _("Automatic Version"))
     diff_summary = fields.Char(readonly=True)
 
     @api.model_create_multi
     def create(self, vals_list):
         if not self.env.su and self.env.context.get("rds_versioning_token") is not _VERSIONING_TOKEN:
-            raise AccessError(_("Şablon sürümleri yalnız doğrulanmış değişiklik akışıyla oluşturulabilir."))
+            raise AccessError(_("Template versions can only be created through the validated change flow."))
         return super().create(vals_list)
 
     def action_restore(self):
         self.ensure_one()
         if not self.env.su and not self.env.user.has_group("ranvals_document_studio.group_rds_manager"):
-            raise AccessError(_("Şablon sürümünü geri yükleme yetkiniz bulunmuyor."))
+            raise AccessError(_("You do not have permission to restore template versions."))
         check_record_access(self)
         check_record_access(self.template_id, "write")
         payload = self.env["rds.template"]._rds_decode_payload(
@@ -784,7 +784,7 @@ class RdsTemplateVersion(models.Model):
         restored = self.template_id._rds_snapshot_payload()
         self.template_id._rds_create_version(
             restored,
-            note=_("Sürüm geri yüklendi: %s") % (self.create_date or self.id),
-            diff_summary=_("Güvenli geri yükleme"),
+            note=_("Version restored: %s") % (self.create_date or self.id),
+            diff_summary=_("Safe Restore"),
         )
         return {"type": "ir.actions.client", "tag": "reload"}

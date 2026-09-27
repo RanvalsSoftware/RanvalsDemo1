@@ -10,6 +10,7 @@ from odoo.tests.common import TransactionCase, new_test_user, tagged
 
 from odoo.addons.ranvals_document_studio.tools.common import (
     is_document_language_supported,
+    lang_code,
 )
 from odoo.addons.ranvals_document_studio.wizard.rds_export_wizard import (
     RdsExportWizard,
@@ -625,6 +626,7 @@ class TestRdsExportFieldSelection(TransactionCase):
         self.assertEqual(values["language_id"], turkish.id)
 
     def test_document_label_languages_are_selectable_and_fallback_is_safe(self):
+        self.assertEqual(lang_code(None), "en")
         Language = self.env["res.lang"]
         english = Language._activate_lang("en_US")
         german = Language._activate_lang("de_DE")

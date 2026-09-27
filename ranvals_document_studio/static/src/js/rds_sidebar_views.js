@@ -1,6 +1,7 @@
 /** @odoo-module **/
 
 import { onMounted } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { FormController } from "@web/views/form/form_controller";
 import { formView } from "@web/views/form/form_view";
@@ -16,18 +17,18 @@ const RDS_ACTIVE_MENU_KEY_BY_MODEL = Object.freeze({
 
 const RDS_LIST_HERO_BY_MODEL = Object.freeze({
     "rds.template": Object.freeze({
-        title: "DocuCraft Şablonları",
-        subtitle: "PDF, Word ve görsel çıktılar için şablonları yönetin.",
+        title: _t("DocuCraft Templates"),
+        subtitle: _t("Manage templates for PDF, Word, and image exports."),
         icon: "13_pdf_file.svg",
     }),
     "account.move": Object.freeze({
-        title: "Faturalar",
-        subtitle: "Tüm fatura ve belge kayıtlarını görüntüleyin ve yönetin.",
+        title: _t("Invoices"),
+        subtitle: _t("View and manage all invoice and document records."),
         icon: "05_accounting_document_calculator.svg",
     }),
     "rds.export.log": Object.freeze({
-        title: "Dışa Aktarım Geçmişi",
-        subtitle: "Oluşturulan belgeleri görüntüleyin ve tekrar indirin.",
+        title: _t("Export History"),
+        subtitle: _t("View generated documents and download them again."),
         icon: "19_activity_clock.svg",
     }),
 });

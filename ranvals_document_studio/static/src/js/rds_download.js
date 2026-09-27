@@ -15,7 +15,7 @@ export class RdsPdfPreviewDialog extends Component {
         title: { type: String, optional: true },
     };
     static defaultProps = {
-        title: _t("PDF Önizleme"),
+        title: _t("PDF Preview"),
     };
 }
 
@@ -55,7 +55,7 @@ export function previewExport(env, action) {
     }
     env.services.dialog.add(RdsPdfPreviewDialog, {
         url,
-        title: action.params?.title || _t("PDF Önizleme"),
+        title: action.params?.title || _t("PDF Preview"),
     });
 }
 

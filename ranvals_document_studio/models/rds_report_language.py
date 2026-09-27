@@ -19,18 +19,18 @@ class RdsReportLanguage(models.Model):
 
     report_id = fields.Many2one("ir.actions.report", required=True, ondelete="cascade", index=True)
     company_id = fields.Many2one("res.company", required=True, ondelete="cascade", index=True)
-    language_code = fields.Selection(RDS_LANGUAGES, required=True, string="Belge dili")
+    language_code = fields.Selection(RDS_LANGUAGES, required=True, string="Document Language")
     if hasattr(models, "Constraint"):
         _report_company_unique = models.Constraint(
             "UNIQUE(report_id, company_id)",
-            "Bir rapor ve şirket için yalnız bir belge dili seçilebilir.",
+            "Only one document language can be selected per report and company.",
         )
     else:  # Odoo 17/18
         _sql_constraints = [
             (
                 "rds_report_language_company_unique",
                 "UNIQUE(report_id, company_id)",
-                "Bir rapor ve şirket için yalnız bir belge dili seçilebilir.",
+                "Only one document language can be selected per report and company.",
             )
         ]
 
@@ -39,9 +39,9 @@ class RdsReportLanguage(models.Model):
         for row in self:
             row.report_id._rds_check_report_access()
             if row.report_id.model not in RDS_STUDIO_MODELS or row.report_id.report_type not in ("qweb-pdf", "qweb-html"):
-                raise ValidationError(_("Bu panel yalnız satış, fatura ve satın alma QWeb raporlarında kullanılabilir."))
+                raise ValidationError(_("This panel is available only for sales, invoice, and purchase QWeb reports."))
             if not self.env["res.lang"].search_count([("code", "=", row.language_code), ("active", "=", True)]):
-                raise ValidationError(_("Bu dil henüz etkin değil."))
+                raise ValidationError(_("This language is not active yet."))
 
     def unlink(self):
         # The field constraint protects create/write, but unlink does not run
@@ -97,10 +97,10 @@ class IrActionsReportLanguage(models.Model):
             return result
         record, company = self._rds_sidebar_scope(record_id)
         if not self._rds_can_manage_design():
-            raise AccessError(_("Tasarım seçimini kaydetmek için DocuCraft yöneticisi olmalısınız."))
+            raise AccessError(_("You must be a DocuCraft manager to save the design selection."))
         if language_code and (language_code not in RDS_LANGUAGE_CODES or not self.env["res.lang"].search_count([
             ("code", "=", language_code), ("active", "=", True)])):
-            raise ValidationError(_("Bu dil henüz etkin değil veya desteklenmiyor."))
+            raise ValidationError(_("This language is not active yet or is not supported."))
         rows = self.env["rds.report.language"].search([("report_id", "=", self.id), ("company_id", "=", company.id)])
         if not language_code:
             rows.unlink()
@@ -126,7 +126,7 @@ class IrActionsReportLanguage(models.Model):
             "png",
             "zip",
         ):
-            raise ValidationError(_("Geçersiz kayıt veya çıktı biçimi."))
+            raise ValidationError(_("Invalid record or output format."))
         template = self._rds_default_export_template(record)
         lang = self.env["res.lang"].search([("code", "=", code)], limit=1)
         wizard = self.env["rds.export.wizard"].with_company(company).create({

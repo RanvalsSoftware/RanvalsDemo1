@@ -101,7 +101,7 @@ class RdsExportLogRetention(models.Model):
 
 class RdsRetentionSettings(models.TransientModel):
     _name = "rds.retention.settings"
-    _description = "DocuCraft Saklama Politikası"
+    _description = "DocuCraft Retention Policy"
 
     retention_days = fields.Integer(required=True, default=90)
     delete_owned_attachments = fields.Boolean(default=False)
@@ -117,13 +117,13 @@ class RdsRetentionSettings(models.TransientModel):
     def _check_retention_days(self):
         for settings in self:
             if settings.retention_days < 1 or settings.retention_days > 3650:
-                raise ValidationError(_("Saklama süresi 1 ile 3650 gün arasında olmalıdır."))
+                raise ValidationError(_("The retention period must be between 1 and 3650 days."))
 
     def _check_system_admin(self):
         # This policy is database-wide and the cron deliberately processes all
         # companies, so only system administrators may change or run it.
         if not self.env.user.has_group("base.group_system"):
-            raise AccessError(_("Genel saklama politikasını yalnız sistem yöneticileri yönetebilir."))
+            raise AccessError(_("Only system administrators can manage the global retention policy."))
 
     def action_save(self):
         self.ensure_one()
@@ -133,7 +133,7 @@ class RdsRetentionSettings(models.TransientModel):
         params.set_param(RETENTION_DAYS_KEY, str(self.retention_days))
         params.set_param(DELETE_ATTACHMENTS_KEY, "True" if self.delete_owned_attachments else "False")
         return {"type": "ir.actions.client", "tag": "display_notification", "params": {
-            "title": _("DocuCraft"), "message": _("Saklama politikası kaydedildi."), "type": "success", "sticky": False,
+            "title": _("DocuCraft"), "message": _("The retention policy has been saved."), "type": "success", "sticky": False,
         }}
 
     def action_purge_now(self):
@@ -141,7 +141,7 @@ class RdsRetentionSettings(models.TransientModel):
         self.action_save()
         result = self.env["rds.export.log"]._cron_purge_expired_payloads(limit=2000)
         return {"type": "ir.actions.client", "tag": "display_notification", "params": {
-            "title": _("Bakım tamamlandı"),
-            "message": _("%(logs)s kayıt tarandı; %(payloads)s arşiv kopyası, %(attachments)s sahipli ek ve %(jobs)s tamamlanmış iş dosyası temizlendi.") % result,
+            "title": _("Maintenance Completed"),
+            "message": _("Scanned %(logs)s records; purged %(payloads)s archived payloads, %(attachments)s owned attachments, and %(jobs)s completed job files.") % result,
             "type": "success", "sticky": True,
         }}

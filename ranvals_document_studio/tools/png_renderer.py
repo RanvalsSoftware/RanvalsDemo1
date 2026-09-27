@@ -1,5 +1,7 @@
 from io import BytesIO
 
+from odoo import _
+
 
 class PngDependencyError(RuntimeError):
     pass
@@ -10,30 +12,30 @@ MAX_RENDER_DPI = 600
 
 def render_png_pages(pdf_bytes, dpi=150, max_pages=50, max_output_bytes=None):
     if not isinstance(pdf_bytes, (bytes, bytearray)) or not pdf_bytes.startswith(b"%PDF"):
-        raise PngDependencyError("PNG çıktısı için geçerli bir PDF belgesi oluşturulamadı.")
+        raise PngDependencyError(_("A valid PDF document could not be created for PNG output."))
     try:
         dpi = int(dpi)
     except (TypeError, ValueError) as exc:
-        raise PngDependencyError("PNG çözünürlüğü geçersiz.") from exc
+        raise PngDependencyError(_("The PNG resolution is invalid.")) from exc
     if dpi < 72 or dpi > MAX_RENDER_DPI:
         raise PngDependencyError(
-            "PNG çözünürlüğü 72 ile %s DPI arasında olmalıdır." % MAX_RENDER_DPI
+            _("The PNG resolution must be between 72 and %s DPI.") % MAX_RENDER_DPI
         )
     if max_output_bytes is not None and (
         not isinstance(max_output_bytes, int) or max_output_bytes <= 0
     ):
-        raise PngDependencyError("PNG çıktı boyutu sınırı geçersiz.")
+        raise PngDependencyError(_("The PNG output size limit is invalid."))
     try:
         import pypdfium2 as pdfium
     except ImportError as exc:  # pragma: no cover - depends on Odoo.sh requirements
         raise PngDependencyError(
-            "PNG çıktısı için pypdfium2 paketi kurulmalıdır. requirements.txt dosyasını Odoo.sh köküne ekleyin."
+            _("The pypdfium2 package is required for PNG output. Add requirements.txt to the Odoo.sh root.")
         ) from exc
 
     try:
         from PIL import Image  # noqa: F401
     except ImportError as exc:  # pragma: no cover
-        raise PngDependencyError("PNG çıktısı için Pillow paketi kurulmalıdır.") from exc
+        raise PngDependencyError(_("The Pillow package is required for PNG output.")) from exc
 
     scale = dpi / 72.0
     result = []
@@ -41,12 +43,12 @@ def render_png_pages(pdf_bytes, dpi=150, max_pages=50, max_output_bytes=None):
     try:
         pdf = pdfium.PdfDocument(pdf_bytes)
     except Exception as exc:
-        raise PngDependencyError("PDF belgesi okunamadı veya geçersiz.") from exc
+        raise PngDependencyError(_("The PDF document could not be read or is invalid.")) from exc
     try:
         page_count = len(pdf)
         if max_pages and page_count > max_pages:
             raise PngDependencyError(
-                "PNG çıktısında PDF en fazla %s sayfa olabilir; belge %s sayfa." % (max_pages, page_count)
+                _("A PDF can contain at most %s pages for PNG output; the document has %s pages.") % (max_pages, page_count)
             )
         try:
             for index in range(page_count):
@@ -62,7 +64,7 @@ def render_png_pages(pdf_bytes, dpi=150, max_pages=50, max_output_bytes=None):
                     output_size += len(page_content)
                     if max_output_bytes is not None and output_size > max_output_bytes:
                         raise PngDependencyError(
-                            "PNG çıktısı izin verilen toplam dosya boyutunu aşıyor."
+                            _("The PNG output exceeds the permitted total file size.")
                         )
                     result.append(page_content)
                 finally:
@@ -75,7 +77,7 @@ def render_png_pages(pdf_bytes, dpi=150, max_pages=50, max_output_bytes=None):
         except PngDependencyError:
             raise
         except Exception as exc:
-            raise PngDependencyError("PDF sayfaları PNG biçimine dönüştürülemedi.") from exc
+            raise PngDependencyError(_("The PDF pages could not be converted to PNG format.")) from exc
     finally:
         if hasattr(pdf, "close"):
             pdf.close()

@@ -10,19 +10,19 @@ UNSUPPORTED_TERMINAL_FIELD_TYPES = {"binary"}
 
 class RdsTemplateField(models.Model):
     _name = "rds.template.field"
-    _description = "Belge Şablonu Alanı"
+    _description = "Document Template Field"
     _order = "section, sequence, id"
 
     template_id = fields.Many2one("rds.template", required=True, ondelete="cascade", index=True)
     active = fields.Boolean(default=True)
     section = fields.Selection(
-        [("metadata", "Belge Bilgi Kartı"), ("line", "Satır / Tablo Kolonu")],
+        [("metadata", "Document Detail Card"), ("line", "Line / Table Column")],
         required=True,
         default="metadata",
     )
     source_model_id = fields.Many2one(
         "ir.model",
-        string="Kaynak Model",
+        string="Source Model",
         required=True,
         domain="[('transient', '=', False)]",
         ondelete="cascade",
@@ -30,32 +30,32 @@ class RdsTemplateField(models.Model):
     source_model_name = fields.Char(related="source_model_id.model", store=True, readonly=True)
     field_id = fields.Many2one(
         "ir.model.fields",
-        string="Odoo Alanı",
+        string="Odoo Field",
         domain="[('model_id', '=', source_model_id)]",
         ondelete="set null",
     )
     field_path = fields.Char(
         required=True,
-        help="Basit alan için örn. name; ilişkili alan için örn. partner_id.vat. En fazla 4 seviye desteklenir; ara ilişkiler Many2one olmalıdır.",
+        help="For a direct field, use e.g. name; for a related field, use e.g. partner_id.vat. Up to 4 levels are supported, and intermediate relations must be Many2one.",
     )
     label = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=10)
     icon_class = fields.Char(default="fa-circle-o")
     value_type = fields.Selection(
         [
-            ("auto", "Otomatik"),
-            ("text", "Metin"),
-            ("date", "Tarih"),
-            ("monetary", "Para"),
-            ("percentage", "Yüzde"),
-            ("integer", "Tam Sayı"),
-            ("float", "Ondalık Sayı"),
+            ("auto", "Automatic"),
+            ("text", "Text"),
+            ("date", "Date"),
+            ("monetary", "Monetary"),
+            ("percentage", "Percentage"),
+            ("integer", "Integer"),
+            ("float", "Decimal Number"),
         ],
         default="auto",
         required=True,
     )
     alignment = fields.Selection(
-        [("left", "Sol"), ("center", "Orta"), ("right", "Sağ")],
+        [("left", "Left"), ("center", "Center"), ("right", "Right")],
         default="left",
         required=True,
     )
@@ -91,21 +91,21 @@ class RdsTemplateField(models.Model):
                 or len(parts) > MAX_FIELD_PATH_DEPTH
                 or any(not part for part in parts)
             ):
-                raise ValidationError(_("Alan yolu 1 ile 4 alan seviyesinden oluşmalıdır."))
+                raise ValidationError(_("The field path must contain between 1 and 4 field levels."))
             model_name = record.source_model_id.model
             if not model_name or model_name not in self.env.registry.models:
-                raise ValidationError(_("Kaynak Odoo modeli artık kullanılamıyor."))
+                raise ValidationError(_("The source Odoo model is no longer available."))
             if record.field_id and record.field_id.model_id != record.source_model_id:
-                raise ValidationError(_("Seçilen Odoo alanı kaynak modele ait değildir."))
+                raise ValidationError(_("The selected Odoo field does not belong to the source model."))
             model = self.env[model_name]
             current_model = model
             for index, part in enumerate(parts):
                 if part.startswith("_") or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", part):
-                    raise ValidationError(_("Geçersiz alan yolu: %s") % record.field_path)
+                    raise ValidationError(_("Invalid field path: %s") % record.field_path)
                 if index == 0 and record.field_id and record.field_id.name != part:
-                    raise ValidationError(_("Seçilen Odoo alanı, alan yolunun ilk bölümüyle aynı olmalıdır."))
+                    raise ValidationError(_("The selected Odoo field must match the first part of the field path."))
                 if part not in current_model._fields:
-                    raise ValidationError(_("%s modelinde %s alanı bulunamadı.") % (current_model._name, part))
+                    raise ValidationError(_("Field %s was not found on model %s.") % (part, current_model._name))
                 field = current_model._fields[part]
                 if index < len(parts) - 1:
                     # Intermediate traversal is deliberately restricted to many2one.
@@ -113,22 +113,22 @@ class RdsTemplateField(models.Model):
                     # rendered as a comma-separated display-name list.
                     if field.type != "many2one" or not field.comodel_name:
                         raise ValidationError(
-                            _("%s alanı ilişkili yolun ortasında kullanılabilecek bir Many2one alanı değildir.")
+                            _("%s is not a Many2one field that can be used in the middle of a related path.")
                             % part
                         )
                     if field.comodel_name not in self.env.registry.models:
                         raise ValidationError(
-                            _("%s alanının ilişkili modeli artık kullanılamıyor.") % part
+                            _("The related model of field %s is no longer available.") % part
                         )
                     current_model = self.env[field.comodel_name]
                 else:
                     if field.type in UNSUPPORTED_TERMINAL_FIELD_TYPES:
                         raise ValidationError(
-                            _("%s türündeki alanlar belge metni olarak kullanılamaz.") % field.type
+                            _("Fields of type %s cannot be used as document text.") % field.type
                         )
                     if getattr(field, "exportable", True) is False:
                         raise ValidationError(
-                            _("%s alanı Odoo tarafından dışa aktarılamaz olarak işaretlenmiştir.") % part
+                            _("Field %s is marked by Odoo as non-exportable.") % part
                         )
 
     @api.constrains("template_id", "section", "source_model_id")
@@ -137,24 +137,24 @@ class RdsTemplateField(models.Model):
             target = record.template_id.target_model_id
             if record.section == "metadata" and target and record.source_model_id != target:
                 raise ValidationError(
-                    _("Bilgi kartı alanının kaynak modeli şablonun hedef modeliyle aynı olmalıdır.")
+                    _("The detail-card field's source model must match the template's target model.")
                 )
 
     @api.constrains("label", "icon_class")
     def _check_display_properties(self):
         for record in self:
             if len(record.label or "") > 200:
-                raise ValidationError(_("Alan etiketi en fazla 200 karakter olabilir."))
+                raise ValidationError(_("The field label can contain at most 200 characters."))
             if record.icon_class and not re.fullmatch(r"fa-[a-z0-9-]+", record.icon_class):
                 raise ValidationError(
-                    _("İkon sınıfı fa- ile başlamalı ve yalnızca küçük harf, rakam ve tire içermelidir.")
+                    _("The icon class must start with fa- and contain only lowercase letters, digits, and hyphens.")
                 )
 
     @api.constrains("width_percent")
     def _check_width(self):
         for record in self:
             if record.width_percent < 5 or record.width_percent > 100:
-                raise ValidationError(_("Kolon genişliği yüzde 5 ile 100 arasında olmalıdır."))
+                raise ValidationError(_("Column width must be between 5 and 100 percent."))
 
 
     @api.constrains(
@@ -173,11 +173,11 @@ class RdsTemplateField(models.Model):
                 and item.source_model_id == current.source_model_id
             )
             if record.section == "metadata" and len(siblings) > 8:
-                raise ValidationError(_("Bir model için en fazla 8 aktif bilgi kartı kullanılabilir."))
+                raise ValidationError(_("A model can use at most 8 active detail cards."))
             if record.section == "line":
                 total_width = sum(siblings.mapped("width_percent"))
                 if total_width > 100:
                     raise ValidationError(
-                        _("Aktif tablo kolonlarının toplam genişliği yüzde 100'ü aşamaz. Mevcut toplam: %s")
+                        _("The total width of active table columns cannot exceed 100 percent. Current total: %s")
                         % total_width
                     )

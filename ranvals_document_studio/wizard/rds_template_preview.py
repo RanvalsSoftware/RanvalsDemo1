@@ -14,22 +14,22 @@ PREVIEW_MODELS = {
 
 class RdsTemplatePreviewWizard(models.TransientModel):
     _name = "rds.template.preview.wizard"
-    _description = "DocuCraft Gerçek Kayıt Önizlemesi"
+    _description = "DocuCraft Real-record Preview"
 
     template_id = fields.Many2one("rds.template", required=True, readonly=True)
     target_model = fields.Selection(
-        [("sale.order", "Satış Teklifi / Siparişi"), ("account.move", "Fatura"), ("purchase.order", "Satın Alma Siparişi")],
+        [("sale.order", "Quotation / Sales Order"), ("account.move", "Invoice"), ("purchase.order", "Purchase Order")],
         required=True,
     )
-    sale_order_id = fields.Many2one("sale.order", string="Satış Belgesi")
+    sale_order_id = fields.Many2one("sale.order", string="Sales Document")
     account_move_id = fields.Many2one(
         "account.move",
-        string="Fatura",
+        string="Invoice",
         domain=[
             ("move_type", "in", ("out_invoice", "out_refund", "in_invoice", "in_refund")),
         ],
     )
-    purchase_order_id = fields.Many2one("purchase.order", string="Satın Alma Belgesi")
+    purchase_order_id = fields.Many2one("purchase.order", string="Purchase Document")
     language_id = fields.Many2one("res.lang", required=True, domain="[('active', '=', True)]")
 
     @api.model
@@ -56,17 +56,17 @@ class RdsTemplatePreviewWizard(models.TransientModel):
         field_name = PREVIEW_MODELS.get(self.target_model)
         record = self[field_name] if field_name else False
         if not record:
-            raise UserError(_("Önizleme için bir belge kaydı seçin."))
+            raise UserError(_("Select a document record to preview."))
         record = record.exists()
         if not record:
-            raise AccessError(_("Kaynak belgeye erişim izniniz bulunmuyor."))
+            raise AccessError(_("You do not have access to the source document."))
         check_record_access(record)
         if "company_id" in record._fields and record.company_id not in self.env.companies:
-            raise AccessError(_("Belgenin şirketine erişim izniniz bulunmuyor."))
+            raise AccessError(_("You do not have access to the document's company."))
         if record._name == "account.move" and record.move_type not in {
             "out_invoice", "out_refund", "in_invoice", "in_refund"
         }:
-            raise ValidationError(_("Önizleme yalnız müşteri/tedarikçi faturaları ve iadeler için kullanılabilir."))
+            raise ValidationError(_("Preview is available only for customer/vendor invoices and refunds."))
         return record
 
     def action_preview(self):
@@ -74,9 +74,9 @@ class RdsTemplatePreviewWizard(models.TransientModel):
         record = self._selected_record()
         check_record_access(self.template_id)
         if self.template_id.target_model_id and self.template_id.target_model_id.model != record._name:
-            raise ValidationError(_("Şablon hedef modeli seçilen belgeyle eşleşmiyor."))
+            raise ValidationError(_("The template target model does not match the selected document."))
         if self.template_id.company_id and self.template_id.company_id != record.company_id:
-            raise ValidationError(_("Şablon şirketi seçilen belgenin şirketiyle eşleşmiyor."))
+            raise ValidationError(_("The template company does not match the selected document company."))
         company = (
             record.company_id
             if "company_id" in record._fields and record.company_id
@@ -101,7 +101,7 @@ class RdsTemplatePreviewActions(models.Model):
         check_record_access(self)
         return {
             "type": "ir.actions.act_window",
-            "name": _("Gerçek Kayıtla Test Et"),
+            "name": _("Test with a Real Record"),
             "res_model": "rds.template.preview.wizard",
             "view_mode": "form",
             "target": "new",

@@ -4,17 +4,17 @@
        t-inherit="ranvals_document_studio.RdsSidebar"
        t-inherit-mode="extension">
         <xpath expr="//button[hasclass('o_rds_sidebar__mobile-toggle')]" position="attributes">
-            <attribute name="aria-label">DocuCraft menüsünü aç</attribute>
+            <attribute name="aria-label">Open the DocuCraft menu</attribute>
         </xpath>
         <xpath expr="//button[hasclass('o_rds_sidebar__backdrop')]" position="attributes">
-            <attribute name="aria-label">DocuCraft menüsünü kapat</attribute>
+            <attribute name="aria-label">Close the DocuCraft menu</attribute>
         </xpath>
         <xpath expr="//aside[hasclass('o_rds_sidebar')]" position="attributes">
-            <attribute name="t-att-aria-label">'DocuCraft Belge Tasarım Stüdyosu'</attribute>
+            <attribute name="t-att-aria-label">'DocuCraft Document Design Studio'</attribute>
         </xpath>
         <xpath expr="//button[hasclass('o_rds_sidebar__brand')]" position="attributes">
-            <attribute name="aria-label">DocuCraft ana bölümünü aç</attribute>
-            <attribute name="title">DocuCraft Belge Tasarım Stüdyosu</attribute>
+            <attribute name="aria-label">Open the DocuCraft home section</attribute>
+            <attribute name="title">DocuCraft Document Design Studio</attribute>
         </xpath>
         <xpath expr="//span[hasclass('o_rds_sidebar__brand-label')]" position="replace">
             <span class="o_rds_sidebar__brand-label">DocuCraft</span>
@@ -25,7 +25,7 @@
        t-inherit="ranvals_document_studio.ConnectorsDashboard"
        t-inherit-mode="extension">
         <xpath expr="//section[hasclass('rds-connector-grid')]" position="attributes">
-            <attribute name="aria-label">DocuCraft bağlayıcıları</attribute>
+            <attribute name="aria-label">DocuCraft connectors</attribute>
         </xpath>
     </t>
 </templates>

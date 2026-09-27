@@ -41,9 +41,10 @@ body.o_rds_sidebar_active .o_menu_sections {
 }
 
 /* Compatibility shell for scoped list/form controllers using RdsSidebar. */
-.o_rds_sidebar_view {
+.o_action.o_rds_sidebar_view {
     position: relative;
     display: flex !important;
+    flex-flow: row nowrap !important;
     width: 100%;
     min-width: 0;
     height: 100%;

@@ -16,7 +16,7 @@
     </template>
 
     <record id="action_report_rds_invoice_document" model="ir.actions.report">
-        <field name="name">DocuCraft Belgesi – Fatura</field>
+        <field name="name">DocuCraft Document – Invoice</field>
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">ranvals_document_studio.report_invoice_document</field>

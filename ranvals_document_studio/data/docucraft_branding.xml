@@ -5,12 +5,12 @@
         <!-- Odoo 19 builds the user-rights arch from this value without XML
              escaping it. Keep the category name free of XML metacharacters. -->
         <field name="name">DocuCraft</field>
-        <field name="description">DocuCraft belge şablonları, PDF / DOCX / PNG dışa aktarımı ve erişim yetkileri</field>
+        <field name="description">DocuCraft document templates, PDF / DOCX / PNG export, and access permissions</field>
     </record>
 
     <record id="privilege_rds" model="res.groups.privilege">
-        <field name="name">DocuCraft Yönetimi</field>
-        <field name="description">DocuCraft belge şablonları ve dışa aktarım yetkileri</field>
+        <field name="name">DocuCraft Management</field>
+        <field name="description">DocuCraft document template and export permissions</field>
     </record>
 
     <record id="paperformat_rds_a4" model="report.paperformat">
@@ -19,22 +19,22 @@
 
     <record id="menu_rds_root" model="ir.ui.menu">
         <field name="name">DocuCraft</field>
-        <field name="web_icon">ranvals_document_studio,static/description/docucraft_app_icon_v9_20260914.png</field>
+        <field name="web_icon">ranvals_document_studio,static/description/icon.png</field>
     </record>
 
     <record id="action_rds_connectors" model="ir.actions.act_window">
-        <field name="name">DocuCraft Bağlayıcıları</field>
+        <field name="name">DocuCraft Connectors</field>
     </record>
     <record id="action_rds_connectors_dashboard" model="ir.actions.client">
-        <field name="name">DocuCraft Bağlayıcıları</field>
+        <field name="name">DocuCraft Connectors</field>
     </record>
     <record id="action_rds_template" model="ir.actions.act_window">
-        <field name="name">DocuCraft Şablonları</field>
+        <field name="name">DocuCraft Templates</field>
     </record>
     <record id="action_rds_export_log" model="ir.actions.act_window">
-        <field name="name">DocuCraft Dışa Aktarım Geçmişi</field>
+        <field name="name">DocuCraft Export History</field>
     </record>
     <record id="action_rds_export_dashboard" model="ir.actions.client">
-        <field name="name">DocuCraft Dışa Aktarım Geçmişi</field>
+        <field name="name">DocuCraft Export History</field>
     </record>
 </odoo>

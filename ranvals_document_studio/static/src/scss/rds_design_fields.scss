@@ -528,9 +528,15 @@
         }
 
         .o_field_html {
-            max-width: 880px;
+            display: block;
+            width: 100%;
+            max-width: 960px;
             margin: 0 auto;
             background: transparent;
+        }
+
+        .o_field_html > .rds-template-layout-preview {
+            width: 100%;
         }
     }
 }

@@ -230,7 +230,7 @@ class TestRdsQuickExport(TransactionCase):
         for xmlid, model_name in print_actions:
             with self.subTest(action=xmlid):
                 action = self.env.ref(f"ranvals_document_studio.{xmlid}")
-                self.assertEqual(action.name, "DocuCraft Yazdır")
+                self.assertEqual(action.name, "Print with DocuCraft")
                 self.assertEqual(action.binding_type, "report")
                 self.assertEqual(action.binding_model_id.model, model_name)
 

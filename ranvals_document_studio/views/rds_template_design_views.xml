@@ -14,27 +14,27 @@
             </xpath>
 
             <xpath expr="//page[@name='design']" position="replace">
-                <page string="Tasarım" name="design">
+                <page string="Design" name="design">
                     <div class="rds-template-design-page">
                     <field name="heading_font_css" invisible="1"/>
                     <field name="body_font_css" invisible="1"/>
                     <div class="rds-design-toolbar">
                         <div class="rds-design-toolbar__copy">
-                            <span class="rds-design-toolbar__icon"><i class="fa fa-magic" title="Tasarım araçları"/></span>
+                            <span class="rds-design-toolbar__icon"><i class="fa fa-magic" title="Design tools"/></span>
                             <span>
-                                <strong>Canlı Şablon Tasarımcısı</strong>
-                                <small>Stili seçin, renk karesine tıklayın, yazı tiplerini değiştirin ve sonucu anında önizleyin.</small>
+                                <strong>Live Template Designer</strong>
+                                <small>Choose a style, click a color swatch, change the fonts, and preview the result instantly.</small>
                             </span>
                         </div>
                         <div class="rds-design-toolbar__actions">
                             <button name="action_apply_style_preset"
                                     type="object"
-                                    string="Şablon Renklerini Yenile"
+                                    string="Reset Template Colors"
                                     icon="fa-refresh"
                                     class="btn-secondary"/>
                             <button name="action_apply_design"
                                     type="object"
-                                    string="Tasarımı Kaydet"
+                                    string="Save Design"
                                     icon="fa-check"
                                     class="btn-primary"/>
                         </div>
@@ -42,8 +42,8 @@
 
                     <section class="rds-design-section rds-layout-style-selector">
                         <div class="rds-design-section__header">
-                            <span class="rds-template-settings-card__icon"><i class="fa fa-th-large" title="Yerleşim"/></span>
-                            <span><strong>Şablon Stili</strong><small>Bir sektör tasarımı seçildiğinde önerilen renk paleti ve tipografi otomatik uygulanır.</small></span>
+                            <span class="rds-template-settings-card__icon"><i class="fa fa-th-large" title="Layout"/></span>
+                            <span><strong>Template Style</strong><small>Selecting an industry design automatically applies its recommended color palette and typography.</small></span>
                         </div>
                         <div class="rds-layout-style-selector__field">
                             <field name="layout_style"
@@ -56,75 +56,75 @@
                     <div class="rds-template-settings-grid">
                         <section class="rds-template-settings-card">
                             <div class="rds-template-settings-card__header">
-                                <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Renk paleti"/></span>
-                                <span><strong>Renk Paleti</strong><small>Belgenizin marka renklerini belirleyin.</small></span>
+                                <span class="rds-template-settings-card__icon"><i class="fa fa-paint-brush" title="Color palette"/></span>
+                                <span><strong>Color Palette</strong><small>Define your document's brand colors.</small></span>
                             </div>
                             <div class="rds-color-settings">
                                 <div class="rds-color-setting-card rds-color-setting-card--primary">
                                     <div class="rds-control-copy">
-                                        <span class="rds-control-label">Ana Renk</span>
-                                        <small>Başlıklar ve güçlü alanlar</small>
+                                        <span class="rds-control-label">Primary Colour</span>
+                                        <small>Headings and prominent areas</small>
                                     </div>
                                     <field name="primary_color" widget="rds_color_picker" nolabel="1"/>
                                 </div>
                                 <div class="rds-color-setting-card rds-color-setting-card--secondary">
                                     <div class="rds-control-copy">
-                                        <span class="rds-control-label">İkincil Renk</span>
-                                        <small>Zeminler ve yumuşak alanlar</small>
+                                        <span class="rds-control-label">Secondary Colour</span>
+                                        <small>Backgrounds and subtle areas</small>
                                     </div>
                                     <field name="secondary_color" widget="rds_color_picker" nolabel="1"/>
                                 </div>
                                 <div class="rds-color-setting-card rds-color-setting-card--accent">
                                     <div class="rds-control-copy">
-                                        <span class="rds-control-label">Vurgu Rengi</span>
-                                        <small>İkonlar ve dikkat noktaları</small>
+                                        <span class="rds-control-label">Accent Colour</span>
+                                        <small>Icons and points of emphasis</small>
                                     </div>
                                     <field name="accent_color" widget="rds_color_picker" nolabel="1"/>
                                 </div>
                                 <div class="rds-color-setting-card rds-color-setting-card--text">
                                     <div class="rds-control-copy">
-                                        <span class="rds-control-label">Metin Rengi</span>
-                                        <small>Okunabilir belge metinleri</small>
+                                        <span class="rds-control-label">Text Colour</span>
+                                        <small>Readable document text</small>
                                     </div>
                                     <field name="text_color" widget="rds_color_picker" nolabel="1"/>
                                 </div>
                             </div>
-                            <div class="rds-settings-card__tip"><i class="fa fa-info-circle"/><span>Renk karesine tıklayın veya HEX kodunu doğrudan yazın.</span></div>
+                            <div class="rds-settings-card__tip"><i class="fa fa-info-circle"/><span>Click the color swatch or enter the HEX code directly.</span></div>
                         </section>
 
                         <section class="rds-template-settings-card">
                             <div class="rds-template-settings-card__header">
-                                <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Yazı tipleri"/></span>
-                                <span><strong>Tipografi ve Metinler</strong><small>Belgenizin yazı karakterini ve marka mesajını düzenleyin.</small></span>
+                                <span class="rds-template-settings-card__icon"><i class="fa fa-font" title="Fonts"/></span>
+                                <span><strong>Typography and Copy</strong><small>Customize your document's typefaces and brand message.</small></span>
                             </div>
                             <div class="rds-typography-settings">
                                 <div class="rds-font-settings-grid">
                                     <div class="rds-font-setting-card">
                                         <div class="rds-control-copy">
-                                            <span class="rds-control-label">Başlık Yazı Tipi</span>
-                                            <small>Belge başlıkları ve toplamlar</small>
+                                            <span class="rds-control-label">Heading Font</span>
+                                            <small>Document headings and totals</small>
                                         </div>
                                         <field name="heading_font" widget="rds_font_picker" nolabel="1"/>
                                     </div>
                                     <div class="rds-font-setting-card">
                                         <div class="rds-control-copy">
-                                            <span class="rds-control-label">Gövde Yazı Tipi</span>
-                                            <small>Açıklamalar ve tablo içerikleri</small>
+                                            <span class="rds-control-label">Body Font</span>
+                                            <small>Descriptions and table content</small>
                                         </div>
                                         <field name="body_font" widget="rds_font_picker" nolabel="1"/>
                                     </div>
                                 </div>
                                 <div class="rds-copy-settings-grid">
                                     <div class="rds-copy-setting rds-copy-setting--wide">
-                                        <span class="rds-control-label"><i class="fa fa-quote-left"/> Slogan</span>
-                                        <field name="tagline" nolabel="1" placeholder="Örn. Modern işletmeler için akıllı belgeler"/>
+                                        <span class="rds-control-label"><i class="fa fa-quote-left"/> Tagline</span>
+                                        <field name="tagline" nolabel="1" placeholder="e.g. Smart documents for modern businesses"/>
                                     </div>
                                     <div class="rds-copy-setting rds-copy-setting--wide">
-                                        <span class="rds-control-label"><i class="fa fa-align-left"/> Alt Bilgi Metni</span>
-                                        <field name="footer_text" nolabel="1" placeholder="Belgenin altında gösterilecek kısa metin"/>
+                                        <span class="rds-control-label"><i class="fa fa-align-left"/> Footer Text</span>
+                                        <field name="footer_text" nolabel="1" placeholder="Short text displayed at the bottom of the document"/>
                                     </div>
                                     <div class="rds-copy-setting rds-copy-setting--compact">
-                                        <span class="rds-control-label"><i class="fa fa-arrows-v"/> Logo Yüksekliği</span>
+                                        <span class="rds-control-label"><i class="fa fa-arrows-v"/> Logo Height</span>
                                         <div class="rds-number-control">
                                             <field name="logo_height_mm" nolabel="1"/>
                                             <span>mm</span>
@@ -138,10 +138,10 @@
                     <section class="rds-design-live-preview">
                         <div class="rds-design-live-preview__heading">
                             <div>
-                                <strong>Canlı Belge Önizlemesi</strong>
-                                <small>Renk, stil, font, slogan ve alt bilgi değişiklikleri bu örneğe uygulanır.</small>
+                                <strong>Live Document Preview</strong>
+                                <small>Color, style, font, tagline, and footer changes are applied to this sample.</small>
                             </div>
-                            <span class="rds-design-live-preview__badge">Canlı</span>
+                            <span class="rds-design-live-preview__badge">Live</span>
                         </div>
                         <field name="design_preview_html" widget="html" nolabel="1" readonly="1"/>
                     </section>

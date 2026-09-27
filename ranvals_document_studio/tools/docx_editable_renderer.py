@@ -15,6 +15,7 @@ from io import BytesIO
 from zipfile import BadZipFile, ZipFile
 
 from lxml import etree
+from odoo import _
 
 EDITABLE_DOCX_FINGERPRINT = "DocuCraft native editable renderer v2"
 MAX_EDITABLE_DOCX_BYTES = 100 * 1024 * 1024
@@ -49,8 +50,15 @@ _LOCALES = {
     "ru_RU": "ru-RU",
     "fr": "fr-FR",
     "fr_FR": "fr-FR",
+    "de": "de-DE",
+    "de_DE": "de-DE",
+    "es": "es-ES",
+    "es_ES": "es-ES",
     "it": "it-IT",
     "it_IT": "it-IT",
+    "pt": "pt-PT",
+    "pt_BR": "pt-BR",
+    "pt_PT": "pt-PT",
     "ar": "ar-SA",
     "ar_001": "ar-SA",
 }
@@ -59,9 +67,22 @@ _PAGE_LABELS = {
     "en": "Page",
     "ru": "Страница",
     "fr": "Page",
+    "de": "Seite",
+    "es": "Página",
     "it": "Pagina",
+    "pt": "Página",
     "ar": "صفحة",
 }
+
+
+def _resolve_docx_locale(language_code):
+    """Return a Word proofing locale for every supported Odoo locale variant."""
+    code = str(language_code or "en_US")
+    if code in _LOCALES:
+        return _LOCALES[code]
+    prefix = code.split("_", 1)[0].lower()
+    return _LOCALES.get(prefix, "en-US")
+
 
 _DOCX_FONT_KEYS = {
     "serif": "Georgia",
@@ -154,20 +175,20 @@ class _TextBudget:
                 value = value.decode("utf-8")
             except UnicodeDecodeError as exc:
                 raise EditableDocxError(
-                    "Düzenlenebilir Word belgesinde geçersiz UTF-8 metin bulundu."
+                    _("The editable Word document contains invalid UTF-8 text.")
                 ) from exc
         elif not isinstance(value, str):
             value = str(value)
         value = unicodedata.normalize("NFC", _CONTROL_CHARACTERS.sub("", value))
         if len(value) > limit:
             raise EditableDocxError(
-                "Düzenlenebilir Word belgesindeki bir metin %s karakter sınırını aşıyor."
+                _("A text value in the editable Word document exceeds the %s character limit.")
                 % limit
             )
         self.used += len(value)
         if self.used > MAX_TOTAL_TEXT_CHARS:
             raise EditableDocxError(
-                "Düzenlenebilir Word belgesindeki toplam metin güvenli işleme sınırını aşıyor."
+                _("The total text in the editable Word document exceeds the safe processing limit.")
             )
         return value
 
@@ -182,10 +203,10 @@ def _items(value, maximum, label):
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
         if len(value) > maximum:
             raise EditableDocxError(
-                "%s listesi en fazla %s öğe içerebilir." % (label, maximum)
+                _("%s can contain at most %s items.") % (label, maximum)
             )
         return list(value)
-    raise EditableDocxError("%s geçerli bir liste olmalıdır." % label)
+    raise EditableDocxError(_("%s must be a valid list.") % label)
 
 
 def _color(value, fallback):
@@ -370,12 +391,12 @@ def _prepare_logo(payload):
     if not payload:
         return b"", 0, 0
     if not isinstance(payload, (bytes, bytearray)) or len(payload) > MAX_LOGO_BYTES:
-        raise EditableDocxError("Şirket logosu 8 MB güvenli işleme sınırını aşıyor.")
+        raise EditableDocxError(_("The company logo exceeds the 8 MB safe processing limit."))
     try:
         from PIL import Image, ImageOps
     except ImportError as exc:
         raise EditableDocxError(
-            "Şirket logosunu işlemek için Pillow paketi kurulmalıdır."
+            _("The Pillow package is required to process the company logo.")
         ) from exc
 
     try:
@@ -396,7 +417,7 @@ def _prepare_logo(payload):
                 or width * height > MAX_LOGO_PIXELS
             ):
                 raise EditableDocxError(
-                    "Şirket logosunun piksel boyutu güvenli işleme sınırını aşıyor."
+                    _("The company logo dimensions exceed the safe processing limit.")
                 )
             image.load()
             image = ImageOps.exif_transpose(image)
@@ -416,9 +437,9 @@ def _prepare_logo(payload):
         ValueError,
         SyntaxError,
     ) as exc:
-        raise EditableDocxError("Şirket logosu geçerli ve güvenli bir resim değil.") from exc
+        raise EditableDocxError(_("The company logo is not a valid, safe image.")) from exc
     if len(sanitized) > MAX_LOGO_BYTES:
-        raise EditableDocxError("İşlenen şirket logosu 8 MB sınırını aşıyor.")
+        raise EditableDocxError(_("The processed company logo exceeds the 8 MB limit."))
     return sanitized, sanitized_width, sanitized_height
 
 
@@ -462,17 +483,40 @@ def _remove_cell_paragraph(cell):
     return paragraph
 
 
-def _add_info_lines(cell, info, budget, *, font, color, locale, rtl, tax_label=None):
+def _add_info_lines(
+    cell,
+    info,
+    budget,
+    *,
+    font,
+    color,
+    locale,
+    rtl,
+    labels=None,
+    tax_label=None,
+):
     info = _mapping(info)
+    labels = _mapping(labels)
     values = []
     name = budget.clean(info.get("name"))
     if name:
         values.append((name, True))
-    for item in _items(info.get("lines"), MAX_ADDRESS_LINES, "Adres satırları"):
+    for item in _items(info.get("lines"), MAX_ADDRESS_LINES, _("Address lines")):
         text = budget.clean(item)
         if text:
             values.append((text, False))
-    for key, prefix in (("phone", "Tel"), ("email", "E-posta"), ("website", "Web"), ("vat", tax_label or "Vergi No")):
+    contact_labels = (
+        ("phone", budget.clean(labels.get("phone")) or "Phone"),
+        ("email", budget.clean(labels.get("email")) or "Email"),
+        ("website", budget.clean(labels.get("website")) or "Website"),
+        (
+            "vat",
+            tax_label
+            or budget.clean(labels.get("tax_no"))
+            or "Tax ID",
+        ),
+    )
+    for key, prefix in contact_labels:
         text = budget.clean(info.get(key))
         if text:
             values.append(("%s: %s" % (prefix, text), False))
@@ -647,16 +691,21 @@ def _render_header(section, context, budget, style, logo):
     for item in _items(
         company_info.get("lines"),
         MAX_ADDRESS_LINES,
-        "Şirket adres satırları",
+        _("Company address lines"),
     ):
         detail = budget.clean(item)
         if detail:
             company_details.append(detail)
+    labels = _mapping(context.get("labels"))
     contact_labels = {
-        "phone": "Tel",
-        "email": "E-posta",
-        "website": "Web",
-        "vat": budget.clean(context.get("tax_label")) or "Vergi No",
+        "phone": budget.clean(labels.get("phone")) or "Phone",
+        "email": budget.clean(labels.get("email")) or "Email",
+        "website": budget.clean(labels.get("website")) or "Website",
+        "vat": (
+            budget.clean(context.get("tax_label"))
+            or budget.clean(labels.get("tax_no"))
+            or "Tax ID"
+        ),
     }
     for key, label in contact_labels.items():
         detail = budget.clean(company_info.get(key))
@@ -743,7 +792,7 @@ def _render_title(document, context, budget, style):
     _set_cell_shading(title_cell, style["title_fill"])
     _set_cell_shading(number_cell, style["secondary"])
 
-    title = budget.clean(context.get("title")) or "Belge"
+    title = budget.clean(context.get("title")) or _("Document")
     paragraph = _remove_cell_paragraph(title_cell)
     paragraph.paragraph_format.space_after = 0
     _add_text(
@@ -782,7 +831,7 @@ def _render_party_and_metadata(document, context, budget, style):
     show_company = bool(context.get("show_company", True))
     show_metadata = bool(context.get("show_metadata", True))
     metadata = (
-        _items(context.get("metadata"), MAX_METADATA_ITEMS, "Belge bilgileri")
+        _items(context.get("metadata"), MAX_METADATA_ITEMS, _("Document information"))
         if show_metadata
         else []
     )
@@ -792,7 +841,7 @@ def _render_party_and_metadata(document, context, budget, style):
         blocks.append(
             (
                 "info",
-                budget.clean(labels.get("company_info")) or "Şirket Bilgileri",
+                budget.clean(labels.get("company_info")) or _("Company Information"),
                 context.get("company_info"),
             )
         )
@@ -801,7 +850,7 @@ def _render_party_and_metadata(document, context, budget, style):
             (
                 "info",
                 budget.clean(labels.get("partner_info"))
-                or "Müşteri / Tedarikçi",
+                or _("Customer / Vendor"),
                 context.get("partner_info"),
             )
         )
@@ -809,7 +858,7 @@ def _render_party_and_metadata(document, context, budget, style):
         blocks.append(
             (
                 "metadata",
-                budget.clean(labels.get("document_info")) or "Belge Bilgileri",
+                budget.clean(labels.get("document_info")) or _("Document Information"),
                 metadata,
             )
         )
@@ -852,6 +901,7 @@ def _render_party_and_metadata(document, context, budget, style):
                 color=style["text"],
                 locale=style["locale"],
                 rtl=style["rtl"],
+                labels=labels,
                 tax_label=budget.clean(context.get("tax_label")),
             )
             continue
@@ -896,13 +946,13 @@ def _render_lines(document, context, budget, style):
 
     columns = [
         _mapping(item)
-        for item in _items(context.get("columns"), MAX_COLUMNS, "Belge sütunları")
+        for item in _items(context.get("columns"), MAX_COLUMNS, _("Document columns"))
     ]
     if not columns:
-        columns = [{"label": "Açıklama", "align": "left", "width": 100}]
+        columns = [{"label": _("Description"), "align": "left", "width": 100}]
     lines = [
         _mapping(item)
-        for item in _items(context.get("lines"), MAX_LINES, "Belge satırları")
+        for item in _items(context.get("lines"), MAX_LINES, _("Document lines"))
     ]
     table = document.add_table(rows=1, cols=len(columns))
     table.style = "Table Grid"
@@ -966,7 +1016,7 @@ def _render_lines(document, context, budget, style):
             for value in _items(
                 line.get("values"),
                 MAX_COLUMNS,
-                "Satır hücreleri",
+                _("Line cells"),
             )
         ]
         for index, cell in enumerate(row.cells):
@@ -999,7 +1049,7 @@ def _render_totals(document, context, budget, style):
 
     totals = [
         _mapping(item)
-        for item in _items(context.get("totals"), MAX_TOTALS, "Belge toplamları")
+        for item in _items(context.get("totals"), MAX_TOTALS, _("Document totals"))
     ]
     if not totals:
         return
@@ -1042,7 +1092,7 @@ def _render_notes_and_bank(document, context, budget, style):
 
     labels = _mapping(context.get("labels"))
     notes = (
-        _items(context.get("notes"), MAX_NOTES, "Belge notları")
+        _items(context.get("notes"), MAX_NOTES, _("Document notes"))
         if context.get("show_notes", True)
         else []
     )
@@ -1051,7 +1101,7 @@ def _render_notes_and_bank(document, context, budget, style):
         heading.paragraph_format.space_before = Pt(8)
         _add_text(
             heading,
-            budget.clean(labels.get("notes")) or "Notlar / Ödeme Koşulları",
+            budget.clean(labels.get("notes")) or _("Notes / Payment Terms"),
             font=style["heading_font"],
             size=10,
             color=style["primary"],
@@ -1090,7 +1140,7 @@ def _render_notes_and_bank(document, context, budget, style):
         heading.paragraph_format.space_before = Pt(8)
         _add_text(
             heading,
-            budget.clean(labels.get("bank_info")) or "Banka Bilgileri",
+            budget.clean(labels.get("bank_info")) or _("Bank Information"),
             font=style["heading_font"],
             size=10,
             color=style["primary"],
@@ -1125,7 +1175,7 @@ def _render_notes_and_bank(document, context, budget, style):
 
 def _validate_editable_archive(content, expected_title, expected_number):
     if not isinstance(content, (bytes, bytearray)) or len(content) > MAX_EDITABLE_DOCX_BYTES:
-        raise EditableDocxError("Düzenlenebilir Word çıktısı 100 MB sınırını aşıyor.")
+        raise EditableDocxError(_("The editable Word output exceeds the 100 MB limit."))
     try:
         with ZipFile(BytesIO(content)) as archive:
             if archive.testzip() is not None:
@@ -1173,7 +1223,7 @@ def _validate_editable_archive(content, expected_title, expected_number):
             media_count = len(media_members)
     except (BadZipFile, KeyError, ValueError, etree.XMLSyntaxError) as exc:
         raise EditableDocxError(
-            "Düzenlenebilir Word oluşturuldu ancak DOCX arşivi doğrulanamadı."
+            _("The editable Word document was created, but the DOCX archive could not be validated.")
         ) from exc
 
     word_ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -1222,19 +1272,19 @@ def _validate_editable_archive(content, expected_title, expected_number):
         or EDITABLE_DOCX_FINGERPRINT.encode("utf-8") not in core_xml
     ):
         raise EditableDocxError(
-            "Düzenlenebilir Word belgesinin metin, tablo veya A4 yapısı doğrulanamadı."
+            _("The editable Word document's text, table, or A4 structure could not be validated.")
         )
 
 
 def render_editable_docx(context, language_code=None):
     """Render an editable A4 DOCX from ``_rds_document_context`` output."""
     if not isinstance(context, Mapping):
-        raise EditableDocxError("Düzenlenebilir Word için belge verisi geçersiz.")
+        raise EditableDocxError(_("The document data for editable Word is invalid."))
     try:
         from docx import Document
     except ImportError as exc:  # pragma: no cover - deployment dependency
         raise EditableDocxError(
-            "Düzenlenebilir Word için python-docx paketi kurulmalıdır."
+            _("The python-docx package is required for editable Word output.")
         ) from exc
 
     budget = _TextBudget()
@@ -1242,8 +1292,8 @@ def render_editable_docx(context, language_code=None):
     layout_style = context.get("layout_style")
     if layout_style not in _LAYOUT_PROFILES:
         layout_style = "technology"
-    resolved_code = language_code or context.get("lang_code") or "tr_TR"
-    locale = _LOCALES.get(resolved_code, "ar-SA" if str(resolved_code).startswith("ar") else "en-US")
+    resolved_code = language_code or context.get("lang_code") or "en_US"
+    locale = _resolve_docx_locale(resolved_code)
     rtl = context.get("direction") == "rtl" or str(resolved_code).startswith("ar")
     primary = _color(theme.get("primary"), "17345F")
     secondary = _color(theme.get("secondary"), "F4F7FA")
@@ -1289,19 +1339,25 @@ def render_editable_docx(context, language_code=None):
     _render_totals(document, context, budget, style)
     _render_notes_and_bank(document, context, budget, style)
 
-    output = BytesIO()
-    try:
-        document.save(output)
-    except (OSError, ValueError) as exc:
-        raise EditableDocxError("Düzenlenebilir Word dosyası kaydedilemedi.") from exc
-    content = output.getvalue()
     expected_title = unicodedata.normalize(
         "NFC",
-        _CONTROL_CHARACTERS.sub("", str(context.get("title") or "Belge")),
+        _CONTROL_CHARACTERS.sub("", str(context.get("title") or _("Document"))),
     )[:MAX_TEXT_CHARS]
     expected_number = unicodedata.normalize(
         "NFC",
         _CONTROL_CHARACTERS.sub("", str(context.get("number") or "-")),
     )[:MAX_TEXT_CHARS]
+    properties = document.core_properties
+    properties.author = "Ranvals Software"
+    properties.last_modified_by = "DocuCraft"
+    properties.title = (f"{expected_title} {expected_number}").strip()[:255]
+    properties.category = "Business document"
+
+    output = BytesIO()
+    try:
+        document.save(output)
+    except (OSError, ValueError) as exc:
+        raise EditableDocxError(_("The editable Word file could not be saved.")) from exc
+    content = output.getvalue()
     _validate_editable_archive(content, expected_title, expected_number)
     return content

@@ -31,7 +31,7 @@ patch(RdsReportDesignSelector.prototype, {
     async prepareLanguageChange() {
         if (this.state.busy) return false;
         if (this.changed) {
-            this.notification.add(_t("Önce bekleyen tasarım ve belge dili seçimini uygulayın."), {type:"warning"});
+            this.notification.add(_t("Apply the pending design and document language selection first."), {type:"warning"});
             return false;
         }
         const key = this.key;

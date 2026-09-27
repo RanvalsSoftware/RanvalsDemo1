@@ -5,22 +5,25 @@
         <field name="model">rds.export.wizard</field>
         <field name="inherit_id" ref="view_rds_export_wizard_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='attach_to_record']" position="before">
-                <field name="processing_mode" widget="radio"/>
-                <div class="alert alert-info" role="status"
-                     invisible="processing_mode != 'auto'">
-                    Küçük belgeler hemen indirilir; büyük, çok kayıtlı veya tüm-format işlemleri otomatik olarak arka plana alınır.
+            <xpath expr="//div[contains(concat(' ', normalize-space(@class), ' '), ' rds-export-switch ')][field[@name='attach_to_record']]" position="before">
+                <div class="rds-export-control rds-export-control--processing">
+                    <label for="processing_mode"/>
+                    <field name="processing_mode" widget="radio" nolabel="1"/>
                 </div>
-                <div class="alert alert-info" role="status"
+                <div class="rds-export-format-note alert alert-info" role="status"
+                     invisible="processing_mode != 'auto'">
+                    Small documents download immediately; large, multi-record, or all-format operations are automatically moved to the background.
+                </div>
+                <div class="rds-export-format-note alert alert-info" role="status"
                      invisible="processing_mode != 'background'">
-                    Pencereyi açık tutmanız gerekmez. İş tamamlandığında bildirim alır ve Arka Plan İşlerim ekranından indirirsiniz.
+                    You do not need to keep this dialog open. You will receive a notification when the job is complete and can download it from My Background Jobs.
                 </div>
             </xpath>
             <xpath expr="//footer/button[@name='action_export']" position="attributes">
                 <attribute name="invisible">processing_mode == 'background' or (processing_mode == 'auto' and (record_count &gt; 3 or output_format == 'zip'))</attribute>
             </xpath>
             <xpath expr="//footer/button[@name='action_export']" position="after">
-                <button name="action_export" type="object" string="Arka Plana Al"
+                <button name="action_export" type="object" string="Run in Background"
                         class="btn-primary" icon="fa-clock-o"
                         invisible="processing_mode == 'immediate' or (processing_mode == 'auto' and record_count &lt;= 3 and output_format != 'zip')"/>
             </xpath>

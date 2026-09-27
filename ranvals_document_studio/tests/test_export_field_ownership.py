@@ -68,7 +68,7 @@ class TestRdsExportFieldOwnership(TransactionCase):
         rpc_line = self.env["rds.export.field.line"].with_user(self.owner).browse(
             line.id
         )
-        with self.assertRaisesRegex(ValidationError, "başka bir işleme taşınamaz"):
+        with self.assertRaisesRegex(ValidationError, "cannot be moved to another operation"):
             rpc_line.write({"wizard_id": other_wizard.id})
 
         self.assertEqual(line.wizard_id, owner_wizard)

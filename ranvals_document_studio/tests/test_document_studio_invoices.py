@@ -113,7 +113,7 @@ class TestRdsDocumentStudioInvoices(TransactionCase):
         self.assertEqual(server_action.model_id.model, "account.move")
         self.assertEqual(server_action.binding_model_id.model, "account.move")
         self.assertEqual(server_action.binding_type, "report")
-        self.assertEqual(server_action.name, "DocuCraft Yazdır")
+        self.assertEqual(server_action.name, "Print with DocuCraft")
         self.assertIn(
             self.env.ref("account.group_account_invoice"), server_action.group_ids
         )
@@ -139,7 +139,7 @@ class TestRdsDocumentStudioInvoices(TransactionCase):
     def test_non_invoice_selection_is_rejected_instead_of_silently_filtered(self):
         journal_entry = self.env["account.move"].new({"move_type": "entry"})
 
-        with self.assertRaisesRegex(UserError, "yalnız fatura"):
+        with self.assertRaisesRegex(UserError, "only be used for invoices"):
             journal_entry.action_open_rds_export()
 
     def test_invoice_context_uses_delivery_address_and_explicit_draft_title(self):

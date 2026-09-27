@@ -8,7 +8,7 @@
                 contentClass="'o_rds_pdf_preview_dialog'">
             <iframe class="o_rds_pdf_preview_dialog__frame"
                     t-att-src="props.url"
-                    title="PDF Önizleme"/>
+                    title="PDF Preview"/>
         </Dialog>
     </t>
 </templates>

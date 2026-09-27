@@ -1,3 +1,4 @@
+import base64
 import json
 from unittest.mock import patch
 
@@ -154,6 +155,22 @@ class TestRdsStudioSaleReports(TransactionCase):
             self.assertIn(template.name, preview)
             self.assertIn(template.primary_color, preview)
             self.assertNotIn("Önizleme bulunmuyor", preview)
+
+    def test_dynamic_preview_reads_real_logo_when_rpc_requests_binary_size(self):
+        png = base64.b64decode(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUB"
+            "AScY42YAAAAASUVORK5CYII="
+        )
+        self.env.company.logo = base64.b64encode(png)
+        template = self.env.ref(
+            "ranvals_document_studio.template_beauty_premium"
+        ).with_context(bin_size=True)
+
+        preview = str(template._rds_dynamic_preview_html())
+
+        self.assertIn("data:image/", preview)
+        self.assertNotIn(";base64,1.00", preview)
+        self.assertNotIn(" Mb", preview)
 
     def test_document_context_keeps_customer_invoice_and_delivery_addresses(self):
         invoice_partner = self.env["res.partner"].create(

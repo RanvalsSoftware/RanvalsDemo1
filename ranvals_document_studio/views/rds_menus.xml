@@ -6,16 +6,16 @@
               web_icon="ranvals_document_studio,static/description/docucraft_app_icon_v9_20260914.png"
               groups="base.group_user"/>
     <record id="action_rds_connectors" model="ir.actions.act_window">
-        <field name="name">DocuCraft Bağlayıcıları</field>
+        <field name="name">DocuCraft Connectors</field>
         <field name="res_model">ir.module.module</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('name', 'in', ('ranvals_document_studio', 'sale_management', 'account', 'purchase', 'web_studio'))]</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Önce Uygulamalar listesini güncelleyin</p>
-            <p>Satış, Muhasebe, Satın Alma ve Enterprise Studio entegrasyonları All-in-One paketle birlikte kurulur.</p>
+            <p class="o_view_nocontent_smiling_face">Update the Apps list first</p>
+            <p>Sales, Accounting, Purchase, and Enterprise Studio integrations are installed with the All-in-One package.</p>
         </field>
     </record>
-    <menuitem id="menu_rds_connectors" name="Bağlayıcılar" parent="menu_rds_root" action="action_rds_connectors_dashboard" sequence="5" groups="base.group_system"/>
-    <menuitem id="menu_rds_templates" name="Şablonlar" parent="menu_rds_root" action="action_rds_template" sequence="10" groups="base.group_user"/>
-    <menuitem id="menu_rds_logs" name="Dışa Aktarım Geçmişi" parent="menu_rds_root" action="action_rds_export_dashboard" sequence="20" groups="base.group_user"/>
+    <menuitem id="menu_rds_connectors" name="Connectors" parent="menu_rds_root" action="action_rds_connectors_dashboard" sequence="5" groups="base.group_system"/>
+    <menuitem id="menu_rds_templates" name="Templates" parent="menu_rds_root" action="action_rds_template" sequence="10" groups="base.group_user"/>
+    <menuitem id="menu_rds_logs" name="Export History" parent="menu_rds_root" action="action_rds_export_dashboard" sequence="20" groups="base.group_user"/>
 </odoo>

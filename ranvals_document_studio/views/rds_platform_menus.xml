@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="menu_rds_template_rules" name="Otomatik Şablon Kuralları" parent="menu_rds_root" action="action_rds_template_rule" sequence="12" groups="ranvals_document_studio.group_rds_manager"/>
-    <menuitem id="menu_rds_template_import" name="Şablon İçe Aktar" parent="menu_rds_root" action="action_rds_template_import" sequence="14" groups="ranvals_document_studio.group_rds_manager"/>
-    <menuitem id="menu_rds_administration" name="Yönetim" parent="menu_rds_root" sequence="90" groups="ranvals_document_studio.group_rds_manager,base.group_system"/>
-    <menuitem id="menu_rds_retention" name="Saklama Politikası" parent="menu_rds_administration" action="action_rds_retention_settings" sequence="10" groups="base.group_system"/>
-    <menuitem id="menu_rds_system_health" name="Sistem Sağlığı" parent="menu_rds_administration" action="action_rds_system_health" sequence="20" groups="base.group_system"/>
+    <menuitem id="menu_rds_template_rules" name="Automatic Template Rules" parent="menu_rds_root" action="action_rds_template_rule" sequence="12" groups="ranvals_document_studio.group_rds_manager"/>
+    <menuitem id="menu_rds_template_import" name="Import Template" parent="menu_rds_root" action="action_rds_template_import" sequence="14" groups="ranvals_document_studio.group_rds_manager"/>
+    <menuitem id="menu_rds_administration" name="Administration" parent="menu_rds_root" sequence="90" groups="ranvals_document_studio.group_rds_manager,base.group_system"/>
+    <menuitem id="menu_rds_retention" name="Retention Policy" parent="menu_rds_administration" action="action_rds_retention_settings" sequence="10" groups="base.group_system"/>
+    <menuitem id="menu_rds_system_health" name="System Health" parent="menu_rds_administration" action="action_rds_system_health" sequence="20" groups="base.group_system"/>
 </odoo>

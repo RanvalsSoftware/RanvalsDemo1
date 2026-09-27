@@ -1,10 +1,34 @@
 # DocuCraft Changelog
 
+## 19.0.3.5.0 — 2026-09-27
+
+- Fixed the template form shell so the designer remains beside the DocuCraft
+  sidebar instead of being pushed below the visible viewport.
+- Fixed designer logos under Odoo's binary-size RPC context and scoped the
+  static-preview image limit so document logos retain their configured size.
+- Added regression coverage for binary-size logo previews and completed the
+  real-product Odoo Apps gallery, Word output proof and searchable product name.
+- Documented the PDF-engine requirement separately from native editable Word.
+
+## 19.0.3.4.0 — 2026-09-27
+
+- Promoted editable Word to a first-class export with localized contact labels,
+  verified native tables and cleaner, language-neutral download names.
+- Standardized the module's user-interface source language on English and
+  completed installable catalogs for English (US/UK), Turkish, German,
+  French, Spanish, Italian, Portuguese, Russian and Arabic.
+- Made company-language document selection consistent across PDF, editable
+  Word, design-preserved Word, PNG, ZIP, live preview and queued exports.
+- Made archived templates reliably searchable with explicit Active, Archived
+  and All filters while retaining Odoo's normal active-only opening view.
+- Prepared the Odoo Apps edition with OPL-1 metadata, EUR 87 pricing, a new
+  store icon, detailed product page and real English product screenshots.
+
 ## 19.0.3.3.1 — 2026-09-27
 
-- Added Active, Inactive and All filters so archived DocuCraft templates can
+- Added Active, Archived and All filters so archived DocuCraft templates can
   always be found without changing the normal active-only opening view.
-- Added a clear inactive ribbon and kept the status toggle available in both
+- Added a clear archived ribbon and kept the status toggle available in both
   list and form views for one-click reactivation.
 - Removed the redundant default Active search chip and separated status from
   default-template filtering for predictable search combinations.
