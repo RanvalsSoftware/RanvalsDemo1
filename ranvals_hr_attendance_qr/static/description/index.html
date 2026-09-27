@@ -1,0 +1,112 @@
+<section class="oe_container py-4">
+    <div class="text-center">
+        <img src="icon.png" alt="Employee QR Attendance icon" class="img-fluid mb-3" width="160" height="160"/>
+        <h1 class="display-4">Employee QR Attendance for Odoo 19</h1>
+        <p class="lead">
+            Secure employee QR check-in and check-out with weekly attendance reports,
+            overtime visibility, exception controls, and payroll-preparation attendance exports.
+        </p>
+    </div>
+</section>
+
+<section class="oe_container py-4">
+    <div class="row">
+        <div class="col-lg-4 mb-3">
+            <div class="border rounded p-4 h-100">
+                <h3>Controlled mobile attendance</h3>
+                <p>
+                    Personal employee code and PIN, HTTPS-only public pages, trusted public-IP
+                    allowlists, signed actions, rate limits, and revocable remembered devices.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-3">
+            <div class="border rounded p-4 h-100">
+                <h3>Weekly and monthly reports</h3>
+                <p>
+                    Create auditable attendance periods with planned hours, worked hours,
+                    scheduled work, outside-schedule work, shortfall, lateness, early leave,
+                    missing days, and missing check-outs.
+                </p>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-3">
+            <div class="border rounded p-4 h-100">
+                <h3>Payroll-preparation hour data</h3>
+                <p>
+                    Export locked attendance snapshots as UTF-8 CSV with in-schedule work,
+                    shortfall, and Odoo-approved overtime grouped by rate, including unpaid rate 0.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container py-4">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h2>Built on standard Odoo Attendances</h2>
+            <ul>
+                <li>Creates standard <strong>hr.attendance</strong> records.</li>
+                <li>Works without an Odoo or portal account for each employee.</li>
+                <li>Supports fixed, split, and cross-midnight work schedules.</li>
+                <li>Uses historical employee calendars, contracts, holidays, and resource leaves.</li>
+                <li>Keeps QR-only analytics separate from complete payroll attendance periods.</li>
+                <li>Provides live pivot/graph analysis, PDF summaries, and detailed CSV exports.</li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <div class="border rounded p-4 bg-light">
+                <h3>Reviewable period workflow</h3>
+                <p class="mb-1"><strong>Draft</strong> — calculate and inspect source records.</p>
+                <p class="mb-1"><strong>Reviewed</strong> — confirm attendance exceptions.</p>
+                <p class="mb-0"><strong>Locked</strong> — freeze the reviewed attendance-input snapshot.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container py-4">
+    <div class="alert alert-info">
+        <h3>Accurate product scope</h3>
+        <p class="mb-0">
+            This Community-compatible core app prepares attendance totals and exports for
+            payroll workflows. The exported metrics are inputs, not payable-hour decisions:
+            leave/work-entry codes and country-specific rules remain in the payroll system.
+            It does not generate payslips or calculate salary amounts. An Enterprise payroll
+            connector can be installed as a separate bridge when required.
+        </p>
+    </div>
+</section>
+
+<section class="oe_container py-4">
+    <h2>Key controls</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <ul>
+                <li>Multi-company record rules and company snapshots</li>
+                <li>One open attendance per employee</li>
+                <li>Idempotent signed check-in/check-out operations</li>
+                <li>Concurrent-request serialization</li>
+                <li>QR and remembered-device revocation</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <ul>
+                <li>Open attendance and anomaly blockers</li>
+                <li>Pending overtime approval blockers</li>
+                <li>Spreadsheet formula-injection protection</li>
+                <li>Non-editable locked reporting periods</li>
+                <li>Source fingerprint for revision comparison</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container py-4 text-center">
+    <h2>Odoo 19 Community and Enterprise</h2>
+    <p>
+        Dependencies: Attendances, Web, and Python qrcode (included in official Odoo 19 requirements). No clinic application, external attendance
+        service, GPS collection, or employee portal account is required.
+    </p>
+</section>

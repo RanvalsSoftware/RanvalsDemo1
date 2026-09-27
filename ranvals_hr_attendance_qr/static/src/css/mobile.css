@@ -1,0 +1,291 @@
+* {
+    box-sizing: border-box;
+}
+
+body.rqa {
+    min-height: 100vh;
+    margin: 0;
+    padding: 30px 16px;
+    background: #f5f2f4;
+    color: #2f2028;
+    font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.rqa-card {
+    width: 100%;
+    max-width: 480px;
+    margin: 3vh auto;
+    padding: 30px;
+    border: 1px solid #d8c9d0;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 14px 40px rgba(61, 29, 45, 0.09);
+}
+
+.rqa-header {
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #ded2d8;
+}
+
+.rqa-brand {
+    color: #612441;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    overflow-wrap: anywhere;
+    text-transform: uppercase;
+}
+
+.rqa h1 {
+    margin: 12px 0 8px;
+    font-size: 26px;
+    line-height: 1.25;
+}
+
+.rqa h2 {
+    margin: 12px 0 18px;
+    font-size: 20px;
+}
+
+.rqa p {
+    margin: 12px 0;
+}
+
+.rqa-header p,
+.rqa-muted {
+    color: #66545e;
+    font-size: 14px;
+}
+
+.rqa-center {
+    text-align: center;
+}
+
+.rqa-button {
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 18px;
+    padding: 14px 16px;
+    border: 1px solid #55213a;
+    border-radius: 12px;
+    background: #55213a;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+}
+
+.rqa-button:hover {
+    background: #371425;
+}
+
+.rqa-button:focus-visible,
+.rqa input:focus-visible,
+.rqa-text-button:focus-visible {
+    outline: 3px solid #7b2c54;
+    outline-offset: 3px;
+}
+
+.rqa-checkout {
+    background: #50313f;
+}
+
+.rqa-outline {
+    background: #fff;
+    color: #55213a;
+}
+
+.rqa-outline:hover {
+    background: #f3e7ec;
+}
+
+.rqa-alert {
+    margin: 16px 0;
+    padding: 14px;
+    border: 1px solid #c9a842;
+    border-radius: 12px;
+    background: #fff7d8;
+    color: #513f05;
+    font-size: 14px;
+}
+
+.rqa-success {
+    border-color: #6eaf89;
+    background: #e8f6ee;
+    color: #174d32;
+}
+
+.rqa-error {
+    border-color: #d79a9a;
+    background: #fff0f0;
+    color: #762020;
+}
+
+.rqa-status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.rqa-status-in {
+    background: #e6f4eb;
+    color: #1d5232;
+}
+
+.rqa-status-out {
+    background: #f0e9ed;
+    color: #5c3e4e;
+}
+
+.rqa-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.rqa-login > label:not(.rqa-remember) {
+    display: block;
+    margin: 17px 0 7px;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.rqa-login > input {
+    width: 100%;
+    min-height: 49px;
+    padding: 11px 13px;
+    border: 2px solid #9a838f;
+    border-radius: 10px;
+    background: #fff;
+    font: inherit;
+}
+
+.rqa-field-help {
+    display: block;
+    margin-top: 5px;
+    color: #66545e;
+    font-size: 13px;
+}
+
+.rqa-remember {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+    color: #574650;
+    font-weight: 400;
+}
+
+.rqa-remember input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin-top: 2px;
+    accent-color: #55213a;
+}
+
+.rqa-forget {
+    margin-top: 24px;
+    padding-top: 15px;
+    border-top: 1px solid #ded2d8;
+}
+
+.rqa-text-button {
+    min-height: 44px;
+    padding: 9px 0;
+    border: 0;
+    background: transparent;
+    color: #634456;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+.rqa-forget small {
+    display: block;
+    color: #66545e;
+    font-size: 12px;
+}
+
+.rqa footer {
+    margin-top: 26px;
+    color: #66545e;
+    font-size: 13px;
+}
+
+.rqa-ip,
+.rqa-fallback {
+    color: #5e4b55;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.rqa-poster {
+    text-align: center;
+}
+
+.rqa-poster .rqa-card {
+    max-width: 650px;
+}
+
+.rqa-image {
+    width: 80mm;
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+}
+
+.rqa-steps {
+    max-width: 440px;
+    margin: 4px auto 18px;
+    padding-left: 28px;
+    text-align: left;
+}
+
+.rqa-no-print {
+    color: #5e4b55;
+    font-size: 13px;
+}
+
+@media (max-width: 480px) {
+    body.rqa {
+        padding: 16px 10px;
+    }
+
+    .rqa-card {
+        margin: 0 auto;
+        padding: 23px;
+    }
+}
+
+@media print {
+    @page {
+        margin: 12mm;
+    }
+
+    body.rqa {
+        padding: 0;
+        background: #fff;
+    }
+
+    .rqa-card {
+        margin: 0 auto;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .rqa-no-print {
+        display: none;
+    }
+}

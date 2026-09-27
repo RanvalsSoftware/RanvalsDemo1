@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ranvals_qr_station_manager,QR station manager,model_ranvals_qr_station,hr_attendance.group_hr_attendance_manager,1,1,1,0
+access_ranvals_qr_credential_manager,QR credential manager,model_ranvals_qr_credential,hr_attendance.group_hr_attendance_manager,1,1,1,0
+access_ranvals_qr_device_manager,QR device manager,model_ranvals_qr_device,hr_attendance.group_hr_attendance_manager,1,0,0,1
+access_ranvals_qr_operation_manager,QR operation manager,model_ranvals_qr_operation,hr_attendance.group_hr_attendance_manager,1,0,0,0
+access_ranvals_qr_rate_internal,QR rate internal,model_ranvals_qr_rate,base.group_no_one,1,0,0,0
+access_ranvals_qr_report_batch_manager,QR attendance report batch manager,model_ranvals_qr_report_batch,hr_attendance.group_hr_attendance_manager,1,1,1,1
+access_ranvals_qr_report_day_manager,QR attendance report day manager,model_ranvals_qr_report_day,hr_attendance.group_hr_attendance_manager,1,0,0,0
+access_ranvals_qr_report_payroll_manager,QR attendance payroll preparation manager,model_ranvals_qr_report_payroll_line,hr_attendance.group_hr_attendance_manager,1,0,0,0
+access_ranvals_qr_report_wizard_manager,QR attendance report wizard manager,model_ranvals_qr_report_wizard,hr_attendance.group_hr_attendance_manager,1,1,1,1

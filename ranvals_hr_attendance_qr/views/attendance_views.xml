@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_station_list" model="ir.ui.view">
+        <field name="name">ranvals.qr.station.list</field>
+        <field name="model">ranvals.qr.station</field>
+        <field name="arch" type="xml">
+            <list string="QR Giriş Noktaları" multi_edit="1">
+                <field name="name"/>
+                <field name="brand_name" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="enabled"/>
+                <field name="base_url" optional="hide"/>
+                <field name="active" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_station_form" model="ir.ui.view">
+        <field name="name">ranvals.qr.station.form</field>
+        <field name="model">ranvals.qr.station</field>
+        <field name="arch" type="xml">
+            <form string="QR Giriş Noktası">
+                <header>
+                    <button name="action_add_current_network" type="object" string="Bulunduğum Ağı Ekle"
+                        confirm="Bu işlemi izin vermek istediğiniz işletme veya test ağına bağlıyken yapın. Sunucunun gördüğü genel IP izin listesine eklenecek. Devam edilsin mi?"/>
+                    <button name="action_open_kiosk" type="object" string="Telefon Ekranını Aç"/>
+                    <button name="action_print_qr" type="object" string="QR Baskı Sayfası"/>
+                    <button name="action_rotate_qr" type="object" string="QR Bağlantısını Yenile"
+                        confirm="Eski basılı QR ve tüm telefon oturumları geçersiz olur. Yeni QR tekrar basılmalıdır. Devam edilsin mi?"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Arşivlendi" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="alert alert-info" role="alert">
+                        Önce demo ortamında test edin. Ağ kontrolü Wi-Fi adını değil, Odoo sunucusunun gördüğü genel internet çıkış IP adresini kullanır.
+                        Reverse proxy güven ayarını ve kaynak IP aktarımını doğrulamadan özelliği etkinleştirmeyin.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="brand_name"/>
+                            <field name="company_id" options="{'no_create': True}" readonly="id" groups="base.group_multi_company"/>
+                            <field name="base_url" placeholder="https://mesai.ornek.com"/>
+                            <field name="timezone"/>
+                            <field name="enabled" widget="boolean_toggle"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="remember_days"/>
+                            <field name="remember_idle_hours"/>
+                            <field name="temporary_session_minutes"/>
+                            <field name="max_devices_per_employee"/>
+                            <field name="cooldown_seconds"/>
+                            <field name="stale_hours"/>
+                            <field name="log_ip_address"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="allowed_networks" placeholder="Her satıra bir genel internet çıkış IP adresi veya dar CIDR. Örnek: 1.1.1.1/32"/>
+                    </group>
+                    <group>
+                        <field name="kiosk_url" widget="CopyClipboardChar" readonly="1"/>
+                        <field name="qr_image" widget="image" options="{'size': [260, 260]}" nolabel="1"/>
+                    </group>
+                    <div class="alert alert-warning" role="alert">
+                        “Yalnız Güvenli QR Kanalı” seçeneği açık personelin standart Odoo kiosk ve üst çubuk geçişleri engellenir.
+                        Yönetici elle kayıt düzeltebilir. Kod ve PIN tek kişiye özeldir; ortak kimlik kullanmayın.
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_stations" model="ir.actions.act_window">
+        <field name="name">QR Giriş Noktaları</field>
+        <field name="res_model">ranvals.qr.station</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
+    <record id="view_credential_list" model="ir.ui.view">
+        <field name="name">ranvals.qr.credential.list</field>
+        <field name="model">ranvals.qr.credential</field>
+        <field name="arch" type="xml">
+            <list string="QR Personel Kimlikleri" multi_edit="1">
+                <field name="employee_id"/>
+                <field name="code"/>
+                <field name="pin_ready"/>
+                <field name="qr_only"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_credential_form" model="ir.ui.view">
+        <field name="name">ranvals.qr.credential.form</field>
+        <field name="model">ranvals.qr.credential</field>
+        <field name="arch" type="xml">
+            <form string="QR Personel Kimliği">
+                <header>
+                    <button name="action_rotate_pin" type="object" string="PIN Oluştur / Yenile" class="oe_highlight"
+                        confirm="Yeni PIN yalnızca ekrandaki bildirimde gösterilir. Eski PIN ve tüm telefon oturumları geçersiz olur. Devam edilsin mi?"/>
+                    <button name="action_revoke_devices" type="object" string="Telefon Oturumlarını Kapat"
+                        confirm="Bu personelin telefonlarında yeniden kod ve PIN istenecek. Devam edilsin mi?"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Kapalı" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="alert alert-info" role="alert">
+                        Odoo kullanıcı hesabı açılmaz. Mevcut çalışanı seçin, kaydedin ve “PIN Oluştur / Yenile” düğmesine basın.
+                        Tek sefer gösterilen kişisel PIN'i yalnız ilgili personele güvenli biçimde iletin.
+                    </div>
+                    <group>
+                        <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        <field name="employee_id" readonly="id"
+                            domain="[('company_id', '=', company_id), ('active', '=', True)]"
+                            options="{'no_create': True}"/>
+                        <field name="code"/>
+                        <field name="pin_ready"/>
+                        <field name="qr_only"/>
+                        <field name="active" widget="boolean_toggle"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_credentials" model="ir.actions.act_window">
+        <field name="name">QR Personel Kimlikleri</field>
+        <field name="res_model">ranvals.qr.credential</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
+    <record id="view_device_list" model="ir.ui.view">
+        <field name="name">ranvals.qr.device.list</field>
+        <field name="model">ranvals.qr.device</field>
+        <field name="arch" type="xml">
+            <list string="Telefon Oturumları" create="0" edit="0" delete="0">
+                <field name="credential_id"/>
+                <field name="station_id"/>
+                <field name="remembered"/>
+                <field name="create_date" string="Oluşturulma"/>
+                <field name="last_seen_at" string="Son Görülme"/>
+                <field name="expires_at" string="Son Geçerlilik"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <button name="action_revoke" type="object" string="İptal Et" icon="fa-ban"
+                    confirm="Bu telefonda yeniden kod ve PIN istenecek. Devam edilsin mi?"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_devices" model="ir.actions.act_window">
+        <field name="name">Telefon Oturumları</field>
+        <field name="res_model">ranvals.qr.device</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_operation_list" model="ir.ui.view">
+        <field name="name">ranvals.qr.operation.list</field>
+        <field name="model">ranvals.qr.operation</field>
+        <field name="arch" type="xml">
+            <list string="QR İşlem Makbuzları" create="0" edit="0" delete="0">
+                <field name="event_time" string="Zaman"/>
+                <field name="employee_id" string="Personel"/>
+                <field name="action" string="İşlem"/>
+                <field name="station_id" string="QR Noktası"/>
+                <field name="attendance_id" string="Mesai Kaydı"/>
+                <field name="device_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_operations" model="ir.actions.act_window">
+        <field name="name">QR İşlem Makbuzları</field>
+        <field name="res_model">ranvals.qr.operation</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_attendance_list_ranvals_qr" model="ir.ui.view">
+        <field name="name">hr.attendance.list.ranvals.qr</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='out_mode']" position="after">
+                <field name="ranvals_qr_in_station_id" string="QR Giriş Noktası" optional="show"
+                    groups="hr_attendance.group_hr_attendance_manager"/>
+                <field name="ranvals_qr_out_station_id" string="QR Çıkış Noktası" optional="show"
+                    groups="hr_attendance.group_hr_attendance_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_attendance_form_ranvals_qr" model="ir.ui.view">
+        <field name="name">hr.attendance.form.ranvals.qr</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='check_out']" position="after">
+                <field name="ranvals_qr_in_station_id" readonly="1"
+                    groups="hr_attendance.group_hr_attendance_manager"/>
+                <field name="ranvals_qr_out_station_id" readonly="1"
+                    groups="hr_attendance.group_hr_attendance_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_attendance_search_ranvals_qr" model="ir.ui.view">
+        <field name="name">hr.attendance.search.ranvals.qr</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='auto_check']" position="after">
+                <filter string="QR Mesai" name="ranvals_qr"
+                    domain="['|', ('ranvals_qr_in_station_id', '!=', False), ('ranvals_qr_out_station_id', '!=', False)]"
+                    groups="hr_attendance.group_hr_attendance_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_attendance_logs" model="ir.actions.act_window">
+        <field name="name">QR Mesai Kayıtları</field>
+        <field name="path">ranvals-qr-attendances</field>
+        <field name="res_model">hr.attendance</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="hr_attendance.view_attendance_tree"/>
+        <field name="search_view_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="domain">['|', ('ranvals_qr_in_station_id', '!=', False), ('ranvals_qr_out_station_id', '!=', False)]</field>
+    </record>
+
+    <menuitem id="menu_ranvals_qr_root" name="QR Mesai Takibi"
+        parent="hr_attendance.menu_hr_attendance_root" sequence="70"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_attendance_logs" name="QR Mesai Kayıtları"
+        parent="menu_ranvals_qr_root" action="action_attendance_logs" sequence="10"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_attendance_stations" name="QR Giriş Noktaları"
+        parent="menu_ranvals_qr_root" action="action_stations" sequence="20"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_attendance_credentials" name="QR Personel Kimlikleri"
+        parent="menu_ranvals_qr_root" action="action_credentials" sequence="30"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_attendance_devices" name="Telefon Oturumları"
+        parent="menu_ranvals_qr_root" action="action_devices" sequence="40"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_attendance_operations" name="QR İşlem Makbuzları"
+        parent="menu_ranvals_qr_root" action="action_operations" sequence="50"
+        groups="hr_attendance.group_hr_attendance_manager"/>
+</odoo>

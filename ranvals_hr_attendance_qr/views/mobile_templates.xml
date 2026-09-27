@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="mobile_page" name="Ranvals QR Mobil Mesai">
+        <html t-att-lang="page_lang">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta name="robots" content="noindex,nofollow"/>
+                <title><t t-esc="brand_name"/> · Personel Giriş–Çıkış</title>
+                <t t-call-assets="ranvals_hr_attendance_qr.assets_public" t-js="false"/>
+            </head>
+            <body class="rqa">
+                <main class="rqa-card">
+                    <header class="rqa-header">
+                        <span class="rqa-brand" t-esc="brand_name"/>
+                        <h1>Personel Giriş–Çıkış</h1>
+                        <p t-esc="station_name"/>
+                    </header>
+
+                    <div t-if="success and not denied" class="rqa-alert rqa-success" role="status" t-esc="success"/>
+                    <div t-if="error" class="rqa-alert rqa-error" role="alert" t-esc="error"/>
+
+                    <t t-if="denied">
+                        <p class="rqa-muted">Ağ veya HTTPS kontrolü tamamlanmadı. Hiçbir giriş–çıkış kaydı oluşturulmadı.</p>
+                        <p class="rqa-ip">Sunucunun gördüğü IP: <strong t-esc="observed_ip"/></p>
+                        <a class="rqa-button rqa-outline" t-att-href="path">Bağlantıyı Yeniden Kontrol Et</a>
+                    </t>
+
+                    <t t-elif="info">
+                        <h2>Merhaba <t t-esc="info['employee_name']"/></h2>
+                        <div t-att-class="'rqa-status ' + ('rqa-status-in' if info['is_in'] else 'rqa-status-out')" role="status">
+                            <span class="rqa-dot" aria-hidden="true"/>
+                            <t t-if="info['is_in']">Durumunuz: İşe giriş kaydınız açık</t>
+                            <t t-else="">Durumunuz: Açık giriş kaydınız yok</t>
+                        </div>
+                        <p t-if="info['last_time']" class="rqa-muted">Son işlem: <strong t-esc="info['last_time']"/></p>
+
+                        <t t-if="info['review']">
+                            <div class="rqa-alert rqa-error" role="alert" t-esc="info['review']"/>
+                            <a class="rqa-button rqa-outline" t-att-href="path">Durumu Yenile</a>
+                        </t>
+                        <t t-elif="info['wait_seconds']">
+                            <p class="rqa-alert" role="status">Çift işlem koruması: <strong t-esc="info['wait_seconds']"/> saniye sonra sayfayı yenileyebilirsiniz.</p>
+                            <a class="rqa-button rqa-outline" t-att-href="path">Durumu Yenile</a>
+                        </t>
+                        <form t-else="" method="post" t-att-action="path + '/submit'">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <input type="hidden" name="intent" t-att-value="info['intent']"/>
+                            <button type="submit" t-att-class="'rqa-button ' + ('rqa-checkout' if info['is_in'] else '')">
+                                <t t-if="info['is_in']">İşten Çıkış Yap</t>
+                                <t t-else="">İşe Giriş Yap</t>
+                            </button>
+                            <p class="rqa-muted rqa-center">Saat, bu düğmeye bastığınız anda sunucuda kaydedilir.</p>
+                        </form>
+
+                        <form method="post" t-att-action="path + '/logout'" class="rqa-forget">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <button type="submit" class="rqa-text-button">Bu telefondaki kimliğimi kaldır</button>
+                            <small>Bu işlem işten çıkış kaydı oluşturmaz.</small>
+                        </form>
+                    </t>
+
+                    <form t-else="" method="post" t-att-action="path + '/login'" class="rqa-login">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <label for="employee-code">Personel kodunuz</label>
+                        <input id="employee-code" name="code" type="text" required="required"
+                            minlength="4" maxlength="20" pattern="[A-Za-z0-9]{4,20}"
+                            autocomplete="username" autocapitalize="characters" spellcheck="false"
+                            aria-describedby="code-help" placeholder="Yöneticinizin verdiği kod"/>
+                        <small id="code-help" class="rqa-field-help">4–20 İngilizce harf veya rakam.</small>
+
+                        <label for="employee-pin">Kişisel PIN'iniz</label>
+                        <input id="employee-pin" name="pin" type="password" required="required"
+                            inputmode="numeric" pattern="[0-9]{6,12}" minlength="6" maxlength="12"
+                            autocomplete="one-time-code" aria-describedby="pin-help" placeholder="Kişisel PIN"/>
+                        <small id="pin-help" class="rqa-field-help">6–12 rakam; kimseyle paylaşmayın.</small>
+
+                        <label class="rqa-remember">
+                            <input type="checkbox" name="remember" value="yes"/>
+                            <span>Bu benim kişisel telefonum; beni hatırla</span>
+                        </label>
+                        <button type="submit" class="rqa-button">Kimliğimi Doğrula</button>
+                        <p class="rqa-muted">Kimlik doğrulaması tek başına mesai başlatmaz. Sonraki ekranda giriş veya çıkışı ayrıca onaylarsınız.</p>
+                    </form>
+
+                    <footer>İşletmenin izin verilen ağına bağlı olmalısınız. Kod ve PIN'inizi başkasıyla paylaşmayın.</footer>
+                </main>
+            </body>
+        </html>
+    </template>
+
+    <template id="qr_poster" name="Ranvals Mesai QR Baskısı">
+        <html t-att-lang="page_lang">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta name="robots" content="noindex,nofollow"/>
+                <title><t t-esc="station.brand_name"/> · Personel QR</title>
+                <t t-call-assets="ranvals_hr_attendance_qr.assets_public" t-js="false"/>
+            </head>
+            <body class="rqa rqa-poster">
+                <main class="rqa-card">
+                    <span class="rqa-brand" t-esc="station.brand_name"/>
+                    <h1>İşe giriş ve çıkışınız<br/>aynı QR ile</h1>
+                    <p t-esc="station.name"/>
+                    <img class="rqa-image" t-att-src="qr_data" alt="Personel giriş ve çıkış QR kodu"/>
+                    <ol class="rqa-steps">
+                        <li>İşletmenin izin verilen ağına bağlanın.</li>
+                        <li>QR kodu telefon kameranızla okutun.</li>
+                        <li>Kendi kimliğinizle giriş veya çıkışı onaylayın.</li>
+                    </ol>
+                    <p class="rqa-fallback"><strong>QR okunmazsa:</strong><br/><span t-esc="station.kiosk_url"/></p>
+                    <p class="rqa-muted">Bu QR yalnızca personel giriş–çıkışı içindir.</p>
+                    <p class="rqa-no-print">Yazdırmak için tarayıcının Yazdır menüsünü kullanın (Ctrl+P). Bu sayfada kişisel PIN bulunmaz.</p>
+                </main>
+            </body>
+        </html>
+    </template>
+</odoo>
